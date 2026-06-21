@@ -35,6 +35,7 @@
 		E3D8059D2FE836410035AB85 /* llm-visualizer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "llm-visualizer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E3D805AC2FE836420035AB85 /* llm-visualizerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "llm-visualizerTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E3D805B62FE836420035AB85 /* llm-visualizerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "llm-visualizerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		14552ec76c214e9097d28456 /* LLMVisualizer.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LLMVisualizer.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -91,6 +92,7 @@
 				E3D8059F2FE836410035AB85 /* llm-visualizer */,
 				E3D805AF2FE836420035AB85 /* llm-visualizerTests */,
 				E3D805B92FE836420035AB85 /* llm-visualizerUITests */,
+				14552ec76c214e9097d28456 /* LLMVisualizer.entitlements */,
 				E3D8059E2FE836410035AB85 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -475,6 +477,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				CODE_SIGN_ENTITLEMENTS = llm-visualizer/LLMVisualizer.entitlements;
 				DEVELOPMENT_TEAM = UTC679J6KQ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -507,6 +510,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				CODE_SIGN_ENTITLEMENTS = llm-visualizer/LLMVisualizer.entitlements;
 				DEVELOPMENT_TEAM = UTC679J6KQ;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
