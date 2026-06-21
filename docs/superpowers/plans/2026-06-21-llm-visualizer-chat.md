@@ -600,23 +600,25 @@ final class LLMService: LLMServiceProtocol {
 final class MockLLMService: LLMServiceProtocol {
     private(set) var loadModelCallCount = 0
     var stubbedChunks: [String] = []
+    var stubbedFinish: Bool = true
     var stubbedInfo: GenerateCompletionInfo?
     var loadModelError: Error?
 
-    private final class StubContainer {}
+    // Shared across mock instances so the first test in a suite pays
+    // the load cost; subsequent tests reuse the cached container.
+    private static var sharedContainer: ModelContainer?
 
     func loadModel() async throws -> ModelContainer {
         loadModelCallCount += 1
         if let loadModelError { throw loadModelError }
-        // The mock returns a real but minimal container: since we can't
-        // construct a ModelContainer directly without a real model, we
-        // cheat: the tests that exercise `generate` set stubbedChunks
-        // and the mock short-circuits. See `generate` below.
-        return try await LLMModelFactory.shared.loadContainer(
+        if let sharedContainer { return sharedContainer }
+        let container = try await LLMModelFactory.shared.loadContainer(
             from: HubApi(),
             using: HuggingFaceTokenizerLoader(),
             configuration: ModelConfiguration(directory: ModelConfig.directory, id: ModelConfig.id)
         ) { _ in }
+        Self.sharedContainer = container
+        return container
     }
 
     func generate(messages: [Message], model: ModelContainer) async throws -> AsyncStream<Generation> {
@@ -627,7 +629,12 @@ final class MockLLMService: LLMServiceProtocol {
             if let info = stubbedInfo {
                 continuation.yield(.info(info))
             }
-            continuation.finish()
+            if stubbedFinish {
+                continuation.finish()
+            }
+            // When stubbedFinish is false the stream stays open until
+            // the consumer's Task is cancelled. This is how the
+            // cancellation test observes a real cancel.
         }
     }
 }
@@ -635,7 +642,7 @@ final class MockLLMService: LLMServiceProtocol {
 
 - [ ] **Step 4: Run the test and verify it passes**
 
-Cmd-U. Expected: 2 tests pass. (The first test will actually call `loadContainer` on the real bundled model — that's fine, it should succeed. If it ever fails in CI, we can swap to a true opaque handle later.)
+Cmd-U. Expected: 2 tests pass. (The first test will call `loadContainer` on the real bundled model — that's fine, it should succeed and is cached for the rest of the suite. If it ever fails in CI we can swap to a true opaque handle later.)
 
 - [ ] **Step 5: Commit**
 
@@ -674,7 +681,7 @@ struct ChatViewModelGenerateTests {
 
     @Test func generateWithEmptyPromptIsNoOp() async throws {
         let mock = MockLLMService()
-        let vm = await ChatViewModel(service: mock)
+        let vm = ChatViewModel(service: mock)
         vm.prompt = "   "
         await vm.generate()
         #expect(vm.messages.count == 1) // only system message
@@ -683,20 +690,20 @@ struct ChatViewModelGenerateTests {
 
     @Test func generateAppendsUserAndAssistantPlaceholder() async throws {
         let mock = MockLLMService()
-        let vm = await ChatViewModel(service: mock)
+        let vm = ChatViewModel(service: mock)
         vm.prompt = "hello"
         await vm.generate()
         #expect(vm.messages.count == 3) // system + user + assistant placeholder
         #expect(vm.messages[1].role == .user)
         #expect(vm.messages[1].content == "hello")
         #expect(vm.messages[2].role == .assistant)
-        #expect(vm.messages[2].content.isEmpty == false || vm.messages[2].content.isEmpty)
+        #expect(vm.messages[2].content.isEmpty) // placeholder is empty
     }
 
     @Test func generateStreamsChunksIntoLastAssistantMessage() async throws {
         let mock = MockLLMService()
         mock.stubbedChunks = ["Hello", " world"]
-        let vm = await ChatViewModel(service: mock)
+        let vm = ChatViewModel(service: mock)
         vm.prompt = "hi"
         await vm.generate()
         let last = vm.messages.last
@@ -781,6 +788,7 @@ final class ChatViewModel {
             do {
                 let stream = try await service.generate(messages: messages, model: modelContainer)
                 for await gen in stream {
+                    if Task.isCancelled { break }
                     switch gen {
                     case .chunk(let s):
                         messages[lastIndex].content += s
@@ -789,6 +797,9 @@ final class ChatViewModel {
                     case .toolCall:
                         break
                     }
+                }
+                if Task.isCancelled {
+                    messages[lastIndex].content += "\n[Cancelled]"
                 }
             } catch is CancellationError {
                 messages[lastIndex].content += "\n[Cancelled]"
@@ -842,15 +853,17 @@ struct ChatViewModelCancelTests {
 
     @Test func cancelAppendsCancelledMarker() async throws {
         let mock = MockLLMService()
-        // Use chunks that don't finish — generate won't end until the stream ends.
+        // Hold the stream open so cancellation has time to take effect
+        // before the stream ends naturally.
         mock.stubbedChunks = ["partial"]
-        let vm = await ChatViewModel(service: mock)
+        mock.stubbedFinish = false
+        let vm = ChatViewModel(service: mock)
         vm.prompt = "hi"
 
         // Start generation but don't await — we cancel it.
         let task = Task { await vm.generate() }
         // give the task a moment to start
-        try? await Task.sleep(nanoseconds: 10_000_000)
+        try? await Task.sleep(nanoseconds: 50_000_000)
         vm.cancel()
         await task.value
 
@@ -912,7 +925,7 @@ struct ChatViewModelResetTests {
 
     @Test func resetKeepsSystemMessageClearsOthers() async throws {
         let mock = MockLLMService()
-        let vm = await ChatViewModel(service: mock)
+        let vm = ChatViewModel(service: mock)
         vm.messages.append(.user("hello"))
         vm.messages.append(.assistant("hi"))
         vm.prompt = "draft"
@@ -1440,6 +1453,27 @@ After executing all tasks, verify:
   - iOS 17.0+: Task 1
   - No model selection UI: confirmed (only one model in ModelConfig)
   - Offline model: confirmed (ModelConfiguration uses directory, no HubApi download)
+
+- [ ] **Deviations from spec (intentional, with rationale):**
+  - `LLMService` uses `private var cached: ModelContainer?` instead of
+    `NSCache<NSString, ModelContainer>` (spec §5.2). Rationale: only one
+    model is bundled; NSCache adds API surface without benefit. If we
+    later support multiple models, switch to `NSCache`.
+  - `MockLLMService.loadModel()` actually loads the real bundled model
+    once and caches it in a static. Rationale: `ModelContainer` has no
+    public initializer; we can't construct a "fake" one. The first
+    test in a suite pays ~5–15 s of load time; subsequent tests reuse
+    the cached container.
+  - Cancellation is detected by checking `Task.isCancelled` inside the
+    `for await` loop and after it. Rationale: the mock uses
+    `AsyncStream` (not `AsyncThrowingStream`), which does not throw on
+    cancellation. Checking `Task.isCancelled` is the simplest way to
+    surface cancellation in the mock-based tests while still working
+    correctly with the real `AsyncThrowingStream` from MLX.
+  - `ChatViewModel.generate()` awaits the inner task at the end. This
+    makes the method block on the generation completing, which is
+    fine for both tests (`await vm.generate()`) and UI (callers wrap
+    in `Task { await vm.generate() }`).
 
 - [ ] pbxproj IDs are unique (re-run `uuidgen` for each insertion in Tasks 3 and 4)
 
