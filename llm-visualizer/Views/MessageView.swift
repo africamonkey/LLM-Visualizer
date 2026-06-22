@@ -5,7 +5,7 @@
 import SwiftUI
 
 struct MessageView: View {
-    private let userBubbleColor = Color(red: 0.04, green: 0.52, blue: 1.0)
+    private let userBubbleColor = Color(red: 0.357, green: 0.694, blue: 1.0)
 
     let message: Message
 
