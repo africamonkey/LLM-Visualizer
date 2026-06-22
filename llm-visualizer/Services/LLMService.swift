@@ -28,8 +28,12 @@ final class LLMService: LLMServiceProtocol, @unchecked Sendable {
     }
 
     func generate(messages: [Message], model: ModelContainer) async throws -> AsyncStream<Generation> {
-        try await model.perform { context in
-            let chatMessages = messages.map { message -> Chat.Message in
+        var input = messages
+        if let last = input.last, last.role == .assistant, last.content.isEmpty {
+            input.removeLast()
+        }
+        return try await model.perform { context in
+            let chatMessages = input.map { message -> Chat.Message in
                 let role: Chat.Message.Role
                 switch message.role {
                 case .user: role = .user
