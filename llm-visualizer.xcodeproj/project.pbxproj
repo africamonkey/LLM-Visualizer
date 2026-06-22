@@ -6,6 +6,16 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		06273d48544647618e5d7d2f /* MLX in Frameworks */ = {isa = PBXBuildFile; productRef = 5999d58603b04e19a6c149b5 /* MLX */; };
+		1499da4a2ea648899f44c190 /* MLXLMCommon in Frameworks */ = {isa = PBXBuildFile; productRef = 99d39c2a206444389506dab7 /* MLXLMCommon */; };
+		2e2438552aab4c51a953f194 /* HuggingFace in Frameworks */ = {isa = PBXBuildFile; productRef = 18f19d117bb34c32b957edb3 /* HuggingFace */; };
+		3147fcbec6a0461888c7ba37 /* MLXLLM in Frameworks */ = {isa = PBXBuildFile; productRef = 054e434e37234be48bb50922 /* MLXLLM */; };
+		E3D8067A2FE8BD060035AB85 /* MLXNN in Frameworks */ = {isa = PBXBuildFile; productRef = a99b8c2d3e4f5a6b7c8d9e0f /* MLXNN */; };
+		eaece80876434a2c8013e171 /* Tokenizers in Frameworks */ = {isa = PBXBuildFile; productRef = 985a6c8c394e4011ad5f64d4 /* Tokenizers */; };
+		fb50832a9cd943058bb95b38 /* Qwen3-0.6B-4bit-DWQ-053125 in Resources */ = {isa = PBXBuildFile; fileRef = 1ee6df7803694d7c846308d4 /* Qwen3-0.6B-4bit-DWQ-053125 */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		E3D805AD2FE836420035AB85 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -24,6 +34,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1ee6df7803694d7c846308d4 /* Qwen3-0.6B-4bit-DWQ-053125 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Qwen3-0.6B-4bit-DWQ-053125"; sourceTree = "<group>"; };
 		E3D8059D2FE836410035AB85 /* llm-visualizer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "llm-visualizer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E3D805AC2FE836420035AB85 /* llm-visualizerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "llm-visualizerTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E3D805B62FE836420035AB85 /* llm-visualizerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "llm-visualizerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -52,6 +63,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E3D8067A2FE8BD060035AB85 /* MLXNN in Frameworks */,
+				06273d48544647618e5d7d2f /* MLX in Frameworks */,
+				3147fcbec6a0461888c7ba37 /* MLXLLM in Frameworks */,
+				1499da4a2ea648899f44c190 /* MLXLMCommon in Frameworks */,
+				eaece80876434a2c8013e171 /* Tokenizers in Frameworks */,
+				2e2438552aab4c51a953f194 /* HuggingFace in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +95,7 @@
 				E3D8059F2FE836410035AB85 /* llm-visualizer */,
 				E3D805AF2FE836420035AB85 /* llm-visualizerTests */,
 				E3D805B92FE836420035AB85 /* llm-visualizerUITests */,
+				1ee6df7803694d7c846308d4 /* Qwen3-0.6B-4bit-DWQ-053125 */,
 				E3D8059E2FE836410035AB85 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -112,6 +130,12 @@
 			);
 			name = "llm-visualizer";
 			packageProductDependencies = (
+				5999d58603b04e19a6c149b5 /* MLX */,
+				a99b8c2d3e4f5a6b7c8d9e0f /* MLXNN */,
+				054e434e37234be48bb50922 /* MLXLLM */,
+				99d39c2a206444389506dab7 /* MLXLMCommon */,
+				985a6c8c394e4011ad5f64d4 /* Tokenizers */,
+				18f19d117bb34c32b957edb3 /* HuggingFace */,
 			);
 			productName = "llm-visualizer";
 			productReference = E3D8059D2FE836410035AB85 /* llm-visualizer.app */;
@@ -195,6 +219,11 @@
 			);
 			mainGroup = E3D805942FE836410035AB85;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				8447e448b9404ac488d42d66 /* XCRemoteSwiftPackageReference "mlx-swift" */,
+				8120f73c742843acb973afba /* XCRemoteSwiftPackageReference "mlx-swift-lm" */,
+				5724436173354aa28ee1ccf5 /* XCRemoteSwiftPackageReference "swift-transformers" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E3D8059E2FE836410035AB85 /* Products */;
 			projectDirPath = "";
@@ -212,6 +241,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				fb50832a9cd943058bb95b38 /* Qwen3-0.6B-4bit-DWQ-053125 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -322,7 +352,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -380,7 +410,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -395,6 +425,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "llm-visualizer/LLMVisualizer.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = UTC679J6KQ;
@@ -427,6 +458,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "llm-visualizer/LLMVisualizer.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = UTC679J6KQ;
@@ -462,7 +494,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = UTC679J6KQ;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.africamonkey.llm-visualizerTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -484,7 +516,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = UTC679J6KQ;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.africamonkey.llm-visualizerTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -578,6 +610,66 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		5724436173354aa28ee1ccf5 /* XCRemoteSwiftPackageReference "swift-transformers" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/huggingface/swift-transformers";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.1.9;
+			};
+		};
+		8120f73c742843acb973afba /* XCRemoteSwiftPackageReference "mlx-swift-lm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ml-explore/mlx-swift-lm";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.31.3;
+			};
+		};
+		8447e448b9404ac488d42d66 /* XCRemoteSwiftPackageReference "mlx-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ml-explore/mlx-swift";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 0.31.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		054e434e37234be48bb50922 /* MLXLLM */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8120f73c742843acb973afba /* XCRemoteSwiftPackageReference "mlx-swift-lm" */;
+			productName = MLXLLM;
+		};
+		18f19d117bb34c32b957edb3 /* HuggingFace */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5724436173354aa28ee1ccf5 /* XCRemoteSwiftPackageReference "swift-transformers" */;
+			productName = HuggingFace;
+		};
+		5999d58603b04e19a6c149b5 /* MLX */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8447e448b9404ac488d42d66 /* XCRemoteSwiftPackageReference "mlx-swift" */;
+			productName = MLX;
+		};
+		985a6c8c394e4011ad5f64d4 /* Tokenizers */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 5724436173354aa28ee1ccf5 /* XCRemoteSwiftPackageReference "swift-transformers" */;
+			productName = Tokenizers;
+		};
+		99d39c2a206444389506dab7 /* MLXLMCommon */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8120f73c742843acb973afba /* XCRemoteSwiftPackageReference "mlx-swift-lm" */;
+			productName = MLXLMCommon;
+		};
+		a99b8c2d3e4f5a6b7c8d9e0f /* MLXNN */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8447e448b9404ac488d42d66 /* XCRemoteSwiftPackageReference "mlx-swift" */;
+			productName = MLXNN;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = E3D805952FE836410035AB85 /* Project object */;
 }
