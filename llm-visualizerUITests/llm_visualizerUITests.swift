@@ -14,7 +14,15 @@ final class llm_visualizerUITests: XCTestCase {
         let app = XCUIApplication()
         app.launch()
         XCTAssertTrue(app.staticTexts["LLM Visualizer"].waitForExistence(timeout: 10))
-        XCTAssertTrue(app.textFields["Prompt"].exists)
+        XCTAssertTrue(app.textFields["Ask anything…"].waitForExistence(timeout: 10))
+    }
+
+    func testSendButtonIsInitiallyDisabled() throws {
+        let app = XCUIApplication()
+        app.launch()
+        let sendButton = app.buttons["Send"]
+        XCTAssertTrue(sendButton.waitForExistence(timeout: 10))
+        XCTAssertFalse(sendButton.isEnabled, "Send button should be disabled until prompt is non-empty and model is loaded")
     }
 
     // MARK: - Device-only tests
