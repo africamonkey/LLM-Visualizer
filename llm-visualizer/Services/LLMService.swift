@@ -15,12 +15,16 @@ protocol LLMServiceProtocol: Sendable {
 }
 
 final class LLMService: LLMServiceProtocol, @unchecked Sendable {
+    private var cached: ModelContainer?
 
     init() {}
 
     func loadModel() async throws -> ModelContainer {
+        if let cached { return cached }
         Memory.cacheLimit = 20 * 1024 * 1024
-        return try await LLMModelFactory.shared.loadContainer(configuration: ModelConfig.configuration)
+        let container = try await LLMModelFactory.shared.loadContainer(configuration: ModelConfig.configuration)
+        cached = container
+        return container
     }
 
     func generate(messages: [Message], model: ModelContainer) async throws -> AsyncStream<Generation> {
