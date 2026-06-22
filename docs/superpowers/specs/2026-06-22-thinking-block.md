@@ -107,6 +107,7 @@ dark mode works without explicit handling. Verified manually.
 
 ### 4.1 To create
 - `llm-visualizer/Views/ThinkingBlock.swift`
+- `llm-visualizer/Models/ThinkingParser.swift`
 - `llm-visualizerTests/ThinkingParserTests.swift`
 
 ### 4.2 To modify
@@ -180,28 +181,41 @@ struct ThinkingBlock: View {
 - `transition` is applied inside `if isExpanded { }` — the modifier is
   visible to SwiftUI when the view enters/exits the tree
 
-### 5.2 `MessageView.parseAssistant(_:)`
+### 5.2 `ThinkingParser.parse(_:)`
+
+Pure data parser — no SwiftUI dependency. Lives in `Models/`:
 
 ```swift
-private func parseAssistant(_ raw: String) -> (thinking: String?, answer: String) {
-    if let endRange = raw.range(of: "") {
-        let before = raw[..<endRange.lowerBound]
-        let after  = raw[endRange.upperBound...]
-        let thinking = before
-            .replacingOccurrences(of: "<think>", with: "")
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-        let answer = after.trimmingCharacters(in: .whitespacesAndNewlines)
-        return (thinking.isEmpty ? nil : thinking, answer)
+//
+//  ThinkingParser.swift
+//
+
+import Foundation
+
+enum ThinkingParser {
+    static func parse(_ raw: String) -> (thinking: String?, answer: String) {
+        if let endRange = raw.range(of: "") {
+            let before = raw[..<endRange.lowerBound]
+            let after  = raw[endRange.upperBound...]
+            let thinking = before
+                .replacingOccurrences(of: "<think>", with: "")
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            let answer = after.trimmingCharacters(in: .whitespacesAndNewlines)
+            return (thinking.isEmpty ? nil : thinking, answer)
+        }
+        if raw.contains("<think>") {
+            let thinking = raw
+                .replacingOccurrences(of: "<think>", with: "")
+                .trimmingCharacters(in: .whitespacesAndNewlines)
+            return (thinking.isEmpty ? nil : thinking, "")
+        }
+        return (nil, raw.trimmingCharacters(in: .whitespacesAndNewlines))
     }
-    if raw.contains("<think>") {
-        let thinking = raw
-            .replacingOccurrences(of: "<think>", with: "")
-            .trimmingCharacters(in: .whitespacesAndNewlines)
-        return (thinking.isEmpty ? nil : thinking, "")
-    }
-    return (nil, raw.trimmingCharacters(in: .whitespacesAndNewlines))
 }
 ```
+
+`MessageView.assistant` calls `ThinkingParser.parse(message.content)` (no
+local helper — the parser is its own type).
 
 **Parsing rules (in priority order):**
 1. If `</think>` exists: split at its position. Everything before (minus
@@ -227,7 +241,7 @@ private func parseAssistant(_ raw: String) -> (thinking: String?, answer: String
 
 ```swift
 case .assistant:
-    let parsed = parseAssistant(message.content)
+    let parsed = ThinkingParser.parse(message.content)
     VStack(alignment: .leading, spacing: 8) {
         if let thinking = parsed.thinking {
             ThinkingBlock(content: thinking)
@@ -297,7 +311,7 @@ app launches or chat resets.
 import Testing
 @testable import llm_visualizer
 
-@Suite struct ThinkingParserTests {
+struct ThinkingParserTests {
 
     @Test func completeThinkBlock() {
         let result = ThinkingParser.parse("<think>思考内容\n\n答案内容")
@@ -340,16 +354,9 @@ import Testing
 ```
 
 **Note on naming:** The tests reference `ThinkingParser.parse(...)`. The
-implementation lives as a private static method on `MessageView` (see
-§5.2). To make it testable, we either:
-- (A) Make `parseAssistant` an `internal static` on `MessageView` and
-  rename to `ThinkingParser.parse` via typealias, OR
-- (B) Extract `parseAssistant` into a separate `enum ThinkingParser` in
-  its own file.
-
-We choose **(B)** — a new `ThinkingParser.swift` in the Views folder
-(matches the pattern of other small focused files like
-`PromptSendButtonStyle.swift`). The unit tests then target the public
+implementation lives as `enum ThinkingParser` in its own file
+`llm-visualizer/Models/ThinkingParser.swift` (no SwiftUI dependency, so it
+sits with the other pure data types). The unit tests target the public
 `ThinkingParser.parse(_:)` directly. `MessageView.assistant` calls
 `ThinkingParser.parse(message.content)`.
 
