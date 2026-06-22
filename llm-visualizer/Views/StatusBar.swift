@@ -23,6 +23,7 @@ struct StatusBar: View {
                     Label("Stop", systemImage: "stop.circle.fill")
                 }
                 .buttonStyle(.bordered)
+                .keyboardShortcut(.cancelAction)
             }
 
             if canReset {
