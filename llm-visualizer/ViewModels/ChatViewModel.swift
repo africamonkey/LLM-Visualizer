@@ -9,7 +9,7 @@ import MLXLMCommon
 @Observable
 final class ChatViewModel {
 
-    enum ModelState {
+    enum ModelState: Equatable {
         case idle
         case loading
         case loaded
