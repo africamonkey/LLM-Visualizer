@@ -50,7 +50,10 @@ struct ChatView: View {
             .navigationTitle("LLM Visualizer")
         }
         .task {
-            await viewModel.bootstrap()
+            // Skip model load during unit/UI tests — Metal doesn't init in simulator
+            if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil {
+                await viewModel.bootstrap()
+            }
         }
     }
 }
