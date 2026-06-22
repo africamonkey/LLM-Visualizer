@@ -7,10 +7,11 @@ import SwiftUI
 
 @main
 struct llm_visualizerApp: App {
+    @State private var viewModel = ChatViewModel(service: LLMService())
+
     var body: some Scene {
         WindowGroup {
-            // ChatView wired up in Task 17
-            Text("LLM Visualizer")
+            ChatView(viewModel: viewModel)
         }
     }
 }
