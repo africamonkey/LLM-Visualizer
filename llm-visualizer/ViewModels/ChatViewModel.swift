@@ -98,4 +98,8 @@ final class ChatViewModel {
         }
         await generateTask?.value
     }
+
+    func cancel() {
+        generateTask?.cancel()
+    }
 }
