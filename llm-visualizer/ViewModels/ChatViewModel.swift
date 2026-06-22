@@ -102,4 +102,12 @@ final class ChatViewModel {
     func cancel() {
         generateTask?.cancel()
     }
+
+    func reset() {
+        generateTask?.cancel()
+        messages = [.system("You are a helpful assistant.")]
+        prompt = ""
+        tokensPerSecond = 0
+        errorBanner = nil
+    }
 }
