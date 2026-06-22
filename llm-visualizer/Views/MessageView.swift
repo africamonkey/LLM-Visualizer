@@ -5,6 +5,8 @@
 import SwiftUI
 
 struct MessageView: View {
+    private let userBubbleColor = Color(red: 0.04, green: 0.52, blue: 1.0)
+
     let message: Message
 
     var body: some View {
@@ -15,12 +17,15 @@ struct MessageView: View {
                 Text(LocalizedStringKey(message.content))
                     .padding(.vertical, 8)
                     .padding(.horizontal, 12)
-                    .background(.tint, in: .rect(cornerRadius: 16))
+                    .background(userBubbleColor, in: .rect(cornerRadius: 16))
                     .textSelection(.enabled)
             }
         case .assistant:
             HStack {
                 Text(LocalizedStringKey(message.content))
+                    .padding(.vertical, 8)
+                    .padding(.horizontal, 12)
+                    .background(Color(.secondarySystemBackground), in: .rect(cornerRadius: 16))
                     .textSelection(.enabled)
                 Spacer()
             }
