@@ -91,7 +91,12 @@ final class ChatViewModel {
                 messages[lastIndex].content += "\n[Cancelled]"
             } catch {
                 messages[lastIndex].content += "\n[Error: \(error.localizedDescription)]"
-                errorBanner = error.localizedDescription
+                let message = error.localizedDescription
+                errorBanner = message
+                Task { @MainActor in
+                    try? await Task.sleep(for: .seconds(3))
+                    if errorBanner == message { errorBanner = nil }
+                }
             }
             isGenerating = false
             generateTask = nil
