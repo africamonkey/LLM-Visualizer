@@ -26,7 +26,7 @@ struct MockLLMServiceTests {
         let container = try await mock.loadModel()
         let messages: [Message] = [.user("hi")]
 
-        let stream = try await mock.generate(messages: messages, model: container)
+        let stream = try await mock.generate(messages: messages, model: container) { _ in }
         var collected: [String] = []
         for await gen in stream {
             if case .chunk(let s) = gen { collected.append(s) }

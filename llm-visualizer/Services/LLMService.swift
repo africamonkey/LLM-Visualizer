@@ -11,7 +11,11 @@ import Tokenizers
 
 protocol LLMServiceProtocol: Sendable {
     func loadModel() async throws -> ModelContainer
-    func generate(messages: [Message], model: ModelContainer) async throws -> AsyncStream<Generation>
+    func generate(
+        messages: [Message],
+        model: ModelContainer,
+        onToken: @escaping @Sendable (Int) -> Void
+    ) async throws -> AsyncStream<Generation>
 }
 
 final class LLMService: LLMServiceProtocol, @unchecked Sendable {
@@ -27,28 +31,55 @@ final class LLMService: LLMServiceProtocol, @unchecked Sendable {
         return container
     }
 
-    func generate(messages: [Message], model: ModelContainer) async throws -> AsyncStream<Generation> {
-        var input = messages
-        if let last = input.last, last.role == .assistant, last.content.isEmpty {
-            input.removeLast()
-        }
-        return try await model.perform { context in
-            let chatMessages = input.map { message -> Chat.Message in
-                let role: Chat.Message.Role
-                switch message.role {
-                case .user: role = .user
-                case .assistant: role = .assistant
-                case .system: role = .system
+    func generate(
+        messages: [Message],
+        model: ModelContainer,
+        onToken: @escaping @Sendable (Int) -> Void
+    ) async throws -> AsyncStream<Generation> {
+        try await model.perform { context in
+            let chatMessages: [Chat.Message] = {
+                var working = messages
+                if let last = working.last, last.role == .assistant, last.content.isEmpty {
+                    working.removeLast()
                 }
-                return Chat.Message(role: role, content: message.content)
-            }
+                return working.map { message in
+                    let role: Chat.Message.Role
+                    switch message.role {
+                    case .user: role = .user
+                    case .assistant: role = .assistant
+                    case .system: role = .system
+                    }
+                    return Chat.Message(role: role, content: message.content)
+                }
+            }()
             let userInput = UserInput(chat: chatMessages)
             let lmInput = try await context.processor.prepare(input: userInput)
-            return try MLXLMCommon.generate(
+            let tokenStream = try MLXLMCommon.generateTokens(
                 input: lmInput,
                 parameters: ModelConfig.parameters,
                 context: context
             )
+            let tokenizer = context.tokenizer
+
+            return AsyncStream<Generation> { continuation in
+                let task = Task {
+                    var detokenizer = NaiveStreamingDetokenizer(tokenizer: tokenizer)
+                    for await tg in tokenStream {
+                        switch tg {
+                        case .token(let t):
+                            onToken(t)
+                            detokenizer.append(token: t)
+                            if let chunk = detokenizer.next() {
+                                continuation.yield(.chunk(chunk))
+                            }
+                        case .info(let i):
+                            continuation.yield(.info(i))
+                        }
+                    }
+                    continuation.finish()
+                }
+                continuation.onTermination = { _ in task.cancel() }
+            }
         }
     }
 }
@@ -103,6 +134,7 @@ final class MockLLMService: LLMServiceProtocol, @unchecked Sendable {
 
     private(set) var loadModelCallCount = 0
     var stubbedChunks: [String] = []
+    var stubbedTokenDelayMillis: Int = 0
     var stubbedFinish: Bool = true
     var stubbedInfo: GenerateCompletionInfo?
     var loadModelError: Error?
@@ -120,20 +152,29 @@ final class MockLLMService: LLMServiceProtocol, @unchecked Sendable {
         return container
     }
 
-    func generate(messages: [Message], model: ModelContainer) async throws -> AsyncStream<Generation> {
+    func generate(
+        messages: [Message],
+        model: ModelContainer,
+        onToken: @escaping @Sendable (Int) -> Void
+    ) async throws -> AsyncStream<Generation> {
         AsyncStream { continuation in
-            for chunk in stubbedChunks {
-                continuation.yield(.chunk(chunk))
+            let task = Task {
+                for (i, chunk) in stubbedChunks.enumerated() {
+                    if Task.isCancelled { break }
+                    onToken(i)
+                    continuation.yield(.chunk(chunk))
+                    if stubbedTokenDelayMillis > 0 {
+                        try? await Task.sleep(for: .milliseconds(stubbedTokenDelayMillis))
+                    }
+                }
+                if let info = stubbedInfo {
+                    continuation.yield(.info(info))
+                }
+                if stubbedFinish && !Task.isCancelled {
+                    continuation.finish()
+                }
             }
-            if let info = stubbedInfo {
-                continuation.yield(.info(info))
-            }
-            if stubbedFinish {
-                continuation.finish()
-            }
-            // When stubbedFinish is false the stream stays open until
-            // the consumer's Task is cancelled. This is how the
-            // cancellation test observes a real cancel.
+            continuation.onTermination = { _ in task.cancel() }
         }
     }
 

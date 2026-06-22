@@ -45,4 +45,27 @@ struct ChatViewModelGenerateTests {
         #expect(last?.content == "Hello world")
         #expect(vm.prompt.isEmpty)
     }
+
+    @Test func tokensPerSecondUpdatesWhileTokensAreStreaming() async throws {
+        let mock = MockLLMService()
+        mock.stubbedChunks = ["a", "b", "c", "d"]
+        mock.stubbedTokenDelayMillis = 30
+        let vm = ChatViewModel(service: mock)
+        vm.prompt = "hi"
+
+        let task = Task { await vm.generate() }
+
+        // Wait long enough for the first few tokens to land
+        try? await Task.sleep(for: .milliseconds(120))
+
+        // Tokens have started arriving — t/s must reflect them mid-stream
+        #expect(vm.tokensPerSecond > 0)
+        #expect(vm.isGenerating == true)
+
+        // Wait for generation to complete
+        await task.value
+
+        #expect(vm.isGenerating == false)
+        #expect(vm.tokensPerSecond > 0)
+    }
 }

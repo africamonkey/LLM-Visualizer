@@ -4,6 +4,7 @@
 
 import Foundation
 import MLXLMCommon
+import os
 
 @MainActor
 @Observable
@@ -19,6 +20,7 @@ final class ChatViewModel {
     private let service: LLMServiceProtocol
     private var modelContainer: ModelContainer?
     private var generateTask: Task<Void, Never>?
+    private var generationStartTime: Date?
 
     var messages: [Message] = [.system("You are a helpful assistant.")]
     var prompt: String = ""
@@ -70,9 +72,22 @@ final class ChatViewModel {
             return
         }
 
+        let counter = TokenCounter()
+        counter.start()
+        generationStartTime = Date()
+
         generateTask = Task { @MainActor in
             do {
-                let stream = try await service.generate(messages: messages, model: model)
+                let stream = try await service.generate(
+                    messages: messages,
+                    model: model,
+                    onToken: { [counter, weak self] _ in
+                        let count = counter.increment()
+                        Task { @MainActor [weak self] in
+                            self?.applyTokenCount(count)
+                        }
+                    }
+                )
                 for await gen in stream {
                     if Task.isCancelled { break }
                     switch gen {
@@ -98,10 +113,18 @@ final class ChatViewModel {
                     if errorBanner == message { errorBanner = nil }
                 }
             }
+            applyTokenCount(counter.currentCount())
             isGenerating = false
             generateTask = nil
         }
         await generateTask?.value
+    }
+
+    private func applyTokenCount(_ count: Int) {
+        guard let start = generationStartTime, count > 0 else { return }
+        let elapsed = Date().timeIntervalSince(start)
+        guard elapsed > 0 else { return }
+        tokensPerSecond = Double(count) / elapsed
     }
 
     func cancel() {
@@ -114,5 +137,24 @@ final class ChatViewModel {
         prompt = ""
         tokensPerSecond = 0
         errorBanner = nil
+    }
+}
+
+private final class TokenCounter: @unchecked Sendable {
+    private let lock = OSAllocatedUnfairLock<Int>(initialState: 0)
+
+    func start() {
+        lock.withLock { $0 = 0 }
+    }
+
+    func increment() -> Int {
+        lock.withLock { current in
+            current += 1
+            return current
+        }
+    }
+
+    func currentCount() -> Int {
+        lock.withLock { $0 }
     }
 }

@@ -4,7 +4,7 @@
 
 import Foundation
 
-struct Message: Identifiable, Sendable {
+nonisolated struct Message: Identifiable, Sendable {
     let id: UUID
     let role: Role
     var content: String
@@ -17,7 +17,7 @@ struct Message: Identifiable, Sendable {
         self.timestamp = timestamp
     }
 
-    enum Role: Sendable {
+    enum Role: Sendable, Equatable {
         case user
         case assistant
         case system
