@@ -187,8 +187,13 @@ HStack(spacing: 8) {
     }
     .buttonStyle(PromptSendButtonStyle())
     .disabled(!canSend)
+    .keyboardShortcut(.return, modifiers: [])
 }
 ```
+
+`keyboardShortcut(.return, modifiers: [])` is preserved from the original
+so a hardware-Return key (iPad keyboard, Mac Catalyst) still triggers send
+when the field is focused.
 
 Placeholder text changed from `"Prompt"` to `"Ask anything…"` to match the
 new AI-tool tone. (This is a copy change only; it does not affect
@@ -244,27 +249,33 @@ State for the pulse animation:
 @State private var pulseOn = false
 ```
 
-Lifecycle:
+Lifecycle and animation (cleaner than nested `withAnimation` — uses the
+`.animation(_:value:)` modifier that supports `nil` to mean "no animation"):
 ```swift
-.onAppear {
-    if modelState == .loading {
-        withAnimation(.easeInOut(duration: 0.6).repeatForever(autoreverses: true)) {
-            pulseOn = true
-        }
-    }
-}
+// Inside the dot's modifier chain:
+.opacity(pulseOn ? 0.45 : 1.0)
+.animation(
+    pulseOn
+        ? .easeInOut(duration: 0.6).repeatForever(autoreverses: true)
+        : nil,
+    value: pulseOn
+)
 .onChange(of: modelState) { _, new in
-    if new == .loading {
-        pulseOn = false
-        withAnimation(.easeInOut(duration: 0.6).repeatForever(autoreverses: true)) {
-            pulseOn = true
-        }
-    } else {
-        // Stop the pulse immediately on any other state.
-        withAnimation(.linear(duration: 0)) { pulseOn = false }
-    }
+    pulseOn = (new == .loading)
+}
+.onAppear {
+    pulseOn = (modelState == .loading)
 }
 ```
+
+Behavior:
+- When `pulseOn` flips to `true`, the animation modifier activates the
+  repeating ease-in-out, oscillating opacity between 1.0 and 0.45 forever.
+- When `pulseOn` flips to `false`, the animation becomes `nil`, so the
+  opacity snaps to 1.0 with no animation. The repeating animation stops
+  immediately (no leaked repeats).
+- On state transitions out of `.loading`, the dot returns to its base
+  color and full opacity in the same frame.
 
 Each `statusText` branch's content is wrapped in an `HStack(spacing: 6)`
 with `statusDot(modelState, isGenerating: isGenerating)` first, then the
