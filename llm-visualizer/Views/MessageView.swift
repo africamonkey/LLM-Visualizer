@@ -21,14 +21,24 @@ struct MessageView: View {
                     .textSelection(.enabled)
             }
         case .assistant:
-            HStack {
-                Text(LocalizedStringKey(message.content))
-                    .padding(.vertical, 8)
-                    .padding(.horizontal, 12)
-                    .background(Color(.secondarySystemBackground), in: .rect(cornerRadius: 16))
-                    .textSelection(.enabled)
-                Spacer()
+            let parsed = ThinkingParser.parse(message.content)
+            VStack(alignment: .leading, spacing: 8) {
+                if let thinking = parsed.thinking {
+                    ThinkingBlock(content: thinking)
+                }
+                if !parsed.answer.isEmpty {
+                    Text(LocalizedStringKey(parsed.answer))
+                        .padding(.vertical, 8)
+                        .padding(.horizontal, 12)
+                        .background(
+                            Color(.secondarySystemBackground),
+                            in: .rect(cornerRadius: 16)
+                        )
+                        .textSelection(.enabled)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
             }
+            .frame(maxWidth: .infinity, alignment: .leading)
         case .system:
             Label(message.content, systemImage: "desktopcomputer")
                 .font(.headline)
