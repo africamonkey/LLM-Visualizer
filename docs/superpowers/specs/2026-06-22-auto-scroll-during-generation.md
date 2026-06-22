@@ -173,6 +173,7 @@ struct ConversationView: View {
                 .onChange(of: messages.count) { _, _ in
                     // New message appended (user just sent) — force scroll
                     if let last = messages.last {
+                        isAtBottom = true
                         withAnimation(.easeInOut(duration: 0.2)) {
                             proxy.scrollTo(last.id, anchor: .bottom)
                         }
