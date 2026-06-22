@@ -12,20 +12,21 @@ struct PromptField: View {
 
     var body: some View {
         HStack(spacing: 8) {
-            TextField("Prompt", text: $prompt, axis: .vertical)
+            TextField("Ask anything…", text: $prompt, axis: .vertical)
                 .lineLimit(1...4)
-                .textFieldStyle(.roundedBorder)
                 .submitLabel(.send)
                 .onSubmit {
                     if canSend { onSend() }
                 }
+                .modifier(PromptFieldBackground())
 
             Button(action: onSend) {
-                Image(systemName: "paperplane.fill")
+                Image(systemName: "arrow.up")
             }
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(PromptSendButtonStyle())
             .disabled(!canSend)
             .keyboardShortcut(.return, modifiers: [])
+            .accessibilityLabel("Send")
         }
     }
 }
