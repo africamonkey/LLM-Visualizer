@@ -117,16 +117,15 @@ final class MockLLMService: LLMServiceProtocol, @unchecked Sendable {
             for chunk in stubbedChunks {
                 continuation.yield(.chunk(chunk))
             }
-            if stubbedFinish {
-                let info = stubbedInfo ?? GenerateCompletionInfo(
-                    promptTokenCount: 0,
-                    generationTokenCount: 0,
-                    promptTime: 0,
-                    generationTime: 0
-                )
+            if let info = stubbedInfo {
                 continuation.yield(.info(info))
             }
-            continuation.finish()
+            if stubbedFinish {
+                continuation.finish()
+            }
+            // When stubbedFinish is false the stream stays open until
+            // the consumer's Task is cancelled. This is how the
+            // cancellation test observes a real cancel.
         }
     }
 
