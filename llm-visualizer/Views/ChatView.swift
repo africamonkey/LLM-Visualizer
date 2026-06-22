@@ -45,7 +45,8 @@ struct ChatView: View {
                         Task { await viewModel.generate() }
                     }
                 )
-                .padding()
+                .padding(.horizontal, 12)
+                .padding(.bottom, 10)
             }
             .navigationTitle("LLM Visualizer")
         }
