@@ -13,6 +13,8 @@ struct StatusBar: View {
     let onReset: () -> Void
     let onRetry: () -> Void
 
+    @State private var pulseOn = false
+
     var body: some View {
         HStack(spacing: 12) {
             statusText
@@ -37,29 +39,42 @@ struct StatusBar: View {
         .padding(.horizontal, 12)
         .padding(.vertical, 8)
         .background(.bar)
+        .onAppear { pulseOn = (modelState == .loading) }
+        .onChange(of: modelState) { _, new in pulseOn = (new == .loading) }
     }
 
     @ViewBuilder
     private var statusText: some View {
         switch modelState {
         case .idle:
-            Text("Initializing…")
+            HStack(spacing: 6) {
+                statusDot(modelState, isGenerating: false)
+                Text("Initializing…")
+            }
         case .loading:
             HStack(spacing: 6) {
+                statusDot(modelState, isGenerating: false)
                 ProgressView().controlSize(.small)
                 Text("Loading model…")
             }
         case .loaded:
             if isGenerating {
-                Label(String(format: "Generating · %.1f t/s", tokensPerSecond),
-                      systemImage: "circle.fill")
-                    .foregroundStyle(.tint)
+                HStack(spacing: 6) {
+                    statusDot(modelState, isGenerating: true)
+                    Label(String(format: "Generating · %.1f t/s", tokensPerSecond),
+                          systemImage: "circle.fill")
+                        .foregroundStyle(.tint)
+                }
             } else {
-                Text("Ready")
-                    .foregroundStyle(.secondary)
+                HStack(spacing: 6) {
+                    statusDot(modelState, isGenerating: false)
+                    Text("Ready")
+                        .foregroundStyle(.secondary)
+                }
             }
         case .error(let message):
             HStack(spacing: 6) {
+                statusDot(modelState, isGenerating: false)
                 Image(systemName: "xmark.octagon.fill")
                     .foregroundStyle(.red)
                 Text(message)
@@ -69,5 +84,30 @@ struct StatusBar: View {
                     .buttonStyle(.borderless)
             }
         }
+    }
+
+    @ViewBuilder
+    private func statusDot(_ state: ChatViewModel.ModelState,
+                            isGenerating: Bool) -> some View {
+        let color: Color = {
+            switch state {
+            case .idle:    return .gray
+            case .loading: return .orange
+            case .loaded:
+                return isGenerating ? .accentColor : .green
+            case .error:   return .red
+            }
+        }()
+        Circle()
+            .fill(color)
+            .frame(width: 9, height: 9)
+            .overlay(Circle().stroke(Color.black.opacity(0.08), lineWidth: 0.5))
+            .opacity(pulseOn ? 0.45 : 1.0)
+            .animation(
+                pulseOn
+                    ? .easeInOut(duration: 0.6).repeatForever(autoreverses: true)
+                    : nil,
+                value: pulseOn
+            )
     }
 }
