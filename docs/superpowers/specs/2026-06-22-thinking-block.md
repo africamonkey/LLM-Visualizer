@@ -194,7 +194,7 @@ import Foundation
 
 enum ThinkingParser {
     static func parse(_ raw: String) -> (thinking: String?, answer: String) {
-        if let endRange = raw.range(of: "") {
+        if let endRange = raw.range(of: "</think>") {
             let before = raw[..<endRange.lowerBound]
             let after  = raw[endRange.upperBound...]
             let thinking = before
