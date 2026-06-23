@@ -61,7 +61,11 @@ struct StatusBar: View {
             if isGenerating {
                 HStack(spacing: 6) {
                     statusDot(modelState, isGenerating: true)
-                    Label(String(format: "Generating · %.1f t/s", tokensPerSecond),
+                    let format = String(
+                        localized: "Generating · %.1f t/s",
+                        defaultValue: "Generating · %.1f t/s"
+                    )
+                    Label(String(format: format, tokensPerSecond),
                           systemImage: "circle.fill")
                         .foregroundStyle(.tint)
                 }
