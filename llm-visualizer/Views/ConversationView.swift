@@ -28,7 +28,8 @@ struct ConversationView: View {
                     }
                 }
                 .padding(.horizontal, 12)
-                .padding(.vertical, 8)
+                .padding(.top, 8)
+                .padding(.bottom, 24)
             }
             .defaultScrollAnchor(.bottom)
             .onChange(of: messages.count) { _, _ in
