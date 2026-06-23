@@ -7,6 +7,8 @@ import SwiftUI
 struct ConversationView: View {
     let messages: [Message]
     @State private var isAtBottom: Bool = true
+    @State private var suppressDisappearUntilAppear: Bool = false
+    @State private var suppressResetTask: Task<Void, Never>?
 
     var body: some View {
         ScrollViewReader { proxy in
@@ -19,10 +21,13 @@ struct ConversationView: View {
                                 .onAppear {
                                     if message.id == messages.last?.id {
                                         isAtBottom = true
+                                        suppressDisappearUntilAppear = false
+                                        suppressResetTask?.cancel()
                                     }
                                 }
                                 .onDisappear {
-                                    if message.id == messages.last?.id {
+                                    if message.id == messages.last?.id
+                                        && !suppressDisappearUntilAppear {
                                         isAtBottom = false
                                     }
                                 }
@@ -52,11 +57,21 @@ struct ConversationView: View {
                 if !isAtBottom {
                     JumpToBottomButton {
                         if let last = messages.last {
+                            suppressDisappearUntilAppear = true
+                            isAtBottom = true
                             withAnimation(.easeInOut(duration: 0.2)) {
                                 proxy.scrollTo(last.id, anchor: .bottom)
                             }
+                            // Failsafe: if last message never re-appears
+                            // (e.g. short list, no last message), clear the
+                            // flag after 5s so isAtBottom can update again.
+                            suppressResetTask?.cancel()
+                            suppressResetTask = Task { @MainActor in
+                                try? await Task.sleep(for: .seconds(5))
+                                guard !Task.isCancelled else { return }
+                                suppressDisappearUntilAppear = false
+                            }
                         }
-                        isAtBottom = true
                     }
                     .padding(.bottom, 16)
                     .padding(.trailing, 12)
