@@ -2377,6 +2377,15 @@ struct Level1View: View {
 
     var body: some View {
         VStack(spacing: 0) {
+            if let banner = viewModel.errorBanner {
+                Text(banner)
+                    .font(.footnote)
+                    .foregroundStyle(.white)
+                    .padding(.vertical, 6)
+                    .frame(maxWidth: .infinity)
+                    .background(Color.red)
+                    .transition(.opacity)
+            }
             inputSection
             ProbabilityBarsView(
                 candidates: viewModel.topCandidates,
@@ -2397,6 +2406,7 @@ struct Level1View: View {
             Spacer(minLength: 8)
             footer
         }
+        .animation(.easeInOut(duration: 0.2), value: viewModel.errorBanner)
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .onChange(of: viewModel.state) { _, newValue in
             if newValue == .passed {
