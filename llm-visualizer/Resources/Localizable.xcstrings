@@ -1,6 +1,23 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "Ask anything…" : {
+      "comment" : "Placeholder text in the prompt TextField, inviting the user to type a message.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ask anything…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "问点什么吧…"
+          }
+        }
+      }
+    },
     "Generating · %.1f t/s" : {
       "comment" : "Status bar text while model is generating tokens. The placeholder is the current tokens-per-second throughput, formatted to one decimal place.",
       "localizations" : {
@@ -99,6 +116,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "重试"
+          }
+        }
+      }
+    },
+    "Send" : {
+      "comment" : "Accessibility label for the send button in the prompt field (used by VoiceOver).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "发送"
           }
         }
       }
