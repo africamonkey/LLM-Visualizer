@@ -63,3 +63,6 @@ fastlane/test_output
 
 # Superpowers brainstorm artifacts (visual companion scratch files)
 .superpowers/
+
+# Git worktrees for feature isolation
+.worktrees/
