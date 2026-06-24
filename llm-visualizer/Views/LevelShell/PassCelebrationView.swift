@@ -1,0 +1,67 @@
+//
+//  PassCelebrationView.swift
+//
+
+import SwiftUI
+
+struct PassCelebrationView: View {
+
+    let onContinue: () -> Void
+
+    var body: some View {
+        ZStack {
+            RadialGradient(
+                colors: [Color.accentColor.opacity(0.18), Color(.systemBackground)],
+                center: .init(x: 0.5, y: 0.4),
+                startRadius: 20,
+                endRadius: 400
+            )
+            .ignoresSafeArea()
+
+            VStack(spacing: 14) {
+                Text("🏆")
+                    .font(.system(size: 80))
+                Text("FIRST CLEAR")
+                    .font(.caption.weight(.bold))
+                    .tracking(2)
+                    .foregroundStyle(Color.accentColor)
+                Text(String(
+                    localized: "你让 AI 闭眼都猜对了",
+                    defaultValue: "你让 AI 闭眼都猜对了"
+                ))
+                    .font(.system(size: 28, weight: .bold))
+                    .multilineTextAlignment(.center)
+                Text(String(
+                    localized: "当上下文足够明确，模型其实早就知道下一个词是什么。",
+                    defaultValue: "当上下文足够明确，模型其实早就知道下一个词是什么。"
+                ))
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 32)
+                Button(action: onContinue) {
+                    Text(String(localized: "再来一次", defaultValue: "再来一次"))
+                        .font(.body.weight(.semibold))
+                        .padding(.horizontal, 32)
+                        .padding(.vertical, 12)
+                        .background(
+                            Capsule().fill(Color.accentColor)
+                        )
+                        .foregroundStyle(.white)
+                }
+                .buttonStyle(.plain)
+                .padding(.top, 12)
+                Text(String(localized: "下一关在路上", defaultValue: "下一关在路上"))
+                    .font(.caption)
+                    .foregroundStyle(.tertiary)
+                    .padding(.top, 6)
+            }
+            .padding(20)
+        }
+        .transition(.opacity.combined(with: .scale(scale: 0.95)))
+    }
+}
+
+#Preview {
+    PassCelebrationView(onContinue: {})
+}
