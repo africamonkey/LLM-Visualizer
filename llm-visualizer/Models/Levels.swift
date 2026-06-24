@@ -34,26 +34,6 @@ class LevelSession {
     func evaluate() {}
 }
 
-/// Minimal placeholder so `LevelRegistry.all` has at least one entry
-/// (required by the `registryContainsAtLeastOne` test). The full
-/// implementation — view model, content view, evaluate logic — is
-/// defined in a later task that will replace this stub.
-@MainActor
-final class Level1Session: LevelSession {
-    init() {
-        super.init(
-            id: 1,
-            title: "Level 1",
-            subtitle: "Send your first message",
-            goalDescription: "Complete your first chat turn."
-        )
-    }
-
-    override func makeContentView() -> AnyView {
-        AnyView(Text("Level 1 — coming soon"))
-    }
-}
-
 enum LevelRegistry {
     /// Ordered list of level classes. App picks the first
     /// not-yet-complete one as the current level. Future slices
