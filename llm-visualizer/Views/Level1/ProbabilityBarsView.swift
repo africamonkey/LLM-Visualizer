@@ -1,0 +1,112 @@
+//
+//  ProbabilityBarsView.swift
+//
+
+import SwiftUI
+
+struct ProbabilityBarsView: View {
+
+    let candidates: [TokenCandidate]
+    var isPassed: Bool = false
+
+    private var top1: TokenCandidate? { candidates.first }
+    private var others: [TokenCandidate] { Array(candidates.dropFirst().prefix(3)) }
+
+    private var passColor: Color { Color(red: 0.13, green: 0.77, blue: 0.37) } // #22c55e
+    private var accent: Color { isPassed ? passColor : Color.accentColor }
+    private var muted: Color { isPassed ? passColor.opacity(0.7) : Color.accentColor.opacity(0.65) }
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            top1Card
+            if !others.isEmpty {
+                Text(String(localized: "其他可能", defaultValue: "其他可能"))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .padding(.horizontal, 4)
+                VStack(spacing: 6) {
+                    ForEach(others) { c in
+                        row(for: c)
+                    }
+                }
+            }
+        }
+    }
+
+    private var top1Card: some View {
+        VStack(spacing: 6) {
+            Text(String(localized: "AI 最可能的下一词", defaultValue: "AI 最可能的下一词"))
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            Text(top1?.text ?? "—")
+                .font(.system(size: 48, weight: .bold))
+                .foregroundStyle(.primary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+            Text(percentString(top1?.probability))
+                .font(.system(size: 22, weight: .semibold))
+                .foregroundStyle(accent)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 22)
+        .background(
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color(.systemBackground))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 12)
+                .stroke(isPassed ? passColor : Color.clear, lineWidth: 2)
+        )
+        .shadow(color: .black.opacity(0.05), radius: 3, x: 0, y: 1)
+    }
+
+    private func row(for c: TokenCandidate) -> some View {
+        HStack(spacing: 10) {
+            Text(c.text)
+                .font(.body)
+                .foregroundStyle(.primary)
+                .frame(width: 36, alignment: .leading)
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(Color(.systemGray5))
+                    RoundedRectangle(cornerRadius: 3)
+                        .fill(muted)
+                        .frame(width: geo.size.width * CGFloat(c.probability))
+                }
+            }
+            .frame(height: 10)
+            Text(percentString(c.probability))
+                .font(.caption.monospacedDigit())
+                .foregroundStyle(.secondary)
+                .frame(width: 40, alignment: .trailing)
+        }
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(
+            RoundedRectangle(cornerRadius: 6)
+                .fill(Color(.systemBackground))
+        )
+    }
+
+    private func percentString(_ p: Double?) -> String {
+        guard let p else { return "—" }
+        return String(format: "%.0f%%", p * 100)
+    }
+}
+
+#Preview {
+    VStack {
+        ProbabilityBarsView(candidates: [
+            TokenCandidate(id: 1, text: "好", probability: 0.32),
+            TokenCandidate(id: 2, text: "不", probability: 0.18),
+            TokenCandidate(id: 3, text: "的", probability: 0.14),
+            TokenCandidate(id: 4, text: "很", probability: 0.09),
+        ])
+        ProbabilityBarsView(candidates: [
+            TokenCandidate(id: 1, text: "国", probability: 0.95),
+        ], isPassed: true)
+    }
+    .padding()
+    .background(Color(.systemGroupedBackground))
+}
