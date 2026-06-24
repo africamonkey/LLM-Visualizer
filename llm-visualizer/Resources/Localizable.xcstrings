@@ -170,6 +170,499 @@
           }
         }
       }
+    },
+    "第 1 关" : {
+      "comment" : "Header label for Level 1 of the onboarding flow.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "第 1 关"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "第 1 关"
+          }
+        }
+      }
+    },
+    "让 AI 闭眼都猜对" : {
+      "comment" : "Level 1 subtitle: challenge the user to craft a sentence so obvious that the model guesses correctly with its eyes closed.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "让 AI 闭眼都猜对"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "让 AI 闭眼都猜对"
+          }
+        }
+      }
+    },
+    "目标：让 Top-1 概率超过 %d%%" : {
+      "comment" : "Level 1 objective label. The placeholder is the target Top-1 probability threshold as an integer percentage.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "目标：让 Top-1 概率超过 %d%%"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "目标：让 Top-1 概率超过 %d%%"
+          }
+        }
+      }
+    },
+    "最高纪录：%d%%" : {
+      "comment" : "Best record label shown in the Level 1 header. The placeholder is the highest Top-1 probability achieved as an integer percentage.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最高纪录：%d%%"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最高纪录：%d%%"
+          }
+        }
+      }
+    },
+    "你的输入" : {
+      "comment" : "Column header in the Level 1 results table for the user's input sentence.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你的输入"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你的输入"
+          }
+        }
+      }
+    },
+    "AI 最可能的下一词" : {
+      "comment" : "Column header in the Level 1 results table for the model's top predicted next token.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI 最可能的下一词"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI 最可能的下一词"
+          }
+        }
+      }
+    },
+    "其他可能" : {
+      "comment" : "Section header for the secondary predictions list in the Level 1 results.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "其他可能"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "其他可能"
+          }
+        }
+      }
+    },
+    "这次 AI 挺确定的。" : {
+      "comment" : "Level 1 commentary when the model's top-1 probability is moderately high.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这次 AI 挺确定的。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这次 AI 挺确定的。"
+          }
+        }
+      }
+    },
+    "这次 AI 有点拿不准。" : {
+      "comment" : "Level 1 commentary when the model shows mild uncertainty.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这次 AI 有点拿不准。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这次 AI 有点拿不准。"
+          }
+        }
+      }
+    },
+    "这次 AI 很犹豫，几个词分数差不多。" : {
+      "comment" : "Level 1 commentary when the model is very uncertain and several tokens score similarly.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这次 AI 很犹豫，几个词分数差不多。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这次 AI 很犹豫，几个词分数差不多。"
+          }
+        }
+      }
+    },
+    "这次 AI 几乎闭眼都猜对了！" : {
+      "comment" : "Level 1 commentary when the model's top-1 probability is very high.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这次 AI 几乎闭眼都猜对了！"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这次 AI 几乎闭眼都猜对了！"
+          }
+        }
+      }
+    },
+    "换一句话试试，看 AI 怎么猜" : {
+      "comment" : "Level 1 hint inviting the user to try a different sentence.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "换一句话试试，看 AI 怎么猜"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "换一句话试试，看 AI 怎么猜"
+          }
+        }
+      }
+    },
+    "这是真的吗？我来试试" : {
+      "comment" : "Level 1 prompt encouraging the user to test the claim about model confidence.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这是真的吗？我来试试"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这是真的吗？我来试试"
+          }
+        }
+      }
+    },
+    "它没在想，只是给每个词打分。" : {
+      "comment" : "Level 1 explainer clarifying that the model scores tokens rather than thinking.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "它没在想，只是给每个词打分。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "它没在想，只是给每个词打分。"
+          }
+        }
+      }
+    },
+    "你可能发现了…" : {
+      "comment" : "Section header introducing an insight the user may have noticed after playing.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你可能发现了…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你可能发现了…"
+          }
+        }
+      }
+    },
+    "有时候 AI 很确定，有时候很犹豫。" : {
+      "comment" : "Level 1 insight: model confidence varies depending on context.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有时候 AI 很确定，有时候很犹豫。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有时候 AI 很确定，有时候很犹豫。"
+          }
+        }
+      }
+    },
+    "你能找到一句话，让 AI 确定到几乎闭着眼睛都能猜对吗？" : {
+      "comment" : "Level 1 challenge prompt asking the user to find a sentence that maximizes model confidence.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你能找到一句话，让 AI 确定到几乎闭着眼睛都能猜对吗？"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你能找到一句话，让 AI 确定到几乎闭着眼睛都能猜对吗？"
+          }
+        }
+      }
+    },
+    "我准备好了" : {
+      "comment" : "Button label confirming the user is ready to begin Level 1.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "我准备好了"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "我准备好了"
+          }
+        }
+      }
+    },
+    "你让 AI 闭眼都猜对了" : {
+      "comment" : "Level 1 success header celebrating the user's clear.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你让 AI 闭眼都猜对了"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你让 AI 闭眼都猜对了"
+          }
+        }
+      }
+    },
+    "当上下文足够明确，模型其实早就知道下一个词是什么。" : {
+      "comment" : "Closing insight for Level 1: with clear context, the model already knows the next token.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "当上下文足够明确，模型其实早就知道下一个词是什么。"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "当上下文足够明确，模型其实早就知道下一个词是什么。"
+          }
+        }
+      }
+    },
+    "再来一次" : {
+      "comment" : "Button label on the Level 1 success screen to retry.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "再来一次"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "再来一次"
+          }
+        }
+      }
+    },
+    "下一关在路上" : {
+      "comment" : "Teaser text on the Level 1 success screen indicating the next level is on its way.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下一关在路上"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下一关在路上"
+          }
+        }
+      }
+    },
+    "FIRST CLEAR" : {
+      "comment" : "Badge label displayed the first time the user clears Level 1.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FIRST CLEAR"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FIRST CLEAR"
+          }
+        }
+      }
+    },
+    "已玩 %d 次" : {
+      "comment" : "Level 1 stats line: number of attempts. The placeholder is the attempt count.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已玩 %d 次"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已玩 %d 次"
+          }
+        }
+      }
+    },
+    "已提交 %d 次" : {
+      "comment" : "Level 1 stats line: number of submissions. The placeholder is the submission count.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已提交 %d 次"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已提交 %d 次"
+          }
+        }
+      }
+    },
+    "最高纪录 %d%%" : {
+      "comment" : "Level 1 stats line: best Top-1 probability. The placeholder is the percentage.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最高纪录 %d%%"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最高纪录 %d%%"
+          }
+        }
+      }
+    },
+    "输入你的句子…" : {
+      "comment" : "Placeholder text in the Level 1 input field.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "输入你的句子…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "输入你的句子…"
+          }
+        }
+      }
+    },
+    "目标：让 AI 对下一个词的预测超过 %d%%" : {
+      "comment" : "Long-form Level 1 goal text. The placeholder is the target percentage.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "目标：让 AI 对下一个词的预测超过 %d%%"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "目标：让 AI 对下一个词的预测超过 %d%%"
+          }
+        }
+      }
+    },
+    "你刚才最高才 %d%%，挑战一下" : {
+      "comment" : "Encouragement shown when the user's previous best is below the goal. The placeholder is the previous best percentage.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你刚才最高才 %d%%，挑战一下"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你刚才最高才 %d%%，挑战一下"
+          }
+        }
+      }
     }
   },
   "version" : "1.0"
