@@ -47,6 +47,8 @@ struct OnboardingFlowView: View {
             }
         }
         .task {
+            // Skip model load during unit/UI tests — Metal doesn't init in simulator
+            guard ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil else { return }
             await viewModel.bootstrap()
             let service = LLMService()
             do {
