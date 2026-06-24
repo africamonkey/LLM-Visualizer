@@ -85,8 +85,38 @@ final class LLMService: LLMServiceProtocol, @unchecked Sendable {
     }
 
     func predictNextTokens(prompt: String, topK: Int) async throws -> [TokenCandidate] {
-        // Full implementation lands in Task 6.
-        return []
+        let container = try await ensureContainer()
+        return try await container.perform { context in
+            let chatMessages = [Chat.Message(role: .user, content: prompt)]
+            let userInput = UserInput(chat: chatMessages)
+            let lmInput = try await context.processor.prepare(input: userInput)
+            let logits = context.model(lmInput.text, cache: nil, state: nil).logits
+            // logits shape: [batch=1, seq, vocab]. Take last position.
+            let lastLogits = logits[0, logits.dim(1) - 1, 0...].asType(.float32)
+            let probs = softmax(lastLogits, axis: -1)
+            let vocab = probs.dim(0)
+            let k = min(max(topK, 1), vocab)
+            // Sort -probs ascending = sort probs descending (highest first).
+            // argSort returns uint32 indices; takeAlong gathers values in the same order.
+            let sortedIndicesDesc = argSort(-probs, axis: -1)
+            let topKIndices = sortedIndicesDesc[..<k]
+            let topKValues = takeAlong(probs, topKIndices, axis: -1)
+            let tokenizer = context.tokenizer
+            var out: [TokenCandidate] = []
+            out.reserveCapacity(k)
+            for i in 0..<k {
+                let tokenId = Int(topKIndices[i].item(Int32.self))
+                let prob = Double(topKValues[i].item(Float32.self))
+                let text = tokenizer.decode(tokens: [tokenId], skipSpecialTokens: false)
+                out.append(TokenCandidate(id: tokenId, text: text, probability: prob))
+            }
+            return out
+        }
+    }
+
+    private func ensureContainer() async throws -> ModelContainer {
+        if let cached { return cached }
+        return try await loadModel()
     }
 }
 
