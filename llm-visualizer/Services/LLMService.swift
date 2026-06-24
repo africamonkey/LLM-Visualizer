@@ -16,6 +16,7 @@ protocol LLMServiceProtocol: Sendable {
         model: ModelContainer,
         onToken: @escaping @Sendable (Int) -> Void
     ) async throws -> AsyncStream<Generation>
+    func predictNextTokens(prompt: String, topK: Int) async throws -> [TokenCandidate]
 }
 
 final class LLMService: LLMServiceProtocol, @unchecked Sendable {
@@ -82,6 +83,11 @@ final class LLMService: LLMServiceProtocol, @unchecked Sendable {
             }
         }
     }
+
+    func predictNextTokens(prompt: String, topK: Int) async throws -> [TokenCandidate] {
+        // Full implementation lands in Task 6.
+        return []
+    }
 }
 
 private final class StubLanguageModel: Module, LanguageModel {
@@ -137,6 +143,7 @@ final class MockLLMService: LLMServiceProtocol, @unchecked Sendable {
     var stubbedTokenDelayMillis: Int = 0
     var stubbedFinish: Bool = true
     var stubbedInfo: GenerateCompletionInfo?
+    var stubbedPredictTopK: [TokenCandidate] = []
     var loadModelError: Error?
 
     init() {}
@@ -176,6 +183,11 @@ final class MockLLMService: LLMServiceProtocol, @unchecked Sendable {
             }
             continuation.onTermination = { _ in task.cancel() }
         }
+    }
+
+    func predictNextTokens(prompt: String, topK: Int) async throws -> [TokenCandidate] {
+        let clamped = max(0, topK)
+        return Array(stubbedPredictTopK.prefix(clamped))
     }
 
     private func makeStubContainer() -> ModelContainer {
