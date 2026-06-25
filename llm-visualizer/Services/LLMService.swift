@@ -87,18 +87,34 @@ final class LLMService: LLMServiceProtocol, @unchecked Sendable {
     func predictNextTokens(prompt: String, topK: Int) async throws -> [TokenCandidate] {
         let container = try await ensureContainer()
         return try await container.perform { context in
-            let chatMessages = [Chat.Message(role: .user, content: prompt)]
-            let userInput = UserInput(chat: chatMessages)
-            let lmInput = try await context.processor.prepare(input: userInput)
-            // `LLMUserInputProcessor.prepare` returns `MLXArray(promptTokens)` which is
-            // 1D shape `(seq_len,)`. The model expects 2D `(batch=1, seq_len)` — the batch
-            // axis is added by `TokenIterator.step` in `generateTokens` via
-            // `previous[text: .newAxis]`. We must do the same here, otherwise the
-            // embedding layer produces `(seq_len, hidden_size)` and downstream reshapes
-            // (e.g. Qwen3Attention's `queries.reshaped(B, L, heads, -1)`) get the wrong
-            // dimensions and crash with "[reshape] Cannot reshape ... into shape (B,L,N,0)".
-            let text = lmInput.text[text: .newAxis]
-            let logits = context.model(text, cache: nil, state: nil).logits
+            // Completion mode. We deliberately bypass the chat template (UserInput +
+            // processor.prepare) and feed the user's raw text straight to the model.
+            //
+            // The chat path wraps the input as `user\n{prompt}\n\nassistant\n[...]` so
+            // the model behaves as an assistant replying to a user message — its top-1
+            // is the start of the assistant's reply ("是啊", "确实", etc.), not a
+            // continuation of the user's text. For the visualizer we want the
+            // opposite: the user provides a sentence fragment and we show the model's
+            // distribution over what would naturally come next in that fragment
+            // (e.g. "今天天气真" → "好" / "差" / "不" / ...).
+            //
+            // Qwen3's base stage is next-token prediction; the chat template is a
+            // post-training wrapper. Without it, the model falls back to base-model
+            // completion behavior, which is exactly what we want here. The chat
+            // app uses chat mode (see `generate(messages:)`) for free conversation.
+            //
+            // `tokenizer.encode(text:)` returns `[Int]` token IDs. The model expects
+            // a 2D `(batch=1, seq_len)` input; the `[.newAxis]` subscript adds the
+            // batch dimension (matches what `TokenIterator.step` does internally for
+            // generation).
+            let promptTokens = try context.tokenizer.encode(text: prompt)
+            let text = MLXArray(promptTokens)[.newAxis]
+            // `LanguageModel` has two `callAsFunction` overloads — one taking
+            // `LMInput.Text` (returns `LMOutput`) and one taking `MLXArray`
+            // (returns `MLXArray` of logits). Drop the `state:` argument so the
+            // compiler picks the MLXArray overload, which gives us the logits
+            // directly from the model's forward pass.
+            let logits = context.model(text, cache: nil)
             // logits shape: [batch=1, seq, vocab]. Take last position.
             let lastLogits = logits[0, logits.dim(1) - 1, 0...].asType(.float32)
             let probs = softmax(lastLogits, axis: -1)
