@@ -26,21 +26,21 @@ struct PassCelebrationView: View {
                     .tracking(2)
                     .foregroundStyle(Color.accentColor)
                 Text(String(
-                    localized: "你让 AI 闭眼都猜对了",
-                    defaultValue: "你让 AI 闭眼都猜对了"
+                    localized: "You made AI guess right with its eyes closed",
+                    defaultValue: "You made AI guess right with its eyes closed"
                 ))
                     .font(.system(size: 28, weight: .bold))
                     .multilineTextAlignment(.center)
                 Text(String(
-                    localized: "当上下文足够明确，模型其实早就知道下一个词是什么。",
-                    defaultValue: "当上下文足够明确，模型其实早就知道下一个词是什么。"
+                    localized: "When the context is clear enough, the model already knows what comes next.",
+                    defaultValue: "When the context is clear enough, the model already knows what comes next."
                 ))
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 32)
                 Button(action: onContinue) {
-                    Text(String(localized: "再来一次", defaultValue: "再来一次"))
+                    Text(String(localized: "Try again", defaultValue: "Try again"))
                         .font(.body.weight(.semibold))
                         .padding(.horizontal, 32)
                         .padding(.vertical, 12)
@@ -51,7 +51,7 @@ struct PassCelebrationView: View {
                 }
                 .buttonStyle(.plain)
                 .padding(.top, 12)
-                Text(String(localized: "下一关在路上", defaultValue: "下一关在路上"))
+                Text(String(localized: "Next level is on the way", defaultValue: "Next level is on the way"))
                     .font(.caption)
                     .foregroundStyle(.tertiary)
                     .padding(.top, 6)

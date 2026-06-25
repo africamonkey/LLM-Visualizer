@@ -12,8 +12,8 @@ struct ChallengeIntroCard: View {
     private var goalText: String {
         let pct = Int((Level1ViewModel.passThreshold * 100).rounded())
         let format = String(
-            localized: "目标：让 AI 对下一个词的预测超过 %d%%",
-            defaultValue: "目标：让 AI 对下一个词的预测超过 %d%%"
+            localized: "Goal: Get AI's next-word prediction above %d%%",
+            defaultValue: "Goal: Get AI's next-word prediction above %d%%"
         )
         return String(format: format, pct)
     }
@@ -21,22 +21,22 @@ struct ChallengeIntroCard: View {
     private var anchorText: String {
         let pct = Int((bestSoFar * 100).rounded())
         let format = String(
-            localized: "你刚才最高才 %d%%，挑战一下",
-            defaultValue: "你刚才最高才 %d%%，挑战一下"
+            localized: "Your highest was just %d%% — try the challenge",
+            defaultValue: "Your highest was just %d%% — try the challenge"
         )
         return String(format: format, pct)
     }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text(String(localized: "你可能发现了…", defaultValue: "你可能发现了…"))
+            Text(String(localized: "You might have noticed…", defaultValue: "You might have noticed…"))
                 .font(.headline)
-            Text(String(localized: "有时候 AI 很确定，有时候很犹豫。", defaultValue: "有时候 AI 很确定，有时候很犹豫。"))
+            Text(String(localized: "Sometimes AI is sure, sometimes it's hesitant.", defaultValue: "Sometimes AI is sure, sometimes it's hesitant."))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
             Text(String(
-                localized: "你能找到一句话，让 AI 确定到几乎闭着眼睛都能猜对吗？",
-                defaultValue: "你能找到一句话，让 AI 确定到几乎闭着眼睛都能猜对吗？"
+                localized: "Can you find a sentence that makes AI so sure it could guess right with its eyes closed?",
+                defaultValue: "Can you find a sentence that makes AI so sure it could guess right with its eyes closed?"
             ))
                 .font(.subheadline.weight(.medium))
             HStack(spacing: 8) {
@@ -44,7 +44,7 @@ struct ChallengeIntroCard: View {
                 chip(text: anchorText, accent: false)
             }
             Button(action: onAccept) {
-                Text(String(localized: "我准备好了", defaultValue: "我准备好了"))
+                Text(String(localized: "I'm ready", defaultValue: "I'm ready"))
                     .font(.body.weight(.semibold))
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 10)

@@ -14,8 +14,8 @@ struct LevelHeaderView: View {
 
     private var titleText: String {
         let format = String(
-            localized: "第 %d 关",
-            defaultValue: "第 %d 关"
+            localized: "Level %d",
+            defaultValue: "Level %d"
         )
         return String(format: format, levelNumber)
     }
@@ -23,8 +23,8 @@ struct LevelHeaderView: View {
     private var goalText: String {
         let pct = Int((Level1ViewModel.passThreshold * 100).rounded())
         let format = String(
-            localized: "目标：让 Top-1 概率超过 %d%%",
-            defaultValue: "目标：让 Top-1 概率超过 %d%%"
+            localized: "Goal: Get Top-1 probability above %d%%",
+            defaultValue: "Goal: Get Top-1 probability above %d%%"
         )
         return String(format: format, pct)
     }
@@ -32,8 +32,8 @@ struct LevelHeaderView: View {
     private var bestText: String {
         let pct = Int((bestSoFar * 100).rounded())
         let format = String(
-            localized: "最高纪录：%d%%",
-            defaultValue: "最高纪录：%d%%"
+            localized: "Best record: %d%%",
+            defaultValue: "Best record: %d%%"
         )
         return String(format: format, pct)
     }
@@ -77,15 +77,15 @@ struct LevelHeaderView: View {
     VStack(spacing: 16) {
         LevelHeaderView(
             levelNumber: 1,
-            subtitle: "让 AI 闭眼都猜对",
-            goalDescription: "目标：让 Top-1 概率超过 90%",
+            subtitle: "Make AI guess right with its eyes closed",
+            goalDescription: "Get Top-1 probability above 90%",
             bestSoFar: 0.32,
             isComplete: false
         )
         LevelHeaderView(
             levelNumber: 1,
-            subtitle: "让 AI 闭眼都猜对",
-            goalDescription: "目标：让 Top-1 概率超过 90%",
+            subtitle: "Make AI guess right with its eyes closed",
+            goalDescription: "Get Top-1 probability above 90%",
             bestSoFar: 0.95,
             isComplete: true
         )

@@ -18,7 +18,9 @@ struct OnboardingFlowView: View {
         self.onComplete = onComplete
     }
 
-    private let openingPrompt = "今天天气真"
+    private var openingPrompt: String {
+        String(localized: "Opening prompt", defaultValue: "Today's weather is")
+    }
 
     var body: some View {
         ZStack {

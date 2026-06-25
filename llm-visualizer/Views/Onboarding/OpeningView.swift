@@ -13,10 +13,10 @@ struct OpeningView: View {
     var body: some View {
         VStack(spacing: 20) {
             VStack(alignment: .leading, spacing: 6) {
-                Text(String(localized: "你的输入", defaultValue: "你的输入"))
+                Text(String(localized: "Your input", defaultValue: "Your input"))
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                Text("今天天气真")
+                Text(String(localized: "Opening prompt", defaultValue: "Today's weather is"))
                     .font(.title3)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -34,8 +34,8 @@ struct OpeningView: View {
             }
 
             Text(String(
-                localized: "它没在想，只是给每个词打分。",
-                defaultValue: "它没在想，只是给每个词打分。"
+                localized: "It's not thinking — it's just scoring every word.",
+                defaultValue: "It's not thinking — it's just scoring every word."
             ))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
@@ -46,8 +46,8 @@ struct OpeningView: View {
 
             Button(action: onTap) {
                 Text(String(
-                    localized: "这是真的吗？我来试试",
-                    defaultValue: "这是真的吗？我来试试"
+                    localized: "Is that real? Let me try",
+                    defaultValue: "Is that real? Let me try"
                 ))
                     .font(.body.weight(.semibold))
                     .frame(maxWidth: .infinity)
@@ -70,10 +70,10 @@ struct OpeningView: View {
 #Preview {
     OpeningView(
         candidates: [
-            TokenCandidate(id: 1, text: "好", probability: 0.32),
-            TokenCandidate(id: 2, text: "不", probability: 0.18),
-            TokenCandidate(id: 3, text: "的", probability: 0.14),
-            TokenCandidate(id: 4, text: "很", probability: 0.09),
+            TokenCandidate(id: 1, text: " good", probability: 0.32),
+            TokenCandidate(id: 2, text: " not", probability: 0.18),
+            TokenCandidate(id: 3, text: " the", probability: 0.14),
+            TokenCandidate(id: 4, text: " very", probability: 0.09),
         ],
         isLoading: false,
         onTap: {}

@@ -15,15 +15,15 @@ struct NarratorLineView: View {
         var text: String {
             switch self {
             case .high:
-                return String(localized: "这次 AI 挺确定的。", defaultValue: "这次 AI 挺确定的。")
+                return String(localized: "This time AI seems pretty sure.", defaultValue: "This time AI seems pretty sure.")
             case .medium:
-                return String(localized: "这次 AI 有点拿不准。", defaultValue: "这次 AI 有点拿不准。")
+                return String(localized: "This time AI is a bit unsure.", defaultValue: "This time AI is a bit unsure.")
             case .low:
-                return String(localized: "这次 AI 很犹豫，几个词分数差不多。",
-                              defaultValue: "这次 AI 很犹豫，几个词分数差不多。")
+                return String(localized: "This time AI is very hesitant — several words have similar scores.",
+                              defaultValue: "This time AI is very hesitant — several words have similar scores.")
             case .passed:
-                return String(localized: "这次 AI 几乎闭眼都猜对了！",
-                              defaultValue: "这次 AI 几乎闭眼都猜对了！")
+                return String(localized: "This time AI almost guessed right with its eyes closed!",
+                              defaultValue: "This time AI almost guessed right with its eyes closed!")
             }
         }
     }

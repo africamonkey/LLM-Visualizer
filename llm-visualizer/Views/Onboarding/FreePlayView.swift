@@ -38,8 +38,8 @@ struct FreePlayView: View {
         VStack(alignment: .leading, spacing: 8) {
             HStack {
                 Text(String(
-                    localized: "换一句话试试，看 AI 怎么猜",
-                    defaultValue: "换一句话试试，看 AI 怎么猜"
+                    localized: "Try another sentence, see how AI guesses",
+                    defaultValue: "Try another sentence, see how AI guesses"
                 ))
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
@@ -47,8 +47,8 @@ struct FreePlayView: View {
                 if showNarrator {
                     Button(action: onTapReady) {
                         Text(String(
-                            localized: "我准备好了",
-                            defaultValue: "我准备好了"
+                            localized: "I'm ready",
+                            defaultValue: "I'm ready"
                         ))
                             .font(.caption.weight(.semibold))
                             .padding(.horizontal, 10)
@@ -61,7 +61,7 @@ struct FreePlayView: View {
             }
             HStack(spacing: 8) {
                 TextField(
-                    String(localized: "输入你的句子…", defaultValue: "输入你的句子…"),
+                    String(localized: "Type your sentence…", defaultValue: "Type your sentence…"),
                     text: $viewModel.prompt
                 )
                 .textFieldStyle(.plain)
@@ -97,16 +97,16 @@ struct FreePlayView: View {
     private var footer: some View {
         HStack {
             let playsFormat = String(
-                localized: "已玩 %d 次",
-                defaultValue: "已玩 %d 次"
+                localized: "Played %d times",
+                defaultValue: "Played %d times"
             )
             Text(String(format: playsFormat, playsSoFar))
                 .font(.caption)
                 .foregroundStyle(.tertiary)
             Spacer()
             let bestFormat = String(
-                localized: "最高纪录 %d%%",
-                defaultValue: "最高纪录 %d%%"
+                localized: "Best record %d%%",
+                defaultValue: "Best record %d%%"
             )
             Text(String(format: bestFormat, Int((viewModel.bestSoFar * 100).rounded())))
                 .font(.caption.monospacedDigit())

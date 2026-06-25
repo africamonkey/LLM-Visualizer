@@ -13,14 +13,14 @@ final class Level1Session: LevelSession {
         self.viewModel = viewModel
         super.init(
             id: 1,
-            title: String(localized: "第 1 关", defaultValue: "第 1 关"),
+            title: String(localized: "Level 1", defaultValue: "Level 1"),
             subtitle: String(
-                localized: "让 AI 闭眼都猜对",
-                defaultValue: "让 AI 闭眼都猜对"
+                localized: "Make AI guess right with its eyes closed",
+                defaultValue: "Make AI guess right with its eyes closed"
             ),
             goalDescription: String(
-                localized: "让 Top-1 概率超过 90%",
-                defaultValue: "让 Top-1 概率超过 90%"
+                localized: "Get Top-1 probability above 90%",
+                defaultValue: "Get Top-1 probability above 90%"
             )
         )
     }

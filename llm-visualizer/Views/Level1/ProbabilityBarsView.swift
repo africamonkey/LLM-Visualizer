@@ -20,7 +20,7 @@ struct ProbabilityBarsView: View {
         VStack(alignment: .leading, spacing: 12) {
             top1Card
             if !others.isEmpty {
-                Text(String(localized: "其他可能", defaultValue: "其他可能"))
+                Text(String(localized: "Other possibilities", defaultValue: "Other possibilities"))
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .padding(.horizontal, 4)
@@ -35,7 +35,7 @@ struct ProbabilityBarsView: View {
 
     private var top1Card: some View {
         VStack(spacing: 6) {
-            Text(String(localized: "AI 最可能的下一词", defaultValue: "AI 最可能的下一词"))
+            Text(String(localized: "AI's most likely next word", defaultValue: "AI's most likely next word"))
                 .font(.caption)
                 .foregroundStyle(.secondary)
             Text(top1?.text ?? "—")
@@ -98,13 +98,13 @@ struct ProbabilityBarsView: View {
 #Preview {
     VStack {
         ProbabilityBarsView(candidates: [
-            TokenCandidate(id: 1, text: "好", probability: 0.32),
-            TokenCandidate(id: 2, text: "不", probability: 0.18),
-            TokenCandidate(id: 3, text: "的", probability: 0.14),
-            TokenCandidate(id: 4, text: "很", probability: 0.09),
+            TokenCandidate(id: 1, text: " good", probability: 0.32),
+            TokenCandidate(id: 2, text: " not", probability: 0.18),
+            TokenCandidate(id: 3, text: " the", probability: 0.14),
+            TokenCandidate(id: 4, text: " very", probability: 0.09),
         ])
         ProbabilityBarsView(candidates: [
-            TokenCandidate(id: 1, text: "国", probability: 0.95),
+            TokenCandidate(id: 1, text: " country", probability: 0.95),
         ], isPassed: true)
     }
     .padding()

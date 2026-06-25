@@ -54,12 +54,12 @@ struct Level1View: View {
 
     private var inputSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text(String(localized: "你的输入", defaultValue: "你的输入"))
+            Text(String(localized: "Your input", defaultValue: "Your input"))
                 .font(.caption)
                 .foregroundStyle(.secondary)
             HStack(spacing: 8) {
                 TextField(
-                    String(localized: "输入你的句子…", defaultValue: "输入你的句子…"),
+                    String(localized: "Type your sentence…", defaultValue: "Type your sentence…"),
                     text: $viewModel.prompt
                 )
                 .textFieldStyle(.plain)
@@ -95,16 +95,16 @@ struct Level1View: View {
     private var footer: some View {
         HStack {
             let submitsFormat = String(
-                localized: "已提交 %d 次",
-                defaultValue: "已提交 %d 次"
+                localized: "Submitted %d times",
+                defaultValue: "Submitted %d times"
             )
             Text(String(format: submitsFormat, viewModel.submitCount))
                 .font(.caption)
                 .foregroundStyle(.tertiary)
             Spacer()
             let bestFormat = String(
-                localized: "最高纪录 %d%%",
-                defaultValue: "最高纪录 %d%%"
+                localized: "Best record %d%%",
+                defaultValue: "Best record %d%%"
             )
             Text(String(format: bestFormat, Int((viewModel.bestSoFar * 100).rounded())))
                 .font(.caption.monospacedDigit())
