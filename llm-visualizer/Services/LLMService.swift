@@ -90,7 +90,15 @@ final class LLMService: LLMServiceProtocol, @unchecked Sendable {
             let chatMessages = [Chat.Message(role: .user, content: prompt)]
             let userInput = UserInput(chat: chatMessages)
             let lmInput = try await context.processor.prepare(input: userInput)
-            let logits = context.model(lmInput.text, cache: nil, state: nil).logits
+            // `LLMUserInputProcessor.prepare` returns `MLXArray(promptTokens)` which is
+            // 1D shape `(seq_len,)`. The model expects 2D `(batch=1, seq_len)` — the batch
+            // axis is added by `TokenIterator.step` in `generateTokens` via
+            // `previous[text: .newAxis]`. We must do the same here, otherwise the
+            // embedding layer produces `(seq_len, hidden_size)` and downstream reshapes
+            // (e.g. Qwen3Attention's `queries.reshaped(B, L, heads, -1)`) get the wrong
+            // dimensions and crash with "[reshape] Cannot reshape ... into shape (B,L,N,0)".
+            let text = lmInput.text[text: .newAxis]
+            let logits = context.model(text, cache: nil, state: nil).logits
             // logits shape: [batch=1, seq, vocab]. Take last position.
             let lastLogits = logits[0, logits.dim(1) - 1, 0...].asType(.float32)
             let probs = softmax(lastLogits, axis: -1)
