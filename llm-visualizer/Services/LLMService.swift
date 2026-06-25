@@ -88,7 +88,17 @@ final class LLMService: LLMServiceProtocol, @unchecked Sendable {
         let container = try await ensureContainer()
         return try await container.perform { context in
             let chatMessages = [Chat.Message(role: .user, content: prompt)]
-            let userInput = UserInput(chat: chatMessages)
+            // Qwen3 is a reasoning model trained to emit `<think>...</think>` before
+            // answering. The chat template in tokenizer_config.json checks the
+            // `enable_thinking` variable — when false, it prepends an empty
+            // `<think>\n\n</think>\n\n` after the assistant prompt, signalling
+            // the model "thinking is done, answer directly". Pass it through so
+            // `predictNextTokens` surfaces the model's actual content-token
+            // distribution instead of thinking scaffolding.
+            let userInput = UserInput(
+                chat: chatMessages,
+                additionalContext: ["enable_thinking": false]
+            )
             let lmInput = try await context.processor.prepare(input: userInput)
             // `LLMUserInputProcessor.prepare` returns `MLXArray(promptTokens)` which is
             // 1D shape `(seq_len,)`. The model expects 2D `(batch=1, seq_len)` — the batch
