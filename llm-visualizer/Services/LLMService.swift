@@ -199,6 +199,7 @@ final class MockLLMService: LLMServiceProtocol, @unchecked Sendable {
     var stubbedInfo: GenerateCompletionInfo?
     var stubbedPredictTopK: [TokenCandidate] = []
     var loadModelError: Error?
+    var predictNextTokensError: Error?
 
     init() {}
 
@@ -240,6 +241,7 @@ final class MockLLMService: LLMServiceProtocol, @unchecked Sendable {
     }
 
     func predictNextTokens(prompt: String, topK: Int) async throws -> [TokenCandidate] {
+        if let error = predictNextTokensError { throw error }
         let clamped = max(0, topK)
         return Array(stubbedPredictTopK.prefix(clamped))
     }
