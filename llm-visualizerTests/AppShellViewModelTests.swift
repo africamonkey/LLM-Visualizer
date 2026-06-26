@@ -52,4 +52,34 @@ struct AppShellViewModelTests {
         await appVM.bootstrap()
         #expect(appVM.state == .ready(hasSeenOnboarding: true))
     }
+
+    @Test func bootstrapFailsWhenLoadModelThrows() async {
+        let mock = MockLLMService()
+        mock.loadModelError = NSError(
+            domain: "test", code: 1,
+            userInfo: [NSLocalizedDescriptionKey: "model not found"]
+        )
+        let appVM = AppShellViewModel(
+            service: mock,
+            progressStore: freshStore()
+        )
+        await appVM.bootstrap()
+        #expect(appVM.state == .failed("model not found"))
+        #expect(appVM.example1 == nil)
+        #expect(appVM.example2 == nil)
+    }
+
+    @Test func bootstrapFailsWhenPredictNextTokensThrows() async {
+        let mock = MockLLMService()
+        mock.predictNextTokensError = NSError(
+            domain: "test", code: 2,
+            userInfo: [NSLocalizedDescriptionKey: "forward pass crashed"]
+        )
+        let appVM = AppShellViewModel(
+            service: mock,
+            progressStore: freshStore()
+        )
+        await appVM.bootstrap()
+        #expect(appVM.state == .failed("forward pass crashed"))
+    }
 }
