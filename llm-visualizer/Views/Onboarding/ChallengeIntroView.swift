@@ -6,7 +6,6 @@ import SwiftUI
 
 struct ChallengeIntroView: View {
 
-    let bestSoFar: Double
     let onAccept: () -> Void
 
     var body: some View {
@@ -14,7 +13,7 @@ struct ChallengeIntroView: View {
             Color.black.opacity(0.35).ignoresSafeArea()
             VStack {
                 Spacer()
-                ChallengeIntroCard(bestSoFar: bestSoFar, onAccept: onAccept)
+                ChallengeIntroCard(onAccept: onAccept)
                 Spacer()
             }
         }
@@ -23,5 +22,5 @@ struct ChallengeIntroView: View {
 }
 
 #Preview {
-    ChallengeIntroView(bestSoFar: 0.68, onAccept: {})
+    ChallengeIntroView(onAccept: {})
 }
