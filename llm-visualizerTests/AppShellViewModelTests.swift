@@ -24,4 +24,32 @@ struct AppShellViewModelTests {
         #expect(appVM.example1 == nil)
         #expect(appVM.example2 == nil)
     }
+
+    @Test func bootstrapHappyPathWhenOnboardingNotSeen() async {
+        let store = freshStore()
+        let mock = MockLLMService()
+        mock.stubbedPredictTopK = [
+            TokenCandidate(id: 1, text: "a", probability: 0.7),
+            TokenCandidate(id: 2, text: "b", probability: 0.2),
+        ]
+        let appVM = AppShellViewModel(service: mock, progressStore: store)
+        await appVM.bootstrap()
+        #expect(appVM.state == .ready(hasSeenOnboarding: false))
+        #expect(appVM.example1?.prompt == "Today's weather is")
+        #expect(appVM.example2?.prompt == "I love eating")
+        #expect(appVM.example1?.candidates.count == 2)
+        #expect(appVM.example2?.candidates.count == 2)
+    }
+
+    @Test func bootstrapHappyPathWhenOnboardingAlreadySeen() async {
+        let store = freshStore()
+        store.hasSeenOnboarding = true
+        let mock = MockLLMService()
+        mock.stubbedPredictTopK = [
+            TokenCandidate(id: 1, text: "a", probability: 0.5)
+        ]
+        let appVM = AppShellViewModel(service: mock, progressStore: store)
+        await appVM.bootstrap()
+        #expect(appVM.state == .ready(hasSeenOnboarding: true))
+    }
 }
