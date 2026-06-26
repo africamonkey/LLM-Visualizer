@@ -37,11 +37,8 @@ struct LevelShellView: View {
             }
         }
         .task {
-            // Skip model load during unit/UI tests — Metal doesn't init in simulator
-            guard ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil else { return }
-            if let level1 = currentSession as? Level1Session {
-                await level1.bootstrap()
-            }
+            // Model is already loaded by AppShellViewModel before we get here.
+            // (No-op task keeps SwiftUI's lifecycle behavior identical.)
         }
     }
 
