@@ -680,6 +680,108 @@
           }
         }
       }
+    },
+    "challenge.body": {
+      "comment": "Body copy of the ChallengeIntroCard, shown after both example cards. Invites the user to try crafting their own sentence.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "You just saw how a model thinks. Now try it for real."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "你已经看到了模型怎么想。现在自己来试试。"
+          }
+        }
+      }
+    },
+    "error.retry": {
+      "comment": "Retry button label on the ModelLoadingView when the model fails to load.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Try again"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "重试"
+          }
+        }
+      }
+    },
+    "loading.model": {
+      "comment": "Loading-state label on the ModelLoadingView, shown while model weights are being read from disk.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loading model…"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在载入模型"
+          }
+        }
+      }
+    },
+    "onboarding.example1.caption": {
+      "comment": "Caption under the first example DotGridView, explaining that the 100 dots represent the model's real on-device predictions.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "These 100 dots are what the model on this device just predicted for that sentence."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "这 100 个点是本机的模型刚才对这句话的真实预测。"
+          }
+        }
+      }
+    },
+    "onboarding.example2.caption": {
+      "comment": "Caption under the second example DotGridView, contrasting with the first by showing how predictions spread out for a different sentence.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Same model, different sentence — and the dots spread out."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "同一个模型，换句话，分布就散了。"
+          }
+        }
+      }
+    },
+    "onboarding.next": {
+      "comment": "Primary CTA on the example onboarding cards, advancing to the next step.",
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Next"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下一张"
+          }
+        }
+      }
     }
   },
   "version": "1.0"
