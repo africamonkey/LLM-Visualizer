@@ -82,4 +82,42 @@ struct AppShellViewModelTests {
         await appVM.bootstrap()
         #expect(appVM.state == .failed("forward pass crashed"))
     }
+
+    @Test func retryFromFailedReachesReady() async {
+        let mock = MockLLMService()
+        mock.loadModelError = NSError(
+            domain: "test", code: 1,
+            userInfo: [NSLocalizedDescriptionKey: "first call fails"]
+        )
+        let appVM = AppShellViewModel(
+            service: mock,
+            progressStore: freshStore()
+        )
+        await appVM.bootstrap()
+        #expect(appVM.state == .failed("first call fails"))
+
+        // Clear the error so the next call succeeds.
+        mock.loadModelError = nil
+        mock.stubbedPredictTopK = [
+            TokenCandidate(id: 1, text: "a", probability: 0.5)
+        ]
+        await appVM.retry()
+        #expect(appVM.state == .ready(hasSeenOnboarding: false))
+        #expect(appVM.example1 != nil)
+    }
+
+    @Test func retryFromReadyIsNoOp() async {
+        let mock = MockLLMService()
+        mock.stubbedPredictTopK = [
+            TokenCandidate(id: 1, text: "a", probability: 0.5)
+        ]
+        let appVM = AppShellViewModel(
+            service: mock,
+            progressStore: freshStore()
+        )
+        await appVM.bootstrap()
+        #expect(appVM.state == .ready(hasSeenOnboarding: false))
+        await appVM.retry()
+        #expect(appVM.state == .ready(hasSeenOnboarding: false))
+    }
 }

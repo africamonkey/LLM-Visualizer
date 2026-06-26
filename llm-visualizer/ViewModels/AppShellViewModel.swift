@@ -49,4 +49,8 @@ final class AppShellViewModel {
             state = .failed(error.localizedDescription)
         }
     }
+
+    func retry() async {
+        await bootstrap()
+    }
 }
