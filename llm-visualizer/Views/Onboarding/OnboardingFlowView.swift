@@ -9,88 +9,65 @@ struct OnboardingFlowView: View {
     @State var viewModel: OnboardingViewModel
     let onComplete: () -> Void
 
-    @MainActor
     init(
-        viewModel: OnboardingViewModel? = nil,
+        viewModel: OnboardingViewModel,
         onComplete: @escaping () -> Void
     ) {
-        self.viewModel = viewModel ?? OnboardingViewModel(service: LLMService())
+        self.viewModel = viewModel
         self.onComplete = onComplete
     }
 
-    private var openingPrompt: String {
-        String(localized: "Opening prompt", defaultValue: "Today's weather is")
-    }
-
     var body: some View {
-        ZStack {
-            switch viewModel.phase {
-            case .opening:
-                openingScreen
-            case .freePlay:
-                FreePlayView(
-                    viewModel: makeLevel1VM(),
-                    playsSoFar: currentPlays,
-                    onUserSubmitted: handleSubmit,
-                    onTapReady: { viewModel.showChallengeManually() }
-                )
-            case .challengeIntro:
-                FreePlayView(
-                    viewModel: makeLevel1VM(),
-                    playsSoFar: currentPlays,
-                    onUserSubmitted: handleSubmit,
-                    onTapReady: { viewModel.showChallengeManually() }
-                )
-                .allowsHitTesting(false)
-                ChallengeIntroView(
-                    bestSoFar: viewModel.bestSoFar,
-                    onAccept: { viewModel.acceptChallenge(onComplete: onComplete) }
-                )
+        VStack(spacing: 0) {
+            card
+            if viewModel.step != .challengeIntro {
+                nextButton
             }
         }
-        .task {
-            // Skip model load during unit/UI tests — Metal doesn't init in simulator
-            guard ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil else { return }
-            await viewModel.bootstrap()
-            let service = LLMService()
-            do {
-                openingCandidates = try await service.predictNextTokens(
-                    prompt: openingPrompt, topK: 4)
-            } catch {
-                openingCandidates = []
-            }
-            openingLoading = false
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(.systemGroupedBackground).ignoresSafeArea())
+    }
+
+    @ViewBuilder
+    private var card: some View {
+        switch viewModel.step {
+        case .firstExample:
+            ExampleCardView(
+                prompt: viewModel.firstExample.prompt,
+                candidates: viewModel.firstExample.candidates,
+                caption: String(
+                    localized: "onboarding.example1.caption",
+                    defaultValue: "These 100 dots are what the model on this device just predicted for that sentence."
+                )
+            )
+        case .secondExample:
+            ExampleCardView(
+                prompt: viewModel.secondExample.prompt,
+                candidates: viewModel.secondExample.candidates,
+                caption: String(
+                    localized: "onboarding.example2.caption",
+                    defaultValue: "Same model, different sentence — and the dots spread out."
+                )
+            )
+        case .challengeIntro:
+            ChallengeIntroView(
+                onAccept: { viewModel.acceptChallenge(onComplete: onComplete) }
+            )
         }
     }
 
-    @State private var openingCandidates: [TokenCandidate] = []
-    @State private var openingLoading: Bool = true
-
-    private var openingScreen: some View {
-        OpeningView(
-            candidates: openingCandidates,
-            isLoading: openingLoading,
-            onTap: { viewModel.transitionToFreePlay() }
-        )
-    }
-
-    private var currentPlays: Int {
-        if case .freePlay(let n) = viewModel.phase { return n }
-        return 0
-    }
-
-    @State private var freePlayVM: Level1ViewModel?
-
-    private func makeLevel1VM() -> Level1ViewModel {
-        if let freePlayVM { return freePlayVM }
-        let vm = Level1ViewModel(service: LLMService())
-        freePlayVM = vm
-        return vm
-    }
-
-    private func handleSubmit() {
-        guard let top1 = freePlayVM?.topCandidates.first else { return }
-        viewModel.recordPlay(top1Probability: top1.probability)
-        viewModel.scheduleAutoShowIfSecondPlay()
+    private var nextButton: some View {
+        Button {
+            viewModel.goNext()
+        } label: {
+            Text(String(localized: "onboarding.next", defaultValue: "Next"))
+                .font(.headline)
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+                .background(Capsule().fill(Color.accentColor))
+        }
+        .buttonStyle(.plain)
+        .padding(20)
     }
 }
