@@ -70,4 +70,13 @@ struct OnboardingViewModelTests {
         vm.goNext()
         #expect(vm.step == .challengeIntro)
     }
+
+    @Test func acceptChallengeWritesPersistenceAndInvokesCallback() {
+        let store = freshStore()
+        let vm = makeVM(store: store)
+        var callbackFired = false
+        vm.acceptChallenge { callbackFired = true }
+        #expect(callbackFired == true)
+        #expect(store.hasSeenOnboarding == true)
+    }
 }

@@ -33,4 +33,9 @@ final class OnboardingViewModel {
         case .challengeIntro: break
         }
     }
+
+    func acceptChallenge(onComplete: @escaping () -> Void) {
+        progressStore.hasSeenOnboarding = true
+        onComplete()
+    }
 }
