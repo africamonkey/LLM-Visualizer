@@ -120,4 +120,29 @@ struct AppShellViewModelTests {
         await appVM.retry()
         #expect(appVM.state == .ready(hasSeenOnboarding: false))
     }
+
+    @Test func markOnboardingCompleteFlipsReadyFalseToReadyTrue() async {
+        let mock = MockLLMService()
+        mock.stubbedPredictTopK = [
+            TokenCandidate(id: 1, text: "a", probability: 0.5)
+        ]
+        let appVM = AppShellViewModel(
+            service: mock,
+            progressStore: freshStore()
+        )
+        await appVM.bootstrap()
+        #expect(appVM.state == .ready(hasSeenOnboarding: false))
+        appVM.markOnboardingComplete()
+        #expect(appVM.state == .ready(hasSeenOnboarding: true))
+    }
+
+    @Test func markOnboardingCompleteFromLoadingIsNoOp() {
+        let appVM = AppShellViewModel(
+            service: MockLLMService(),
+            progressStore: freshStore()
+        )
+        #expect(appVM.state == .loading)
+        appVM.markOnboardingComplete()
+        #expect(appVM.state == .loading)
+    }
 }

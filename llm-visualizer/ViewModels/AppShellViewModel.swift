@@ -53,4 +53,10 @@ final class AppShellViewModel {
     func retry() async {
         await bootstrap()
     }
+
+    func markOnboardingComplete() {
+        if case .ready(let hasSeen) = state, !hasSeen {
+            state = .ready(hasSeenOnboarding: true)
+        }
+    }
 }
