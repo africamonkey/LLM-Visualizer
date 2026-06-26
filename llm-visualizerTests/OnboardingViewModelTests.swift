@@ -48,4 +48,26 @@ struct OnboardingViewModelTests {
         let vm = makeVM()
         #expect(vm.step == .firstExample)
     }
+
+    @Test func goNextFromFirstExampleAdvancesToSecondExample() {
+        let vm = makeVM()
+        vm.goNext()
+        #expect(vm.step == .secondExample)
+    }
+
+    @Test func goNextFromSecondExampleAdvancesToChallengeIntro() {
+        let vm = makeVM()
+        vm.goNext()
+        vm.goNext()
+        #expect(vm.step == .challengeIntro)
+    }
+
+    @Test func goNextFromChallengeIntroIsNoOp() {
+        let vm = makeVM()
+        vm.goNext()
+        vm.goNext()
+        #expect(vm.step == .challengeIntro)
+        vm.goNext()
+        #expect(vm.step == .challengeIntro)
+    }
 }

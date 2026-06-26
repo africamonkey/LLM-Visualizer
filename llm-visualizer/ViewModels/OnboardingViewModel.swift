@@ -25,4 +25,12 @@ final class OnboardingViewModel {
         self.secondExample = secondExample
         self.progressStore = progressStore
     }
+
+    func goNext() {
+        switch step {
+        case .firstExample:  step = .secondExample
+        case .secondExample: step = .challengeIntro
+        case .challengeIntro: break
+        }
+    }
 }
