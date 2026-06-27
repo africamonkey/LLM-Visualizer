@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Remove the Onboarding-vs-Level 1 duplication by replacing the 3-step onboarding (Opening → Free Play → Challenge Intro) with a 2-card passive example flow, and hide model loading behind a dedicated full-screen page. Centralize all model bootstrapping in a new `AppShellViewModel` and pre-fetch both onboarding examples during that bootstrap, so the user never sees an in-onboarding loading state.
+**Goal:** Remove the Onboarding-vs-Level 1 duplication by replacing the 3-step onboarding (Opening → Free Play → Challenge Intro) with a single passive example card (followed by the existing Challenge Intro), and hide model loading behind a dedicated full-screen page. Centralize all model bootstrapping in a new `AppShellViewModel` and pre-fetch the onboarding example during that bootstrap, so the user never sees an in-onboarding loading state.
 
 **Architecture:** New `AppShellViewModel` owns the model-load + onboarding-example pre-fetch as a single state machine (`loading` / `failed(msg)` / `ready(hasSeenOnboarding)`). `AppRootView` switches on this state. `ModelLoadingView` is the visual for `.loading` and `.failed`. Onboarding becomes a 2-card passive example flow (`ExampleCardView` × 2 with `DotGridView`), followed by the existing `ChallengeIntroView` (with a small copy tweak). `OnboardingViewModel` shrinks to a 3-step enum + accept-challenge. `LevelShellView` and `Level1Session` lose their `bootstrap()` calls (model is guaranteed loaded by the time we get there). TDD-first for all data-layer code; SwiftUI primitives built directly and verified manually.
 
@@ -57,7 +57,7 @@ xcodebuild test -project llm-visualizer.xcodeproj -scheme llm-visualizer \
 - `LLMService.swift` — add `predictNextTokensError: Error?` to `MockLLMService` for failure-injection tests
 
 **Localization (modified):**
-- `Resources/Localizable.xcstrings` — add `loading.model`, `error.retry`, `onboarding.next`, `onboarding.example1.caption`, `onboarding.example2.caption`, plus updated `ChallengeIntroCard` copy
+- `Resources/Localizable.xcstrings` — add `loading.model`, `error.retry`, `onboarding.next`, `onboarding.prompt`, `onboarding.example.caption`, plus updated `ChallengeIntroCard` copy
 
 **Tests (new):**
 - `AppShellViewModelTests.swift`
@@ -240,11 +240,11 @@ struct AppShellViewModelTests {
     @Test func initialStateIsLoading() {
         let appVM = AppShellViewModel(
             service: MockLLMService(),
-            progressStore: freshStore()
+            progressStore: freshStore(),
+            onboardingPrompt: "test"
         )
         #expect(appVM.state == .loading)
-        #expect(appVM.example1 == nil)
-        #expect(appVM.example2 == nil)
+        #expect(appVM.example == nil)
     }
 }
 ```
@@ -283,16 +283,18 @@ final class AppShellViewModel {
     var state: State = .loading
     let service: LLMServiceProtocol
     private let progressStore: ProgressStore
+    private let onboardingPrompt: String
 
-    private(set) var example1: OnboardingExample?
-    private(set) var example2: OnboardingExample?
+    private(set) var example: OnboardingExample?
 
     init(
         service: LLMServiceProtocol,
-        progressStore: ProgressStore = .shared
+        progressStore: ProgressStore = .shared,
+        onboardingPrompt: String
     ) {
         self.service = service
         self.progressStore = progressStore
+        self.onboardingPrompt = onboardingPrompt
     }
 }
 ```
@@ -313,7 +315,7 @@ git commit -m "feat(AppShell): AppShellViewModel state enum + initial state (TDD
 
 ### Task 4: `AppShellViewModel` — bootstrap happy path
 
-Implement the happy path of `bootstrap()`: load the model, pre-fetch both example prompts, transition to `.ready`, and store the results.
+Implement the happy path of `bootstrap()`: load the model, pre-fetch the onboarding example using the prompt passed to `init`, transition to `.ready`, and store the result.
 
 **Files:**
 - Modify: `llm-visualizerTests/AppShellViewModelTests.swift`
@@ -328,16 +330,18 @@ Append to `llm-visualizerTests/AppShellViewModelTests.swift`:
         let store = freshStore()
         let mock = MockLLMService()
         mock.stubbedPredictTopK = [
-            TokenCandidate(id: 1, text: "a", probability: 0.7),
-            TokenCandidate(id: 2, text: "b", probability: 0.2),
+            TokenCandidate(id: 1, text: "好", probability: 0.7),
+            TokenCandidate(id: 2, text: "不错", probability: 0.2),
         ]
-        let appVM = AppShellViewModel(service: mock, progressStore: store)
+        let appVM = AppShellViewModel(
+            service: mock,
+            progressStore: store,
+            onboardingPrompt: "今天天气真"
+        )
         await appVM.bootstrap()
         #expect(appVM.state == .ready(hasSeenOnboarding: false))
-        #expect(appVM.example1?.prompt == "Today's weather is")
-        #expect(appVM.example2?.prompt == "I love eating")
-        #expect(appVM.example1?.candidates.count == 2)
-        #expect(appVM.example2?.candidates.count == 2)
+        #expect(appVM.example?.prompt == "今天天气真")
+        #expect(appVM.example?.candidates.count == 2)
     }
 
     @Test func bootstrapHappyPathWhenOnboardingAlreadySeen() async {
@@ -345,9 +349,13 @@ Append to `llm-visualizerTests/AppShellViewModelTests.swift`:
         store.hasSeenOnboarding = true
         let mock = MockLLMService()
         mock.stubbedPredictTopK = [
-            TokenCandidate(id: 1, text: "a", probability: 0.5)
+            TokenCandidate(id: 1, text: "好", probability: 0.5)
         ]
-        let appVM = AppShellViewModel(service: mock, progressStore: store)
+        let appVM = AppShellViewModel(
+            service: mock,
+            progressStore: store,
+            onboardingPrompt: "今天天气真"
+        )
         await appVM.bootstrap()
         #expect(appVM.state == .ready(hasSeenOnboarding: true))
     }
@@ -363,30 +371,23 @@ xcodebuild test -project llm-visualizer.xcodeproj -scheme llm-visualizer \
 
 Expected: the two new tests fail (build may pass; the `.ready` assertion is wrong because `bootstrap` doesn't exist yet, and `state` is still `.loading`).
 
-- [ ] **Step 3: Add `onboardingPrompts` and `bootstrap` to `AppShellViewModel`**
+- [ ] **Step 3: Add `bootstrap` to `AppShellViewModel`**
 
-Edit `llm-visualizer/ViewModels/AppShellViewModel.swift`. Add a static prompt list inside the class (after the `init`):
-
-```swift
-    static let onboardingPrompts: [String] = [
-        "Today's weather is",
-        "I love eating",
-    ]
-```
-
-Then add the `bootstrap` method:
+Edit `llm-visualizer/ViewModels/AppShellViewModel.swift`. Add the `bootstrap` method after `init` (no static prompt list — the prompt is injected):
 
 ```swift
     func bootstrap() async {
         state = .loading
         do {
             try await service.loadModel()
-            let p1 = Self.onboardingPrompts[0]
-            let p2 = Self.onboardingPrompts[1]
-            let c1 = try await service.predictNextTokens(prompt: p1, topK: 4)
-            let c2 = try await service.predictNextTokens(prompt: p2, topK: 4)
-            self.example1 = OnboardingExample(prompt: p1, candidates: c1)
-            self.example2 = OnboardingExample(prompt: p2, candidates: c2)
+            let candidates = try await service.predictNextTokens(
+                prompt: onboardingPrompt,
+                topK: 4
+            )
+            self.example = OnboardingExample(
+                prompt: onboardingPrompt,
+                candidates: candidates
+            )
             state = .ready(hasSeenOnboarding: progressStore.hasSeenOnboarding)
         } catch {
             state = .failed(error.localizedDescription)
@@ -428,12 +429,12 @@ Append to `llm-visualizerTests/AppShellViewModelTests.swift`:
         )
         let appVM = AppShellViewModel(
             service: mock,
-            progressStore: freshStore()
+            progressStore: freshStore(),
+            onboardingPrompt: "test"
         )
         await appVM.bootstrap()
         #expect(appVM.state == .failed("model not found"))
-        #expect(appVM.example1 == nil)
-        #expect(appVM.example2 == nil)
+        #expect(appVM.example == nil)
     }
 
     @Test func bootstrapFailsWhenPredictNextTokensThrows() async {
@@ -444,7 +445,8 @@ Append to `llm-visualizerTests/AppShellViewModelTests.swift`:
         )
         let appVM = AppShellViewModel(
             service: mock,
-            progressStore: freshStore()
+            progressStore: freshStore(),
+            onboardingPrompt: "test"
         )
         await appVM.bootstrap()
         #expect(appVM.state == .failed("forward pass crashed"))
@@ -505,7 +507,7 @@ Append to `llm-visualizerTests/AppShellViewModelTests.swift`:
         ]
         await appVM.retry()
         #expect(appVM.state == .ready(hasSeenOnboarding: false))
-        #expect(appVM.example1 != nil)
+        #expect(appVM.example != nil)
     }
 
     @Test func retryFromReadyIsNoOp() async {
@@ -515,7 +517,8 @@ Append to `llm-visualizerTests/AppShellViewModelTests.swift`:
         ]
         let appVM = AppShellViewModel(
             service: mock,
-            progressStore: freshStore()
+            progressStore: freshStore(),
+            onboardingPrompt: "test"
         )
         await appVM.bootstrap()
         #expect(appVM.state == .ready(hasSeenOnboarding: false))
@@ -574,11 +577,12 @@ Append to `llm-visualizerTests/AppShellViewModelTests.swift`:
     @Test func markOnboardingCompleteFlipsReadyFalseToReadyTrue() async {
         let mock = MockLLMService()
         mock.stubbedPredictTopK = [
-            TokenCandidate(id: 1, text: "a", probability: 0.5)
+            TokenCandidate(id: 1, text: "好", probability: 0.5)
         ]
         let appVM = AppShellViewModel(
             service: mock,
-            progressStore: freshStore()
+            progressStore: freshStore(),
+            onboardingPrompt: "test"
         )
         await appVM.bootstrap()
         #expect(appVM.state == .ready(hasSeenOnboarding: false))
@@ -589,7 +593,8 @@ Append to `llm-visualizerTests/AppShellViewModelTests.swift`:
     @Test func markOnboardingCompleteFromLoadingIsNoOp() {
         let appVM = AppShellViewModel(
             service: MockLLMService(),
-            progressStore: freshStore()
+            progressStore: freshStore(),
+            onboardingPrompt: "test"
         )
         #expect(appVM.state == .loading)
         appVM.markOnboardingComplete()
@@ -635,7 +640,7 @@ git commit -m "feat(AppShell): AppShellViewModel.markOnboardingComplete (TDD)"
 
 ### Task 8: `OnboardingViewModel` rewrite — Step enum + init
 
-Replace the existing `OnboardingViewModel` with a slim 3-step state machine. The first TDD pass: define the `Step` enum, the `step` property, the `firstExample` / `secondExample` stored properties, and the initializer.
+Replace the existing `OnboardingViewModel` with a slim 2-step state machine. The first TDD pass: define the `Step` enum (`.example` / `.challengeIntro`), the `step` property, the single `example` stored property, and the initializer.
 
 This task **rewrites** `OnboardingViewModelTests.swift` in place. The old test cases reference `phase`, `transitionToFreePlay()`, `recordPlay()`, `showChallengeManually()`, `scheduleAutoShowIfSecondPlay()`, and `bestSoFar` — all of which are removed. The new file has a different shape.
 
@@ -660,16 +665,10 @@ import Testing
 @MainActor
 struct OnboardingViewModelTests {
 
-    private let firstExample = OnboardingExample(
-        prompt: "Today's weather is",
+    private let example = OnboardingExample(
+        prompt: "今天天气真",
         candidates: [
-            TokenCandidate(id: 1, text: "sunny", probability: 0.85)
-        ]
-    )
-    private let secondExample = OnboardingExample(
-        prompt: "I love eating",
-        candidates: [
-            TokenCandidate(id: 2, text: "pizza", probability: 0.35)
+            TokenCandidate(id: 1, text: "好", probability: 0.85)
         ]
     )
 
@@ -680,23 +679,20 @@ struct OnboardingViewModelTests {
 
     private func makeVM(store: ProgressStore? = nil) -> OnboardingViewModel {
         OnboardingViewModel(
-            firstExample: firstExample,
-            secondExample: secondExample,
+            example: example,
             progressStore: store ?? freshStore()
         )
     }
 
-    @Test func initStoresExamples() {
+    @Test func initStoresExample() {
         let vm = makeVM()
-        #expect(vm.firstExample.prompt == "Today's weather is")
-        #expect(vm.firstExample.candidates.count == 1)
-        #expect(vm.secondExample.prompt == "I love eating")
-        #expect(vm.secondExample.candidates.count == 1)
+        #expect(vm.example.prompt == "今天天气真")
+        #expect(vm.example.candidates.count == 1)
     }
 
-    @Test func initialStepIsFirstExample() {
+    @Test func initialStepIsExample() {
         let vm = makeVM()
-        #expect(vm.step == .firstExample)
+        #expect(vm.step == .example)
     }
 }
 ```
@@ -726,21 +722,18 @@ import Foundation
 @Observable
 final class OnboardingViewModel {
 
-    enum Step { case firstExample, secondExample, challengeIntro }
-    var step: Step = .firstExample
+    enum Step { case example, challengeIntro }
+    var step: Step = .example
 
-    let firstExample: OnboardingExample
-    let secondExample: OnboardingExample
+    let example: OnboardingExample
 
     private let progressStore: ProgressStore
 
     init(
-        firstExample: OnboardingExample,
-        secondExample: OnboardingExample,
+        example: OnboardingExample,
         progressStore: ProgressStore = .shared
     ) {
-        self.firstExample = firstExample
-        self.secondExample = secondExample
+        self.example = example
         self.progressStore = progressStore
     }
 }
@@ -757,7 +750,7 @@ Re-run the same `xcodebuild test` command. Expected: 2 tests pass.
 ```bash
 git add llm-visualizer/ViewModels/OnboardingViewModel.swift \
         llm-visualizerTests/OnboardingViewModelTests.swift
-git commit -m "feat(Onboarding): OnboardingViewModel rewritten as 3-step state machine (TDD)"
+git commit -m "feat(Onboarding): OnboardingViewModel rewritten as 2-step state machine (TDD)"
 ```
 
 ---
@@ -775,22 +768,14 @@ Add the `goNext()` method, which advances the step in order.
 Append to `llm-visualizerTests/OnboardingViewModelTests.swift`:
 
 ```swift
-    @Test func goNextFromFirstExampleAdvancesToSecondExample() {
+    @Test func goNextFromExampleAdvancesToChallengeIntro() {
         let vm = makeVM()
-        vm.goNext()
-        #expect(vm.step == .secondExample)
-    }
-
-    @Test func goNextFromSecondExampleAdvancesToChallengeIntro() {
-        let vm = makeVM()
-        vm.goNext()
         vm.goNext()
         #expect(vm.step == .challengeIntro)
     }
 
     @Test func goNextFromChallengeIntroIsNoOp() {
         let vm = makeVM()
-        vm.goNext()
         vm.goNext()
         #expect(vm.step == .challengeIntro)
         vm.goNext()
@@ -815,8 +800,7 @@ Edit `llm-visualizer/ViewModels/OnboardingViewModel.swift`. Add after the `init`
 ```swift
     func goNext() {
         switch step {
-        case .firstExample:  step = .secondExample
-        case .secondExample: step = .challengeIntro
+        case .example:        step = .challengeIntro
         case .challengeIntro: break
         }
     }
@@ -824,7 +808,7 @@ Edit `llm-visualizer/ViewModels/OnboardingViewModel.swift`. Add after the `init`
 
 - [ ] **Step 4: Run the tests to verify they pass**
 
-Re-run the same `xcodebuild test` command. Expected: 5 tests pass.
+Re-run the same `xcodebuild test` command. Expected: 4 tests pass (init + initial + goNext × 2 — first advances, second is no-op).
 
 - [ ] **Step 5: Commit**
 
@@ -882,7 +866,7 @@ Edit `llm-visualizer/ViewModels/OnboardingViewModel.swift`. Add after `goNext`:
 
 - [ ] **Step 4: Run the test to verify it passes**
 
-Re-run the same `xcodebuild test` command. Expected: 6 tests pass.
+Re-run the same `xcodebuild test` command. Expected: 5 tests pass.
 
 - [ ] **Step 5: Commit**
 
@@ -1159,22 +1143,13 @@ struct OnboardingFlowView: View {
     @ViewBuilder
     private var card: some View {
         switch viewModel.step {
-        case .firstExample:
+        case .example:
             ExampleCardView(
-                prompt: viewModel.firstExample.prompt,
-                candidates: viewModel.firstExample.candidates,
+                prompt: viewModel.example.prompt,
+                candidates: viewModel.example.candidates,
                 caption: String(
-                    localized: "onboarding.example1.caption",
-                    defaultValue: "These 100 dots are what the model on this device just predicted for that sentence."
-                )
-            )
-        case .secondExample:
-            ExampleCardView(
-                prompt: viewModel.secondExample.prompt,
-                candidates: viewModel.secondExample.candidates,
-                caption: String(
-                    localized: "onboarding.example2.caption",
-                    defaultValue: "Same model, different sentence — and the dots spread out."
+                    localized: "onboarding.example.caption",
+                    defaultValue: "These 100 dots are what the model on this device really thought. Now you try — can you make it more sure?"
                 )
             )
         case .challengeIntro:
@@ -1228,7 +1203,13 @@ import SwiftUI
 
 struct AppRootView: View {
 
-    @State private var appVM = AppShellViewModel(service: LLMService())
+    @State private var appVM = AppShellViewModel(
+        service: LLMService(),
+        onboardingPrompt: String(
+            localized: "onboarding.prompt",
+            defaultValue: "今天天气真"
+        )
+    )
 
     var body: some View {
         Group {
@@ -1243,27 +1224,40 @@ struct AppRootView: View {
                     LevelShellView(currentSession: Level1Session(
                         viewModel: Level1ViewModel(service: appVM.service)
                     ))
-                } else if let ex1 = appVM.example1, let ex2 = appVM.example2 {
+                } else if let example = appVM.example {
                     OnboardingFlowView(
-                        viewModel: OnboardingViewModel(
-                            firstExample: ex1,
-                            secondExample: ex2
-                        ),
+                        viewModel: OnboardingViewModel(example: example),
                         onComplete: {
                             appVM.markOnboardingComplete()
                         }
                     )
                 } else {
-                    // Defensive: .ready(false) should always have examples.
-                    // Render an empty view rather than crash.
+                    // Defensive: .ready(false) should always have an example.
                     EmptyView()
                 }
             }
         }
-        .task { await appVM.bootstrap() }
+        .task {
+            // Skip model load during unit/UI tests — Metal doesn't init in simulator.
+            // Same pattern as LevelShellView.swift:40.
+            guard ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil else { return }
+            await appVM.bootstrap()
+        }
     }
 }
 ```
+
+> **Implementation note:** The XCTest guard at the view call site (not
+> inside `AppShellViewModel.bootstrap()`) is required because the test
+> target links against the main target's compiled module — when the
+> main target doesn't compile (because `bootstrap()` triggers
+> `LLMService.loadModel()` → Metal init → crash on simulator), the
+> test target also fails to load. Without the guard, `xcodebuild test`
+> crashes with `Test crashed with signal abrt before establishing
+> connection`. The guard sits at the view call site so data-layer
+> TDD tests that call `bootstrap()` directly on a fresh `AppShellViewModel`
+> remain unaffected (their tests run in a process where the view's
+> `.task` modifier never fires).
 
 - [ ] **Step 2: Commit**
 
@@ -1401,8 +1395,8 @@ In the JSON catalog, add entries for these keys (both `en` and `zh-Hans`):
 | `loading.model` | `Loading model…` | `正在载入模型` |
 | `error.retry` | `Try again` | `重试` |
 | `onboarding.next` | `Next` | `下一张` |
-| `onboarding.example1.caption` | `These 100 dots are what the model on this device just predicted for that sentence.` | `这 100 个点是本机的模型刚才对这句话的真实预测。` |
-| `onboarding.example2.caption` | `Same model, different sentence — and the dots spread out.` | `同一个模型，换句话，分布就散了。` |
+| `onboarding.prompt`                 | `Today's weather is really`                                       | `今天天气真`           |
+| `onboarding.example.caption`         | `These 100 dots are what the model on this device really thought. Now you try — can you make it more sure?` | `这 100 个点是本机模型刚才的真实想法。下一关你来试试，看能不能让它更确定。` |
 | `challenge.body` (or whatever key the card uses) | `You just saw how a model thinks. Now try it for real.` | `你已经看到了模型怎么想。现在自己来试试。` |
 
 Edit the file directly. The catalog is JSON with a `strings` map; each entry has `comment`, `localizations.en.stringUnit.state` / `localizations.en.stringUnit.value`, and the same for `zh-Hans`.
@@ -1489,7 +1483,7 @@ If nothing needed fixing, skip this step.
 **Spec coverage:**
 
 - §3 architecture (AppRootView + AppShellViewModel + ModelLoadingView + OnboardingFlowView + LevelShellView) → Tasks 14–17 ✓
-- §3.1 invariants (single model load, pre-fetch both, errors in loading view, Onboarding ≠ Level 1 structurally) → Tasks 3–7, 11, 15, 17 ✓
+- §3.1 invariants (single model load, pre-fetch the example, errors in loading view, Onboarding ≠ Level 1 structurally) → Tasks 3–7, 11, 15, 17 ✓
 - §4 files (4.1 create, 4.2 delete, 4.3 modify) → Tasks 2, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19 ✓
 - §5.0 OnboardingExample → Task 2 ✓
 - §5.1 AppShellViewModel (state, bootstrap, retry, markOnboardingComplete) → Tasks 3–7 ✓
@@ -1509,6 +1503,6 @@ If nothing needed fixing, skip this step.
 **Type consistency:**
 - `AppShellViewModel.State` is referenced as `AppShellViewModel.State` in `ModelLoadingView` and `AppRootView` — defined in Task 3, used in Tasks 11, 15 ✓
 - `OnboardingViewModel.Step` is referenced in `OnboardingFlowView` — defined in Task 8, used in Task 14 ✓
-- `OnboardingExample` is referenced in `AppShellViewModel.example1/2`, `OnboardingViewModel` init, and `OnboardingFlowView` — defined in Task 2, used in Tasks 4, 8, 14, 15 ✓
+- `OnboardingExample` is referenced in `AppShellViewModel.example`, `OnboardingViewModel` init, and `OnboardingFlowView` — defined in Task 2, used in Tasks 4, 8, 14, 15 ✓
 - `bootstrap()`, `retry()`, `markOnboardingComplete()` are all public on `AppShellViewModel` — defined Tasks 4, 6, 7, used Task 15 ✓
 - `goNext()` and `acceptChallenge(onComplete:)` are public on `OnboardingViewModel` — defined Tasks 9, 10, used Task 14 ✓
