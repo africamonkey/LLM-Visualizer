@@ -26,10 +26,10 @@ This slice restructures Onboarding along two axes:
    waits inside an onboarding card.
 
 The pedagogical premise of Onboarding shifts from "tease the user with
-a free copy of Level 1, then challenge them" to "show the user two
-real, pre-canned model predictions, side by side, with a teaching
-caption — the user reads and taps Next." This treats Onboarding as a
-**classroom**, not a **tutorial** that previews the game.
+a free copy of Level 1, then challenge them" to "show the user one
+real, pre-canned model prediction with a teaching caption, then hand
+off to Level 1." This treats Onboarding as a **brief classroom**,
+not a **tutorial** that previews the game.
 
 ## 2. Scope
 
@@ -45,17 +45,18 @@ caption — the user reads and taps Next." This treats Onboarding as a
 - New `DotGridView` — 10×10 grid of small circles, colored by
   top-K candidate proportion. Private subview of `ExampleCardView`.
 - Simplified `OnboardingViewModel` — pure state machine over a
-  3-step enum (`firstExample` / `secondExample` / `challengeIntro`).
-  Holds two pre-fetched `[TokenCandidate]` arrays, no `service`,
-  no `modelState`, no `bootstrap()`, no progress tracking.
-- Pre-fetch of **both** onboarding examples during model loading
+  2-step enum (`example` / `challengeIntro`). Holds one pre-fetched
+  `[OnboardingExample]`, no `service`, no `modelState`, no `bootstrap()`,
+  no progress tracking.
+- Pre-fetch of **one** onboarding example during model loading
   (no per-example loading screen).
 - Centralize model loading in `AppRootView`. Remove bootstrap calls
   from `OnboardingFlowView` and `LevelShellView`/`Level1Session`.
 - Delete `FreePlayView`, `OpeningView`, and the old `OnboardingState`
   enum (which carried `playsSoFar` and progress fields).
-- Extend `Localizable.xcstrings` with "Loading model…" and the two
-  example captions (English + zh-Hans).
+- Extend `Localizable.xcstrings` with "Loading model…", the
+  onboarding prompt (used by both the model and the example card), and
+  the example caption (English + zh-Hans).
 - Unit tests (TDD-first per project convention): `AppShellViewModel`,
   `OnboardingViewModel`.
 
@@ -93,32 +94,30 @@ caption — the user reads and taps Next." This treats Onboarding as a
                                      │      │ ModelLoadingView    │
                                      ▼      │  logo               │
                           ┌──────────────────┤  ⚠ <error message>  │
-                          │ ModelLoadingView │  [ Try again ]      │
-                          │  logo            └─────────────────────┘
-                          │  "Loading model…"
-                          │  ProgressView()
-                          │  .task: appVM.bootstrap()
-                          │   ↳ loadModel()
-                          │   ↳ predictNextTokens("Today's weather is", topK: 4) → example1
-                          │   ↳ predictNextTokens("I love eating",      topK: 4) → example2
-                          │   ↳ state = .ready(hasSeenOnboarding: …)
-                          └──────────────┬───────────────────────────────┘
-                                         │
-                          state: ready(  │
-                          hasSeenOnboarding:  │
-                              false)         │  hasSeenOnboarding: true
-                                         │   │
-                          ┌──────────────▼─┐ ┌▼──────────────────────┐
-                          │ OnboardingFlowView│ │ LevelShellView      │
-                          │  OnboardingVM    │ │  Level1Session      │
-                          │   .firstExample  │ │   → Level1View      │
-                          │   .secondExample │ │  (no bootstrap —    │
-                          │   .challengeIntro│ │   model is ready)   │
-                          │                  │ └─────────────────────┘
-                          │ Examples pre-pop │
-                          │ from appVM.      │
-                          │ example1/2       │
-                          └──────────────────┘
+                           │ ModelLoadingView │  [ Try again ]      │
+                           │  logo            └─────────────────────┘
+                           │  "Loading model…"
+                           │  ProgressView()
+                           │  .task: appVM.bootstrap()
+                           │   ↳ loadModel()
+                           │   ↳ predictNextTokens(prompt,         topK: 4) → example
+                           │   ↳ state = .ready(hasSeenOnboarding: …)
+                           └──────────────┬───────────────────────────────┘
+                                          │
+                           state: ready(  │
+                           hasSeenOnboarding:  │
+                               false)         │  hasSeenOnboarding: true
+                                          │   │
+                           ┌──────────────▼─┐ ┌▼──────────────────────┐
+                           │ OnboardingFlowView│ │ LevelShellView      │
+                           │  OnboardingVM    │ │  Level1Session      │
+                           │   .example       │ │   → Level1View      │
+                           │   .challengeIntro│ │  (no bootstrap —    │
+                           │                  │ │   model is ready)   │
+                           │ Example pre-pop  │ └─────────────────────┘
+                           │ from appVM.      │
+                           │ example          │
+                           └──────────────────┘
 ```
 
 ### 3.1 Key invariants
@@ -126,7 +125,7 @@ caption — the user reads and taps Next." This treats Onboarding as a
 - **The model is loaded exactly once per app launch.** `AppShellViewModel`
   is the sole owner. `OnboardingViewModel` and `Level1Session` do not
   call `service.loadModel()`. `LevelShellView` does not bootstrap.
-- **Onboarding's two examples are pre-fetched during model loading.**
+- **The onboarding example is pre-fetched during model loading.**
   The user sees a single continuous loading screen that covers the
   entire bootstrap. There is no in-onboarding loading state.
 - **All load-time errors land in `ModelLoadingView`.** In-game errors
@@ -186,24 +185,25 @@ inside `OnboardingViewModelTests` (rewrite the test file).
   Construct `AppShellViewModel` with `LLMService()` (real) or
   `MockLLMService` (test).
 - `llm-visualizer/ViewModels/OnboardingViewModel.swift` — full rewrite:
-  holds two `OnboardingExample`, holds `step: OnboardingViewModel.Step`
-  (nested enum), exposes `goNext()` and `acceptChallenge(onComplete:)`.
-  No `service`, no `modelState`, no `bootstrap()`.
+  holds one `OnboardingExample`, holds `step: OnboardingViewModel.Step`
+  (nested enum, `.example` / `.challengeIntro`), exposes `goNext()` and
+  `acceptChallenge(onComplete:)`. No `service`, no `modelState`,
+  no `bootstrap()`.
 - `llm-visualizer/Views/Onboarding/OnboardingFlowView.swift` — remove
   `.task { viewModel.bootstrap() }`. Construct `OnboardingViewModel`
-  with the two pre-fetched example arrays passed in from `AppRootView`.
+  with the single pre-fetched example passed in from `AppRootView`.
   `switch viewModel.step` to choose between `ExampleCardView`
-  (×2) and `ChallengeIntroView`.
+  (×1) and `ChallengeIntroView`.
 - `llm-visualizer/Views/LevelShell/LevelShellView.swift` — remove
   `currentSession.bootstrap()` from `.task`. The model is guaranteed
   loaded by the time we get here.
 - `llm-visualizer/Models/Level1Session.swift` — remove `bootstrap()`
   method.
 - `llm-visualizer/Resources/Localizable.xcstrings` — add
-  `"Loading model…"` (`loading.model`), two example captions
-  (`onboarding.example1.caption`, `onboarding.example2.caption`),
-  and a `"Try again"` (`error.retry`) string. Both `en` and
-  `zh-Hans`.
+  `"Loading model…"` (`loading.model`), the onboarding prompt
+  (`onboarding.prompt`), the example caption
+  (`onboarding.example.caption`), and a `"Try again"` (`error.retry`)
+  string. Both `en` and `zh-Hans`.
 
 ## 5. Components
 
@@ -220,7 +220,7 @@ Bundles a pre-canned prompt with its pre-fetched top-K candidate
 distribution. The prompt and the candidates are produced together
 during `AppShellViewModel.bootstrap()` — keeping them in one struct
 avoids the risk of the prompt text and the candidate list drifting
-out of sync. Held by `AppShellViewModel.example1/2` and passed by
+out of sync. Held by `AppShellViewModel.example` and passed by
 value into `OnboardingViewModel`'s initializer.
 
 No unit test (pure data type with no behavior).
@@ -239,20 +239,21 @@ final class AppShellViewModel {
 
     var state: State = .loading
     let service: LLMServiceProtocol
+    private let onboardingPrompt: String
 
-    private(set) var example1: OnboardingExample?
-    private(set) var example2: OnboardingExample?
+    private(set) var example: OnboardingExample?
 
-    static let onboardingPrompts: [String] = [
-        "Today's weather is",
-        "I love eating",
-    ]
-
-    init(service: LLMServiceProtocol) {
+    init(
+        service: LLMServiceProtocol,
+        progressStore: ProgressStore = .shared,
+        onboardingPrompt: String
+    ) {
         self.service = service
+        self.progressStore = progressStore
+        self.onboardingPrompt = onboardingPrompt
     }
 
-    /// Loads the model and pre-fetches both onboarding examples.
+    /// Loads the model and pre-fetches the onboarding example.
     /// Transitions: .loading → .ready on success, .loading → .failed on any throw.
     func bootstrap() async { … }
 
@@ -277,10 +278,10 @@ final class AppShellViewModel {
   `ProgressStore.hasSeenOnboarding = true`.
 - `bootstrap()` transitions `.loading → .ready(hasSeenOnboarding: false)`
   when `ProgressStore.hasSeenOnboarding = false`.
-- `bootstrap()` populates `example1` and `example2` with `OnboardingExample`
-  values whose `prompt` matches the corresponding entry in
-  `onboardingPrompts` and whose `candidates` matches the values
-  returned by `service.predictNextTokens`.
+- `bootstrap()` populates `example` with an `OnboardingExample`
+  whose `prompt` equals the `onboardingPrompt` passed to `init` and
+  whose `candidates` matches the values returned by
+  `service.predictNextTokens`.
 - `bootstrap()` transitions `.loading → .failed(message)` when
   `service.loadModel()` throws; the message equals
   `error.localizedDescription`.
@@ -400,21 +401,18 @@ red, unclaimed → `Color.gray.opacity(0.15)`.
 @MainActor
 @Observable
 final class OnboardingViewModel {
-    enum Step { case firstExample, secondExample, challengeIntro }
-    var step: Step = .firstExample
+    enum Step { case example, challengeIntro }
+    var step: Step = .example
 
-    let firstExample: OnboardingExample
-    let secondExample: OnboardingExample
+    let example: OnboardingExample
 
-    init(firstExample: OnboardingExample, secondExample: OnboardingExample) {
-        self.firstExample = firstExample
-        self.secondExample = secondExample
+    init(example: OnboardingExample) {
+        self.example = example
     }
 
     func goNext() {
         switch step {
-        case .firstExample:  step = .secondExample
-        case .secondExample: step = .challengeIntro
+        case .example:        step = .challengeIntro
         case .challengeIntro: break
         }
     }
@@ -431,10 +429,9 @@ behavior worth promoting to its own file.
 
 **Test contract** (`OnboardingViewModelTests`, rewrite, TDD):
 
-- `init` stores `firstExample` and `secondExample`.
-- Initial `step == .firstExample`.
-- `goNext()` from `.firstExample` → `.secondExample`.
-- `goNext()` from `.secondExample` → `.challengeIntro`.
+- `init` stores `example`.
+- Initial `step == .example`.
+- `goNext()` from `.example` → `.challengeIntro`.
 - `goNext()` from `.challengeIntro` is a no-op.
 - `acceptChallenge(onComplete:)` sets
   `ProgressStore.shared.hasSeenOnboarding = true` and invokes
@@ -444,7 +441,13 @@ behavior worth promoting to its own file.
 
 ```swift
 struct AppRootView: View {
-    @State private var appVM = AppShellViewModel(service: LLMService())
+    @State private var appVM = AppShellViewModel(
+        service: LLMService(),
+        onboardingPrompt: String(
+            localized: "onboarding.prompt",
+            defaultValue: "今天天气真"
+        )
+    )
 
     var body: some View {
         Group {
@@ -459,35 +462,43 @@ struct AppRootView: View {
                     LevelShellView(currentSession: Level1Session(
                         viewModel: Level1ViewModel(service: appVM.service)
                     ))
-                } else if let ex1 = appVM.example1, let ex2 = appVM.example2 {
+                } else if let example = appVM.example {
                     OnboardingFlowView(
-                        viewModel: OnboardingViewModel(
-                            firstExample: ex1,
-                            secondExample: ex2
-                        ),
+                        viewModel: OnboardingViewModel(example: example),
                         onComplete: {
-                            // Trigger a re-render so AppRootView picks up the new state.
-                            // Simplest: bump appVM.state to .ready(hasSeenOnboarding: true)
-                            // via a small dedicated method on AppShellViewModel.
                             appVM.markOnboardingComplete()
                         }
                     )
                 } else {
-                    // Should not happen — ready always implies example1/2 are set.
-                    // Render an empty view rather than crash.
+                    // Defensive: .ready(false) should always have an example.
                     EmptyView()
                 }
             }
         }
-        .task { await appVM.bootstrap() }
+        .task {
+            // Skip model load during unit/UI tests — Metal doesn't init in simulator.
+            // Same guard pattern as LevelShellView.swift:40.
+            guard ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil else { return }
+            await appVM.bootstrap()
+        }
     }
 }
 ```
 
-A small `markOnboardingComplete()` method on `AppShellViewModel`
-flips `state` to `.ready(hasSeenOnboarding: true)` so `AppRootView`
-re-evaluates. This avoids having `OnboardingViewModel` re-render the
-`AppRootView` shell.
+The onboarding prompt is resolved via `String(localized:defaultValue:)`
+at view init time and passed into `AppShellViewModel.init`. The VM does
+not own the prompt — it is app-level configuration. The default value
+serves as a fallback if the catalog entry is missing.
+
+`markOnboardingComplete()` on `AppShellViewModel` flips `state` to
+`.ready(hasSeenOnboarding: true)` so `AppRootView` re-evaluates. This
+avoids having `OnboardingViewModel` re-render the `AppRootView` shell.
+
+The `.task` guard around `bootstrap()` matches the existing pattern
+in `LevelShellView.swift:40-41` — without it, the test target crashes
+because Metal cannot initialize in the simulator process. The guard
+sits at the view call site (not in `bootstrap()`) so data-layer TDD
+tests that call `bootstrap()` directly remain unaffected.
 
 ## 6. UI Design
 
@@ -525,7 +536,7 @@ Failed state:
 
 ```
 ┌──────────────────────────────────────┐
-│ Today's weather is                   │   ← title3 semibold
+│ 今天天气真                            │   ← title3 semibold (localized via "onboarding.prompt")
 │                                      │
 │ 🟢🟢🟢🟢🟢🟢🟢🟢🟢·                 │   ← 100 dots, 10×10 grid
 │ 🟢🟢🟢🟢🟢🟢🟢🟢🟢·                 │   ← top-1 = green
@@ -538,9 +549,9 @@ Failed state:
 │ 🟢🟢🟢🟢🟢🟢🟢🟢🟡·                 │
 │ 🟢🟢🟢🟢🟢🟢🟢🟢🟡·                 │
 │                                      │
-│ These 100 dots are what the model    │   ← subhead secondary
-│ on this device just predicted for    │
-│ that sentence.                       │
+│ These 100 dots are what the model    │   ← subhead secondary (localized via "onboarding.example.caption")
+│ on this device really thought. Now   │
+│ you try — can you make it more sure? │
 └──────────────────────────────────────┘
 ```
 
@@ -565,20 +576,19 @@ The Next button lives in `OnboardingFlowView`, not in the card.
 
 ```
 llm_visualizerApp
-  → AppRootView (creates @State AppShellViewModel)
+  → AppRootView (creates @State AppShellViewModel
+                    with onboardingPrompt resolved from
+                    String(localized: "onboarding.prompt", …))
        .task: appVM.bootstrap()
          ├─ service.loadModel()                       (~5s typical for Qwen3-0.6B)
          ├─ service.predictNextTokens(                 (~1–3s)
-         │     "Today's weather is", topK: 4) → example1
-         ├─ service.predictNextTokens(                 (~1–3s)
-         │     "I love eating", topK: 4) → example2
+         │     onboardingPrompt, topK: 4) → example
          └─ state = .ready(hasSeenOnboarding: false)
   → body re-evaluates: state.ready(false)
   → OnboardingFlowView
-       OnboardingViewModel(firstExample: ex1, secondExample: ex2)
+       OnboardingViewModel(example: appVM.example)
        body: switch viewModel.step {
-         case .firstExample:  ExampleCardView(prompt: ex1.prompt, candidates: ex1.candidates, caption: …)
-         case .secondExample: ExampleCardView(prompt: ex2.prompt, candidates: ex2.candidates, caption: …)
+         case .example:       ExampleCardView(prompt: example.prompt, candidates: example.candidates, caption: …)
          case .challengeIntro: ChallengeIntroView(...)
        }
 ```
@@ -587,11 +597,8 @@ llm_visualizerApp
 
 ```
 goNext()                // OnboardingViewModel
-  step = .firstExample → .secondExample
-  (body re-renders, second card appears)
-goNext()
-  step = .secondExample → .challengeIntro
-  (ChallengeIntroView shown)
+  step = .example → .challengeIntro
+  (body re-renders, challenge intro appears)
 [Accept]
 acceptChallenge(onComplete: swapToLevelShell)
   ProgressStore.hasSeenOnboarding = true
@@ -628,11 +635,9 @@ app), distinct from the bootstrap-time errors this slice addresses.
 | App first launch                          | `appVM.state` = `.loading` → `.ready(hasSeenOnboarding: false)`      |
 | App reopen (already seen onboarding)      | `appVM.state` = `.loading` → `.ready(hasSeenOnboarding: true)`       |
 | `loadModel()` throws                      | `appVM.state` = `.loading` → `.failed(localizedDescription)`         |
-| Example 1 fetch throws                    | same as above                                                         |
-| Example 2 fetch throws                    | same as above                                                         |
+| `predictNextTokens` throws               | same as above                                                         |
 | User taps [Try again]                     | `appVM.state` = `.failed(msg)` → `.loading` → (retry path)           |
-| User taps Next on example 1               | `OnboardingViewModel.step` = `.firstExample` → `.secondExample`      |
-| User taps Next on example 2               | `OnboardingViewModel.step` = `.secondExample` → `.challengeIntro`    |
+| User taps Next on example                 | `OnboardingViewModel.step` = `.example` → `.challengeIntro`          |
 | User taps Next on `.challengeIntro`       | no-op                                                                |
 | User accepts challenge                    | `ProgressStore.hasSeenOnboarding` = true; `appVM.state` → `.ready(true)` |
 | User navigates to Level 1 (post-onboarding) | `Level1ViewModel.submit()` is the only error path; `errorBanner` shown for ~3s on failure |
@@ -645,16 +650,17 @@ New strings in `Resources/Localizable.xcstrings` (en Base + zh-Hans):
 |--------------------------------------|--------------------------------------------------------|------------------------|
 | `loading.model`                      | `Loading model…`                                       | `正在载入模型`         |
 | `error.retry`                        | `Try again`                                            | `重试`                 |
-| `onboarding.example1.caption`        | `These 100 dots are what the model on this device just predicted for that sentence.` | `这 100 个点是本机的模型刚才对这句话的真实预测。` |
-| `onboarding.example2.caption`        | `Same model, different sentence — and the dots spread out.` | `同一个模型，换句话，分布就散了。` |
+| `onboarding.prompt`                 | `Today's weather is really`                           | `今天天气真`           |
+| `onboarding.example.caption`         | `These 100 dots are what the model on this device really thought. Now you try — can you make it more sure?` | `这 100 个点是本机模型刚才的真实想法。下一关你来试试，看能不能让它更确定。` |
 
-The two example prompts (`"Today's weather is"` / `"I love eating"`)
-live in `AppShellViewModel.onboardingPrompts` as plain strings and
-are **not** localized in this slice (the model is English-trained and
-the onboarding is the first-run experience; switching the prompt
-language risks confusing the user when the model's response is in
-English regardless). Future slices can revisit this if the app adds
-multilingual model support.
+The `onboarding.prompt` key is the text sent to the model **and**
+shown to the user on the example card. It is localized so that en users
+see the prompt in English and zh-Hans users see it in Chinese —
+each in a form natural for the user to read. The LLM's distribution
+will reflect how strongly the model handles each language (Qwen3-0.6B
+is Chinese-trained, so Chinese prompts give sharper distributions).
+This trade-off is honest: the user sees the same prompt that was sent
+to the model, in the language they understand.
 
 ## 10. Open Questions
 
