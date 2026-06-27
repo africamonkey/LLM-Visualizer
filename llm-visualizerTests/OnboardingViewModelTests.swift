@@ -10,60 +10,73 @@ import Testing
 @MainActor
 struct OnboardingViewModelTests {
 
-    private func freshDefaults() -> UserDefaults {
-        UserDefaults(suiteName: "llmviz.test.\(UUID().uuidString)")!
+    private let firstExample = OnboardingExample(
+        prompt: "Today's weather is",
+        candidates: [
+            TokenCandidate(id: 1, text: "sunny", probability: 0.85)
+        ]
+    )
+    private let secondExample = OnboardingExample(
+        prompt: "I love eating",
+        candidates: [
+            TokenCandidate(id: 2, text: "pizza", probability: 0.35)
+        ]
+    )
+
+    private func freshStore() -> ProgressStore {
+        let defaults = UserDefaults(suiteName: "llmviz.test.\(UUID().uuidString)")!
+        return ProgressStore(defaults: defaults)
     }
 
-    private func makeVM() -> OnboardingViewModel {
-        ProgressStore.shared  // keep linker happy
-        return OnboardingViewModel(service: MockLLMService())
+    private func makeVM(store: ProgressStore? = nil) -> OnboardingViewModel {
+        OnboardingViewModel(
+            firstExample: firstExample,
+            secondExample: secondExample,
+            progressStore: store ?? freshStore()
+        )
     }
 
-    @Test func initialPhaseIsOpening() {
+    @Test func initStoresExamples() {
         let vm = makeVM()
-        #expect(vm.phase == .opening)
+        #expect(vm.firstExample.prompt == "Today's weather is")
+        #expect(vm.firstExample.candidates.count == 1)
+        #expect(vm.secondExample.prompt == "I love eating")
+        #expect(vm.secondExample.candidates.count == 1)
     }
 
-    @Test func bestSoFarStartsAtZero() {
+    @Test func initialStepIsFirstExample() {
         let vm = makeVM()
-        #expect(vm.bestSoFar == 0.0)
+        #expect(vm.step == .firstExample)
     }
 
-    @Test func recordPlayBumpsCount() {
+    @Test func goNextFromFirstExampleAdvancesToSecondExample() {
         let vm = makeVM()
-        vm.transitionToFreePlay()
-        vm.recordPlay(top1Probability: 0.32)
-        #expect(vm.phase == .freePlay(playsSoFar: 1))
-        #expect(vm.bestSoFar == 0.32)
+        vm.goNext()
+        #expect(vm.step == .secondExample)
     }
 
-    @Test func recordPlayUpdatesBestSoFar() {
+    @Test func goNextFromSecondExampleAdvancesToChallengeIntro() {
         let vm = makeVM()
-        vm.transitionToFreePlay()
-        vm.recordPlay(top1Probability: 0.10)
-        vm.recordPlay(top1Probability: 0.55)
-        vm.recordPlay(top1Probability: 0.30)
-        #expect(vm.bestSoFar == 0.55)
+        vm.goNext()
+        vm.goNext()
+        #expect(vm.step == .challengeIntro)
     }
 
-    @Test func showChallengeManuallyJumpsToIntro() {
+    @Test func goNextFromChallengeIntroIsNoOp() {
         let vm = makeVM()
-        vm.transitionToFreePlay()
-        vm.showChallengeManually()
-        #expect(vm.phase == .challengeIntro)
+        vm.goNext()
+        vm.goNext()
+        #expect(vm.step == .challengeIntro)
+        vm.goNext()
+        #expect(vm.step == .challengeIntro)
     }
 
     @Test func acceptChallengeWritesPersistenceAndInvokesCallback() {
-        let defaults = freshDefaults()
-        let store = ProgressStore(defaults: defaults)
-        _ = store  // ensure init
-        let vm = OnboardingViewModel(
-            service: MockLLMService(),
-            progressStore: ProgressStore(defaults: defaults)
-        )
+        let store = freshStore()
+        let vm = makeVM(store: store)
         var callbackFired = false
         vm.acceptChallenge { callbackFired = true }
         #expect(callbackFired == true)
-        #expect(ProgressStore(defaults: defaults).hasSeenOnboarding == true)
+        #expect(store.hasSeenOnboarding == true)
     }
 }

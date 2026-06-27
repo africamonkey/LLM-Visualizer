@@ -40,8 +40,4 @@ final class Level1Session: LevelSession {
             isComplete = true
         }
     }
-
-    func bootstrap() async {
-        await viewModel.bootstrap()
-    }
 }

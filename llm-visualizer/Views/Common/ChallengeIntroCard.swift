@@ -6,7 +6,6 @@ import SwiftUI
 
 struct ChallengeIntroCard: View {
 
-    let bestSoFar: Double
     let onAccept: () -> Void
 
     private var goalText: String {
@@ -14,15 +13,6 @@ struct ChallengeIntroCard: View {
         let format = String(
             localized: "Goal: Get AI's next-word prediction above %d%%",
             defaultValue: "Goal: Get AI's next-word prediction above %d%%"
-        )
-        return String(format: format, pct)
-    }
-
-    private var anchorText: String {
-        let pct = Int((bestSoFar * 100).rounded())
-        let format = String(
-            localized: "Your highest was just %d%% — try the challenge",
-            defaultValue: "Your highest was just %d%% — try the challenge"
         )
         return String(format: format, pct)
     }
@@ -35,13 +25,12 @@ struct ChallengeIntroCard: View {
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
             Text(String(
-                localized: "Can you find a sentence that makes AI so sure it could guess right with its eyes closed?",
-                defaultValue: "Can you find a sentence that makes AI so sure it could guess right with its eyes closed?"
+                localized: "challenge.body",
+                defaultValue: "You just saw how a model thinks. Now try it for real."
             ))
                 .font(.subheadline.weight(.medium))
             HStack(spacing: 8) {
                 chip(text: goalText, accent: true)
-                chip(text: anchorText, accent: false)
             }
             Button(action: onAccept) {
                 Text(String(localized: "I'm ready", defaultValue: "I'm ready"))
@@ -79,7 +68,7 @@ struct ChallengeIntroCard: View {
 }
 
 #Preview {
-    ChallengeIntroCard(bestSoFar: 0.68, onAccept: {})
+    ChallengeIntroCard(onAccept: {})
         .padding()
         .background(Color(.systemGroupedBackground))
 }
