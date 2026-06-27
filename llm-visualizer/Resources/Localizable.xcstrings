@@ -732,42 +732,42 @@
         }
       }
     },
-    "onboarding.example1.caption": {
-      "comment": "Caption under the first example DotGridView, explaining that the 100 dots represent the model's real on-device predictions.",
+    "onboarding.example.caption": {
+      "comment": "Caption under the example DotGridView. Acknowledges that the dots are the model's real on-device prediction, then hands off to the user for Level 1.",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "These 100 dots are what the model on this device just predicted for that sentence."
+            "value": "These 100 dots are what the model on this device really thought. Now you try — can you make it more sure?"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "这 100 个点是本机的模型刚才对这句话的真实预测。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这 100 个点是本机模型刚才的真实想法。下一关你来试试，看能不能让它更确定。"
           }
         }
       }
     },
-    "onboarding.example2.caption": {
-      "comment": "Caption under the second example DotGridView, contrasting with the first by showing how predictions spread out for a different sentence.",
+    "onboarding.prompt": {
+      "comment": "Model prompt shown to the user on the example card AND sent to the LLM for prediction. Localized so the user sees the prompt in their device language; the LLM distribution will reflect how well the model handles that language.",
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Same model, different sentence — and the dots spread out."
+            "value": "Today's weather is really"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "同一个模型，换句话，分布就散了。"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今天天气真"
           }
         }
       }
     },
     "onboarding.next": {
-      "comment": "Primary CTA on the example onboarding cards, advancing to the next step.",
+      "comment": "Primary CTA on the example onboarding card, advancing to the challenge intro.",
       "localizations": {
         "en": {
           "stringUnit": {

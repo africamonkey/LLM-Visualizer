@@ -10,16 +10,10 @@ import Testing
 @MainActor
 struct OnboardingViewModelTests {
 
-    private let firstExample = OnboardingExample(
-        prompt: "Today's weather is",
+    private let example = OnboardingExample(
+        prompt: "今天天气真",
         candidates: [
-            TokenCandidate(id: 1, text: "sunny", probability: 0.85)
-        ]
-    )
-    private let secondExample = OnboardingExample(
-        prompt: "I love eating",
-        candidates: [
-            TokenCandidate(id: 2, text: "pizza", probability: 0.35)
+            TokenCandidate(id: 1, text: "好", probability: 0.65)
         ]
     )
 
@@ -30,41 +24,30 @@ struct OnboardingViewModelTests {
 
     private func makeVM(store: ProgressStore? = nil) -> OnboardingViewModel {
         OnboardingViewModel(
-            firstExample: firstExample,
-            secondExample: secondExample,
+            example: example,
             progressStore: store ?? freshStore()
         )
     }
 
-    @Test func initStoresExamples() {
+    @Test func initStoresExample() {
         let vm = makeVM()
-        #expect(vm.firstExample.prompt == "Today's weather is")
-        #expect(vm.firstExample.candidates.count == 1)
-        #expect(vm.secondExample.prompt == "I love eating")
-        #expect(vm.secondExample.candidates.count == 1)
+        #expect(vm.example.prompt == "今天天气真")
+        #expect(vm.example.candidates.count == 1)
     }
 
-    @Test func initialStepIsFirstExample() {
+    @Test func initialStepIsExample() {
         let vm = makeVM()
-        #expect(vm.step == .firstExample)
+        #expect(vm.step == .example)
     }
 
-    @Test func goNextFromFirstExampleAdvancesToSecondExample() {
+    @Test func goNextFromExampleAdvancesToChallengeIntro() {
         let vm = makeVM()
-        vm.goNext()
-        #expect(vm.step == .secondExample)
-    }
-
-    @Test func goNextFromSecondExampleAdvancesToChallengeIntro() {
-        let vm = makeVM()
-        vm.goNext()
         vm.goNext()
         #expect(vm.step == .challengeIntro)
     }
 
     @Test func goNextFromChallengeIntroIsNoOp() {
         let vm = makeVM()
-        vm.goNext()
         vm.goNext()
         #expect(vm.step == .challengeIntro)
         vm.goNext()

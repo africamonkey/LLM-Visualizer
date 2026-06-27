@@ -6,7 +6,13 @@ import SwiftUI
 
 struct AppRootView: View {
 
-    @State private var appVM = AppShellViewModel(service: LLMService())
+    @State private var appVM = AppShellViewModel(
+        service: LLMService(),
+        onboardingPrompt: String(
+            localized: "onboarding.prompt",
+            defaultValue: "今天天气真"
+        )
+    )
 
     var body: some View {
         Group {
@@ -21,12 +27,9 @@ struct AppRootView: View {
                     LevelShellView(currentSession: Level1Session(
                         viewModel: Level1ViewModel(service: appVM.service)
                     ))
-                } else if let ex1 = appVM.example1, let ex2 = appVM.example2 {
+                } else if let example = appVM.example {
                     OnboardingFlowView(
-                        viewModel: OnboardingViewModel(
-                            firstExample: ex1,
-                            secondExample: ex2
-                        ),
+                        viewModel: OnboardingViewModel(example: example),
                         onComplete: {
                             appVM.markOnboardingComplete()
                         }

@@ -31,22 +31,13 @@ struct OnboardingFlowView: View {
     @ViewBuilder
     private var card: some View {
         switch viewModel.step {
-        case .firstExample:
+        case .example:
             ExampleCardView(
-                prompt: viewModel.firstExample.prompt,
-                candidates: viewModel.firstExample.candidates,
+                prompt: viewModel.example.prompt,
+                candidates: viewModel.example.candidates,
                 caption: String(
-                    localized: "onboarding.example1.caption",
-                    defaultValue: "These 100 dots are what the model on this device just predicted for that sentence."
-                )
-            )
-        case .secondExample:
-            ExampleCardView(
-                prompt: viewModel.secondExample.prompt,
-                candidates: viewModel.secondExample.candidates,
-                caption: String(
-                    localized: "onboarding.example2.caption",
-                    defaultValue: "Same model, different sentence — and the dots spread out."
+                    localized: "onboarding.example.caption",
+                    defaultValue: "These 100 dots are what the model on this device really thought. Now you try — can you make it more sure?"
                 )
             )
         case .challengeIntro:
