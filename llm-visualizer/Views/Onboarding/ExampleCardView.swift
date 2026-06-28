@@ -14,7 +14,7 @@ struct ExampleCardView: View {
         VStack(alignment: .leading, spacing: 16) {
             Text(prompt)
                 .font(.title3.weight(.semibold))
-            DotGridView(candidates: candidates)
+            ProbabilityListView(candidates: candidates)
             Text(caption)
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
@@ -24,37 +24,52 @@ struct ExampleCardView: View {
     }
 }
 
-private struct DotGridView: View {
+private struct ProbabilityListView: View {
 
     let candidates: [TokenCandidate]
-    private let columns = Array(
-        repeating: GridItem(.fixed(14), spacing: 4),
-        count: 10
-    )
-
-    private static let palette: [Color] = [
-        .green, .orange, .yellow, .red
-    ]
 
     var body: some View {
-        LazyVGrid(columns: columns, spacing: 4) {
-            ForEach(0..<100, id: \.self) { index in
-                Circle()
-                    .fill(color(for: index))
-                    .frame(width: 14, height: 14)
+        VStack(alignment: .leading, spacing: 8) {
+            ForEach(Array(candidates.prefix(4).enumerated()), id: \.offset) { _, c in
+                ProbabilityRow(token: c.text, probability: c.probability)
             }
         }
     }
+}
 
-    private func color(for index: Int) -> Color {
-        var remaining = index
-        for (i, c) in candidates.prefix(4).enumerated() {
-            let count = Int((c.probability * 100).rounded())
-            if remaining < count {
-                return Self.palette[min(i, Self.palette.count - 1)]
+private struct ProbabilityRow: View {
+
+    let token: String
+    let probability: Double
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Text(token)
+                .font(.body.monospaced())
+                .frame(width: 60, alignment: .leading)
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(Color.gray.opacity(0.15))
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(color(for: probability))
+                        .frame(width: geo.size.width * CGFloat(probability))
+                }
             }
-            remaining -= count
+            .frame(height: 12)
+            Text("\(Int((probability * 100).rounded()))%")
+                .font(.callout.monospacedDigit())
+                .foregroundStyle(.secondary)
+                .frame(width: 40, alignment: .trailing)
         }
-        return Color.gray.opacity(0.15)
+    }
+
+    private func color(for probability: Double) -> Color {
+        switch probability {
+        case 0.50...:        return .green
+        case 0.25..<0.50:    return .orange
+        case 0.10..<0.25:    return .yellow
+        default:             return .red
+        }
     }
 }

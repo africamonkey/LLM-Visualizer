@@ -1,761 +1,424 @@
 {
-  "sourceLanguage": "en",
-  "strings": {
-    "Ask anything…": {
-      "comment": "Placeholder text in the prompt TextField, inviting the user to type a message.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ask anything…"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "问点什么吧…"
-          }
-        }
-      }
+  "sourceLanguage" : "en",
+  "strings" : {
+    "·" : {
+
     },
-    "Generating · %.1f t/s": {
-      "comment": "Status bar text while model is generating tokens. The placeholder is the current tokens-per-second throughput, formatted to one decimal place.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Generating · %.1f t/s"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "生成中 · %.1f tokens/秒"
-          }
-        }
-      }
+    "✓" : {
+
     },
-    "Initializing…": {
-      "comment": "Status bar text while the model state is idle (e.g. just after launch, before model starts loading).",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Initializing…"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "初始化中…"
-          }
-        }
-      }
+    "🏆" : {
+
     },
-    "LLM Visualizer": {
-      "comment": "Navigation bar title of the main chat view.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "LLM Visualizer"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "LLM 可视化"
-          }
-        }
-      }
-    },
-    "Loading model…": {
-      "comment": "Status bar text while the model state is loading (model weights being read from disk).",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Loading model…"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "正在加载模型…"
-          }
-        }
-      }
-    },
-    "Ready": {
-      "comment": "Status bar text when the model is loaded and idle, waiting for user input.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ready"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "就绪"
-          }
-        }
-      }
-    },
-    "Retry": {
-      "comment": "Button label in the status bar's error state. Tapping it retries the last action.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Retry"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "重试"
-          }
-        }
-      }
-    },
-    "Send": {
-      "comment": "Accessibility label for the send button in the prompt field (used by VoiceOver).",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Send"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "发送"
-          }
-        }
-      }
-    },
-    "Stop": {
-      "comment": "Button label in the status bar while the model is generating. Tapping it cancels the current generation.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Stop"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "停止"
-          }
-        }
-      }
-    },
-    "Thinking": {
-      "comment": "Header label of the collapsible thinking block rendered above the answer bubble when the model emits <think>…</think> content.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Thinking"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "思考中"
-          }
-        }
-      }
-    },
-    "Level 1": {
-      "comment": "Header label for Level 1 of the onboarding flow.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Level 1"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "第 1 关"
-          }
-        }
-      }
-    },
-    "Make AI guess right with its eyes closed": {
-      "comment": "Level 1 subtitle: challenge the user to craft a sentence so obvious that the model guesses correctly with its eyes closed.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Make AI guess right with its eyes closed"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "让 AI 闭眼都猜对"
-          }
-        }
-      }
-    },
-    "Goal: Get Top-1 probability above %d%%": {
-      "comment": "Level 1 objective label. The placeholder is the target Top-1 probability threshold as an integer percentage.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Goal: Get Top-1 probability above %d%%"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "目标：让 Top-1 概率超过 %d%%"
-          }
-        }
-      }
-    },
-    "Best record: %d%%": {
-      "comment": "Best record label shown in the Level 1 header. The placeholder is the highest Top-1 probability achieved as an integer percentage.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Best record: %d%%"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "最高纪录：%d%%"
-          }
-        }
-      }
-    },
-    "Your input": {
-      "comment": "Column header in the Level 1 results table for the user's input sentence.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Your input"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "你的输入"
-          }
-        }
-      }
-    },
-    "AI's most likely next word": {
-      "comment": "Column header in the Level 1 results table for the model's top predicted next token.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "AI's most likely next word"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "AI 最可能的下一词"
-          }
-        }
-      }
-    },
-    "Other possibilities": {
-      "comment": "Section header for the secondary predictions list in the Level 1 results.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Other possibilities"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "其他可能"
-          }
-        }
-      }
-    },
-    "This time AI seems pretty sure.": {
-      "comment": "Level 1 commentary when the model's top-1 probability is moderately high.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This time AI seems pretty sure."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "这次 AI 挺确定的。"
-          }
-        }
-      }
-    },
-    "This time AI is a bit unsure.": {
-      "comment": "Level 1 commentary when the model shows mild uncertainty.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This time AI is a bit unsure."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "这次 AI 有点拿不准。"
-          }
-        }
-      }
-    },
-    "This time AI is very hesitant — several words have similar scores.": {
-      "comment": "Level 1 commentary when the model is very uncertain and several tokens score similarly.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This time AI is very hesitant — several words have similar scores."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "这次 AI 很犹豫，几个词分数差不多。"
-          }
-        }
-      }
-    },
-    "This time AI almost guessed right with its eyes closed!": {
-      "comment": "Level 1 commentary when the model's top-1 probability is very high.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This time AI almost guessed right with its eyes closed!"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "这次 AI 几乎闭眼都猜对了！"
-          }
-        }
-      }
-    },
-    "Try another sentence, see how AI guesses": {
-      "comment": "Level 1 hint inviting the user to try a different sentence.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Try another sentence, see how AI guesses"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "换一句话试试，看 AI 怎么猜"
-          }
-        }
-      }
-    },
-    "Is that real? Let me try": {
-      "comment": "Level 1 prompt encouraging the user to test the claim about model confidence.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Is that real? Let me try"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "这是真的吗？我来试试"
-          }
-        }
-      }
-    },
-    "It's not thinking — it's just scoring every word.": {
-      "comment": "Level 1 explainer clarifying that the model scores tokens rather than thinking.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "It's not thinking — it's just scoring every word."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "它没在想，只是给每个词打分。"
-          }
-        }
-      }
-    },
-    "You might have noticed…": {
-      "comment": "Section header introducing an insight the user may have noticed after playing.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "You might have noticed…"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "你可能发现了…"
-          }
-        }
-      }
-    },
-    "Sometimes AI is sure, sometimes it's hesitant.": {
-      "comment": "Level 1 insight: model confidence varies depending on context.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sometimes AI is sure, sometimes it's hesitant."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "有时候 AI 很确定，有时候很犹豫。"
-          }
-        }
-      }
-    },
-    "Can you find a sentence that makes AI so sure it could guess right with its eyes closed?": {
-      "comment": "Level 1 challenge prompt asking the user to find a sentence that maximizes model confidence.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Can you find a sentence that makes AI so sure it could guess right with its eyes closed?"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "你能找到一句话，让 AI 确定到几乎闭着眼睛都能猜对吗？"
-          }
-        }
-      }
-    },
-    "I'm ready": {
-      "comment": "Button label confirming the user is ready to begin Level 1.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "I'm ready"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "我准备好了"
-          }
-        }
-      }
-    },
-    "You made AI guess right with its eyes closed": {
-      "comment": "Level 1 success header celebrating the user's clear.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "You made AI guess right with its eyes closed"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "你让 AI 闭眼都猜对了"
-          }
-        }
-      }
-    },
-    "When the context is clear enough, the model already knows what comes next.": {
-      "comment": "Closing insight for Level 1: with clear context, the model already knows the next token.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "When the context is clear enough, the model already knows what comes next."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "当上下文足够明确，模型其实早就知道下一个词是什么。"
-          }
-        }
-      }
-    },
-    "Try again": {
-      "comment": "Button label on the Level 1 success screen to retry.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Try again"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "再来一次"
-          }
-        }
-      }
-    },
-    "Next level is on the way": {
-      "comment": "Teaser text on the Level 1 success screen indicating the next level is on its way.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Next level is on the way"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "下一关在路上"
-          }
-        }
-      }
-    },
-    "FIRST CLEAR": {
-      "comment": "Badge label displayed the first time the user clears Level 1.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "FIRST CLEAR"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "FIRST CLEAR"
-          }
-        }
-      }
-    },
-    "Played %d times": {
-      "comment": "Level 1 stats line: number of attempts. The placeholder is the attempt count.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Played %d times"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已玩 %d 次"
-          }
-        }
-      }
-    },
-    "Submitted %d times": {
-      "comment": "Level 1 stats line: number of submissions. The placeholder is the submission count.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Submitted %d times"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "已提交 %d 次"
-          }
-        }
-      }
-    },
-    "Best record %d%%": {
-      "comment": "Level 1 stats line: best Top-1 probability. The placeholder is the percentage.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Best record %d%%"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "最高纪录 %d%%"
-          }
-        }
-      }
-    },
-    "Type your sentence…": {
-      "comment": "Placeholder text in the Level 1 input field.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Type your sentence…"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "输入你的句子…"
-          }
-        }
-      }
-    },
-    "Goal: Get AI's next-word prediction above %d%%": {
-      "comment": "Long-form Level 1 goal text. The placeholder is the target percentage.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Goal: Get AI's next-word prediction above %d%%"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "目标：让 AI 对下一个词的预测超过 %d%%"
-          }
-        }
-      }
-    },
-    "Your highest was just %d%% — try the challenge": {
-      "comment": "Encouragement shown when the user's previous best is below the goal. The placeholder is the previous best percentage.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Your highest was just %d%% — try the challenge"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "你刚才最高才 %d%%，挑战一下"
-          }
-        }
-      }
-    },
-    "Opening prompt": {
-      "comment": "Pre-canned opening prompt displayed in OpeningView and used as model input.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Today's weather is"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "今天天气真"
-          }
-        }
-      }
-    },
-    "challenge.body": {
-      "comment": "Body copy of the ChallengeIntroCard, shown after both example cards. Invites the user to try crafting their own sentence.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "You just saw how a model thinks. Now try it for real."
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "你已经看到了模型怎么想。现在自己来试试。"
-          }
-        }
-      }
-    },
-    "error.retry": {
-      "comment": "Retry button label on the ModelLoadingView when the model fails to load.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Try again"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "重试"
-          }
-        }
-      }
-    },
-    "loading.model": {
-      "comment": "Loading-state label on the ModelLoadingView, shown while model weights are being read from disk.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Loading model…"
-          }
-        },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "正在载入模型"
-          }
-        }
-      }
-    },
-    "onboarding.example.caption": {
-      "comment": "Caption under the example DotGridView. Acknowledges that the dots are the model's real on-device prediction, then hands off to the user for Level 1.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "These 100 dots are what the model on this device really thought. Now you try — can you make it more sure?"
+    "AI's most likely next word" : {
+      "comment" : "Column header in the Level 1 results table for the model's top predicted next token.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI's most likely next word"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "这 100 个点是本机模型刚才的真实想法。下一关你来试试，看能不能让它更确定。"
+            "value" : "AI 最可能的下一词"
           }
         }
       }
     },
-    "onboarding.prompt": {
-      "comment": "Model prompt shown to the user on the example card AND sent to the LLM for prediction. Localized so the user sees the prompt in their device language; the LLM distribution will reflect how well the model handles that language.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Today's weather is really"
+    "Ask anything…" : {
+      "comment" : "Placeholder text in the prompt TextField, inviting the user to type a message.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ask anything…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "问点什么吧…"
+          }
+        }
+      }
+    },
+    "Best record %d%%" : {
+      "comment" : "Level 1 stats line: best Top-1 probability. The placeholder is the percentage.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Best record %d%%"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最高纪录 %d%%"
+          }
+        }
+      }
+    },
+    "Best record: %d%%" : {
+      "comment" : "Best record label shown in the Level 1 header. The placeholder is the highest Top-1 probability achieved as an integer percentage.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Best record: %d%%"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "最高纪录：%d%%"
+          }
+        }
+      }
+    },
+    "Can you find a sentence that makes AI so sure it could guess right with its eyes closed?" : {
+      "comment" : "Level 1 challenge prompt asking the user to find a sentence that maximizes model confidence.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Can you find a sentence that makes AI so sure it could guess right with its eyes closed?"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你能找到一句话，让 AI 确定到几乎闭着眼睛都能猜对吗？"
+          }
+        }
+      }
+    },
+    "challenge.body" : {
+      "comment" : "Body copy of the ChallengeIntroCard, shown after both example cards. Invites the user to try crafting their own sentence.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You just saw how a model thinks. Now try it for real."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你已经看到了模型怎么想。现在自己来试试。"
+          }
+        }
+      }
+    },
+    "error.retry" : {
+      "comment" : "Retry button label on the ModelLoadingView when the model fails to load.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try again"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重试"
+          }
+        }
+      }
+    },
+    "FIRST CLEAR" : {
+      "comment" : "Badge label displayed the first time the user clears Level 1.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FIRST CLEAR"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FIRST CLEAR"
+          }
+        }
+      }
+    },
+    "Generating · %.1f t/s" : {
+      "comment" : "Status bar text while model is generating tokens. The placeholder is the current tokens-per-second throughput, formatted to one decimal place.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Generating · %.1f t/s"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "生成中 · %.1f tokens/秒"
+          }
+        }
+      }
+    },
+    "Get Top-1 probability above 90%" : {
+
+    },
+    "Goal: Get AI's next-word prediction above %d%%" : {
+      "comment" : "Long-form Level 1 goal text. The placeholder is the target percentage.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Goal: Get AI's next-word prediction above %d%%"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "目标：让 AI 对下一个词的预测超过 %d%%"
+          }
+        }
+      }
+    },
+    "Goal: Get Top-1 probability above %d%%" : {
+      "comment" : "Level 1 objective label. The placeholder is the target Top-1 probability threshold as an integer percentage.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Goal: Get Top-1 probability above %d%%"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "目标：让 Top-1 概率超过 %d%%"
+          }
+        }
+      }
+    },
+    "I'm ready" : {
+      "comment" : "Button label confirming the user is ready to begin Level 1.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I'm ready"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "我准备好了"
+          }
+        }
+      }
+    },
+    "Initializing…" : {
+      "comment" : "Status bar text while the model state is idle (e.g. just after launch, before model starts loading).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Initializing…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "初始化中…"
+          }
+        }
+      }
+    },
+    "Is that real? Let me try" : {
+      "comment" : "Level 1 prompt encouraging the user to test the claim about model confidence.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Is that real? Let me try"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这是真的吗？我来试试"
+          }
+        }
+      }
+    },
+    "It's not thinking — it's just scoring every word." : {
+      "comment" : "Level 1 explainer clarifying that the model scores tokens rather than thinking.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It's not thinking — it's just scoring every word."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "它没在想，只是给每个词打分。"
+          }
+        }
+      }
+    },
+    "Level %d" : {
+
+    },
+    "Level 1" : {
+      "comment" : "Header label for Level 1 of the onboarding flow.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Level 1"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "第 1 关"
+          }
+        }
+      }
+    },
+    "LLM Visualizer" : {
+      "comment" : "Navigation bar title of the main chat view.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LLM Visualizer"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LLM 可视化"
+          }
+        }
+      }
+    },
+    "Loading model…" : {
+      "comment" : "Status bar text while the model state is loading (model weights being read from disk).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading model…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在加载模型…"
+          }
+        }
+      }
+    },
+    "loading.model" : {
+      "comment" : "Loading-state label on the ModelLoadingView, shown while model weights are being read from disk.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Loading model…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在载入模型"
+          }
+        }
+      }
+    },
+    "Make AI guess right with its eyes closed" : {
+      "comment" : "Level 1 subtitle: challenge the user to craft a sentence so obvious that the model guesses correctly with its eyes closed.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Make AI guess right with its eyes closed"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "让 AI 闭眼都猜对"
+          }
+        }
+      }
+    },
+    "Next level is on the way" : {
+      "comment" : "Teaser text on the Level 1 success screen indicating the next level is on its way.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next level is on the way"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下一关在路上"
+          }
+        }
+      }
+    },
+    "onboarding.example.caption" : {
+      "comment" : "Caption under the example ProbabilityListView. States the teaching point (the model gave several candidates with different probabilities) and hands off to Level 1 (find a sentence where one word clearly wins).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The model's actual guess — these are the words it considered, each with its own probability. Now you try to find a sentence where one word clearly wins."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模型的真实想法——这几个候选词各有不同的概率。下一关看你能不能让某一个词明显胜出。"
+          }
+        }
+      }
+    },
+    "onboarding.next" : {
+      "comment" : "Primary CTA on the example onboarding card, advancing to the challenge intro.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下一张"
+          }
+        }
+      }
+    },
+    "onboarding.prompt" : {
+      "comment" : "Model prompt shown to the user on the example card AND sent to the LLM for prediction. Localized so the user sees the prompt in their device language; the LLM distribution will reflect how well the model handles that language.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today's weather is really"
           }
         },
         "zh-Hans" : {
@@ -766,23 +429,384 @@
         }
       }
     },
-    "onboarding.next": {
-      "comment": "Primary CTA on the example onboarding card, advancing to the challenge intro.",
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Next"
+    "Opening prompt" : {
+      "comment" : "Pre-canned opening prompt displayed in OpeningView and used as model input.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today's weather is"
           }
         },
-        "zh-Hans": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "下一张"
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今天天气真"
+          }
+        }
+      }
+    },
+    "Other possibilities" : {
+      "comment" : "Section header for the secondary predictions list in the Level 1 results.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Other possibilities"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "其他可能"
+          }
+        }
+      }
+    },
+    "Played %d times" : {
+      "comment" : "Level 1 stats line: number of attempts. The placeholder is the attempt count.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Played %d times"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已玩 %d 次"
+          }
+        }
+      }
+    },
+    "Ready" : {
+      "comment" : "Status bar text when the model is loaded and idle, waiting for user input.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ready"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "就绪"
+          }
+        }
+      }
+    },
+    "Retry" : {
+      "comment" : "Button label in the status bar's error state. Tapping it retries the last action.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Retry"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重试"
+          }
+        }
+      }
+    },
+    "Send" : {
+      "comment" : "Accessibility label for the send button in the prompt field (used by VoiceOver).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Send"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "发送"
+          }
+        }
+      }
+    },
+    "Sometimes AI is sure, sometimes it's hesitant." : {
+      "comment" : "Level 1 insight: model confidence varies depending on context.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sometimes AI is sure, sometimes it's hesitant."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "有时候 AI 很确定，有时候很犹豫。"
+          }
+        }
+      }
+    },
+    "Stop" : {
+      "comment" : "Button label in the status bar while the model is generating. Tapping it cancels the current generation.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stop"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "停止"
+          }
+        }
+      }
+    },
+    "Submitted %d times" : {
+      "comment" : "Level 1 stats line: number of submissions. The placeholder is the submission count.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Submitted %d times"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "已提交 %d 次"
+          }
+        }
+      }
+    },
+    "Thinking" : {
+      "comment" : "Header label of the collapsible thinking block rendered above the answer bubble when the model emits <think>…</think> content.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Thinking"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "思考中"
+          }
+        }
+      }
+    },
+    "This time AI almost guessed right with its eyes closed!" : {
+      "comment" : "Level 1 commentary when the model's top-1 probability is very high.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This time AI almost guessed right with its eyes closed!"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这次 AI 几乎闭眼都猜对了！"
+          }
+        }
+      }
+    },
+    "This time AI is a bit unsure." : {
+      "comment" : "Level 1 commentary when the model shows mild uncertainty.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This time AI is a bit unsure."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这次 AI 有点拿不准。"
+          }
+        }
+      }
+    },
+    "This time AI is very hesitant — several words have similar scores." : {
+      "comment" : "Level 1 commentary when the model is very uncertain and several tokens score similarly.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This time AI is very hesitant — several words have similar scores."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这次 AI 很犹豫，几个词分数差不多。"
+          }
+        }
+      }
+    },
+    "This time AI seems pretty sure." : {
+      "comment" : "Level 1 commentary when the model's top-1 probability is moderately high.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This time AI seems pretty sure."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这次 AI 挺确定的。"
+          }
+        }
+      }
+    },
+    "Try again" : {
+      "comment" : "Button label on the Level 1 success screen to retry.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try again"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "再来一次"
+          }
+        }
+      }
+    },
+    "Try another sentence, see how AI guesses" : {
+      "comment" : "Level 1 hint inviting the user to try a different sentence.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try another sentence, see how AI guesses"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "换一句话试试，看 AI 怎么猜"
+          }
+        }
+      }
+    },
+    "Type your sentence…" : {
+      "comment" : "Placeholder text in the Level 1 input field.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type your sentence…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "输入你的句子…"
+          }
+        }
+      }
+    },
+    "When the context is clear enough, the model already knows what comes next." : {
+      "comment" : "Closing insight for Level 1: with clear context, the model already knows the next token.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "When the context is clear enough, the model already knows what comes next."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "当上下文足够明确，模型其实早就知道下一个词是什么。"
+          }
+        }
+      }
+    },
+    "You made AI guess right with its eyes closed" : {
+      "comment" : "Level 1 success header celebrating the user's clear.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You made AI guess right with its eyes closed"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你让 AI 闭眼都猜对了"
+          }
+        }
+      }
+    },
+    "You might have noticed…" : {
+      "comment" : "Section header introducing an insight the user may have noticed after playing.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You might have noticed…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你可能发现了…"
+          }
+        }
+      }
+    },
+    "Your highest was just %d%% — try the challenge" : {
+      "comment" : "Encouragement shown when the user's previous best is below the goal. The placeholder is the previous best percentage.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your highest was just %d%% — try the challenge"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你刚才最高才 %d%%，挑战一下"
+          }
+        }
+      }
+    },
+    "Your input" : {
+      "comment" : "Column header in the Level 1 results table for the user's input sentence.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your input"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你的输入"
           }
         }
       }
     }
   },
-  "version": "1.0"
+  "version" : "1.0"
 }
