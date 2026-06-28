@@ -4,7 +4,7 @@
 
 **Goal:** Remove the Onboarding-vs-Level 1 duplication by replacing the 3-step onboarding (Opening → Free Play → Challenge Intro) with a single passive example card (followed by the existing Challenge Intro), and hide model loading behind a dedicated full-screen page. Centralize all model bootstrapping in a new `AppShellViewModel` and pre-fetch the onboarding example during that bootstrap, so the user never sees an in-onboarding loading state.
 
-**Architecture:** New `AppShellViewModel` owns the model-load + onboarding-example pre-fetch as a single state machine (`loading` / `failed(msg)` / `ready(hasSeenOnboarding)`). `AppRootView` switches on this state. `ModelLoadingView` is the visual for `.loading` and `.failed`. Onboarding becomes a single-card passive example flow (`ExampleCardView` with a private `ProbabilityListView`), followed by the existing `ChallengeIntroView`. `OnboardingViewModel` shrinks to a 2-step enum + accept-challenge. `LevelShellView` and `Level1Session` lose their `bootstrap()` calls (model is guaranteed loaded by the time we get there). TDD-first for all data-layer code; SwiftUI primitives built directly and verified manually.
+**Architecture:** New `AppShellViewModel` owns the model-load + onboarding-example pre-fetch as a single state machine (`loading` / `failed(msg)` / `ready(hasSeenOnboarding)`). `AppRootView` switches on this state. `ModelLoadingView` is the visual for `.loading` and `.failed`. Onboarding is a single-card passive example flow (`ExampleCardView` with a private `ProbabilityListView`) plus a single "Try it" button that goes directly to Level 1 — no intermediate modal, no state machine in `OnboardingViewModel` (it just holds the example and exposes `acceptChallenge(onComplete:)`). `LevelShellView` and `Level1Session` lose their `bootstrap()` calls (model is guaranteed loaded by the time we get there). TDD-first for all data-layer code; SwiftUI primitives built directly and verified manually.
 
 **Tech Stack:** Swift 5.9+, SwiftUI (`@Observable`, `@Bindable`, `LazyVGrid`), Swift Testing (`@Test`, `#expect`, `@Suite(.serialized)`, `@MainActor`), `LLMServiceProtocol` (with `MockLLMService` for tests), `ProgressStore` (UserDefaults-backed), `Localizable.xcstrings` String Catalog.
 
@@ -44,9 +44,8 @@ xcodebuild test -project llm-visualizer.xcodeproj -scheme llm-visualizer \
 - `Onboarding/ExampleCardView.swift` — prompt + ProbabilityListView (private, same file) + caption
 
 **Views (modified):**
-- `Onboarding/OnboardingFlowView.swift` — switch on `viewModel.step`, render `ExampleCardView` × 2 then `ChallengeIntroView`
-- `Onboarding/ChallengeIntroView.swift` — drop `bestSoFar` parameter
-- `AppRootView.swift` — switch on `appVM.state`; construct `OnboardingViewModel` from prefetched examples
+- `Onboarding/OnboardingFlowView.swift` — render `ExampleCardView` plus a single "Try it" button (no `Step` switch, no intermediate modal)
+- `AppRootView.swift` — switch on `appVM.state`; construct `OnboardingViewModel` from the single prefetched example
 - `LevelShell/LevelShellView.swift` — remove `.task { ... bootstrap() }` block
 
 **Views (deleted):**
@@ -57,7 +56,7 @@ xcodebuild test -project llm-visualizer.xcodeproj -scheme llm-visualizer \
 - `LLMService.swift` — add `predictNextTokensError: Error?` to `MockLLMService` for failure-injection tests
 
 **Localization (modified):**
-- `Resources/Localizable.xcstrings` — add `loading.model`, `error.retry`, `onboarding.next`, `onboarding.prompt`, `onboarding.example.caption`, plus updated `ChallengeIntroCard` copy
+- `Resources/Localizable.xcstrings` — add `loading.model`, `error.retry`, `onboarding.prompt`, `onboarding.example.caption`, `onboarding.tryIt`. The earlier `challenge.body` and `onboarding.next` keys are deprecated (kept so existing translations aren't orphaned).
 
 **Tests (new):**
 - `AppShellViewModelTests.swift`
@@ -755,72 +754,15 @@ git commit -m "feat(Onboarding): OnboardingViewModel rewritten as 2-step state m
 
 ---
 
-### Task 9: `OnboardingViewModel` — `goNext`
-
-Add the `goNext()` method, which advances the step in order.
-
-**Files:**
-- Modify: `llm-visualizerTests/OnboardingViewModelTests.swift`
-- Modify: `llm-visualizer/ViewModels/OnboardingViewModel.swift`
-
-- [ ] **Step 1: Add the failing tests**
-
-Append to `llm-visualizerTests/OnboardingViewModelTests.swift`:
-
-```swift
-    @Test func goNextFromExampleAdvancesToChallengeIntro() {
-        let vm = makeVM()
-        vm.goNext()
-        #expect(vm.step == .challengeIntro)
-    }
-
-    @Test func goNextFromChallengeIntroIsNoOp() {
-        let vm = makeVM()
-        vm.goNext()
-        #expect(vm.step == .challengeIntro)
-        vm.goNext()
-        #expect(vm.step == .challengeIntro)
-    }
-```
-
-- [ ] **Step 2: Run the new tests to verify they fail**
-
-```bash
-xcodebuild test -project llm-visualizer.xcodeproj -scheme llm-visualizer \
-  -destination 'platform=iOS Simulator,name=iPhone 17' \
-  -only-testing:llm-visualizerTests/OnboardingViewModelTests
-```
-
-Expected: 3 new tests fail with "Value of type 'OnboardingViewModel' has no member 'goNext'".
-
-- [ ] **Step 3: Implement `goNext`**
-
-Edit `llm-visualizer/ViewModels/OnboardingViewModel.swift`. Add after the `init`:
-
-```swift
-    func goNext() {
-        switch step {
-        case .example:        step = .challengeIntro
-        case .challengeIntro: break
-        }
-    }
-```
-
-- [ ] **Step 4: Run the tests to verify they pass**
-
-Re-run the same `xcodebuild test` command. Expected: 4 tests pass (init + initial + goNext × 2 — first advances, second is no-op).
-
-- [ ] **Step 5: Commit**
-
-```bash
-git add llm-visualizer/ViewModels/OnboardingViewModel.swift \
-        llm-visualizerTests/OnboardingViewModelTests.swift
-git commit -m "feat(Onboarding): OnboardingViewModel.goNext (TDD)"
-```
+> **Task removed.** The `goNext` method and its tests were dropped
+> alongside `ChallengeIntroView`. `OnboardingViewModel` no longer
+> has a `Step` enum — it just holds the example and exposes
+> `acceptChallenge(onComplete:)`. The corresponding step in this
+> plan is now **Task 9** below.
 
 ---
 
-### Task 10: `OnboardingViewModel` — `acceptChallenge`
+### Task 9: `OnboardingViewModel` — `acceptChallenge`
 
 Add the `acceptChallenge(onComplete:)` method. Writes `hasSeenOnboarding = true` and invokes the callback.
 
@@ -855,7 +797,7 @@ Expected: fails with "Value of type 'OnboardingViewModel' has no member 'acceptC
 
 - [ ] **Step 3: Implement `acceptChallenge`**
 
-Edit `llm-visualizer/ViewModels/OnboardingViewModel.swift`. Add after `goNext`:
+Edit `llm-visualizer/ViewModels/OnboardingViewModel.swift`. Add after the `init`:
 
 ```swift
     func acceptChallenge(onComplete: @escaping () -> Void) {
@@ -1050,74 +992,20 @@ git commit -m "feat(Views): ExampleCardView with ProbabilityListView"
 
 ---
 
-### Task 13: Update `ChallengeIntroView` to drop `bestSoFar`
+### ~~Task 13: Update `ChallengeIntroView` to drop `bestSoFar`~~
 
-The redesign removes `bestSoFar` from `OnboardingViewModel`. `ChallengeIntroView` (and `ChallengeIntroCard` underneath) currently render "Your highest was just X%". Without `bestSoFar`, the copy becomes a fixed invitation.
-
-**Files:**
-- Modify: `llm-visualizer/Views/Onboarding/ChallengeIntroView.swift`
-- Modify: `llm-visualizer/Views/Common/ChallengeIntroCard.swift`
-
-- [ ] **Step 1: Read the current `ChallengeIntroCard.swift` to see the body-copy field**
-
-```bash
-cat llm-visualizer/Views/Common/ChallengeIntroCard.swift
-```
-
-Note the body-copy parameter and localized string. (It currently has `bestSoFar` interpolated.)
-
-- [ ] **Step 2: Update `ChallengeIntroCard` to remove `bestSoFar`**
-
-In `llm-visualizer/Views/Common/ChallengeIntroCard.swift`, change the struct so it no longer takes a `bestSoFar` parameter and the body copy no longer interpolates it. Replace any `String(format: bestSoFarFormat, Int((bestSoFar * 100).rounded()))` with a plain `String(localized:defaultValue:)` that reads from `Localizable.xcstrings` (key `challenge.body`, default `"You just saw how a model thinks. Now try it for real."`). Keep the title/CTA as they are.
-
-- [ ] **Step 3: Update `ChallengeIntroView` to drop the `bestSoFar` parameter**
-
-Rewrite `llm-visualizer/Views/Onboarding/ChallengeIntroView.swift`:
-
-```swift
-//
-//  ChallengeIntroView.swift
-//
-
-import SwiftUI
-
-struct ChallengeIntroView: View {
-
-    let onAccept: () -> Void
-
-    var body: some View {
-        ZStack {
-            Color.black.opacity(0.35).ignoresSafeArea()
-            VStack {
-                Spacer()
-                ChallengeIntroCard(onAccept: onAccept)
-                Spacer()
-            }
-        }
-        .transition(.opacity)
-    }
-}
-
-#Preview {
-    ChallengeIntroView(onAccept: {})
-}
-```
-
-- [ ] **Step 4: Commit**
-
-```bash
-git add llm-visualizer/Views/Onboarding/ChallengeIntroView.swift \
-        llm-visualizer/Views/Common/ChallengeIntroCard.swift
-git commit -m "refactor(Views): drop bestSoFar from ChallengeIntroView/Card"
-```
+> **Task removed.** `ChallengeIntroView` and `ChallengeIntroCard`
+> were deleted entirely (along with the `bestSoFar` parameter that
+> this task addressed). The flow now goes directly from the example
+> card to Level 1 via a single "Try it" button — see Task 13 below.
 
 ---
 
-## Phase 3: Integration (modify existing call sites)
+### Task 13: Rewrite `OnboardingFlowView` — single button to Level 1
 
-### Task 14: Rewrite `OnboardingFlowView`
-
-Switch on `viewModel.step` instead of `viewModel.phase`. Render `ExampleCardView` for the first two steps and `ChallengeIntroView` for the third. Own the bottom Next button. Drop the `.task` model-loading block and the `openingCandidates` state.
+Wrap `ExampleCardView` with a single "Try it" button. Tapping it calls
+`viewModel.acceptChallenge(onComplete:)`, which writes persistence and
+invokes the `onComplete` closure that AppRootView routes to LevelShellView.
 
 **Files:**
 - Modify: `llm-visualizer/Views/Onboarding/OnboardingFlowView.swift`
@@ -1133,7 +1021,7 @@ import SwiftUI
 
 struct OnboardingFlowView: View {
 
-    @State var viewModel: OnboardingViewModel
+    let viewModel: OnboardingViewModel
     let onComplete: () -> Void
 
     init(
@@ -1146,19 +1034,6 @@ struct OnboardingFlowView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            card
-            if viewModel.step != .challengeIntro {
-                nextButton
-            }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(.systemGroupedBackground).ignoresSafeArea())
-    }
-
-    @ViewBuilder
-    private var card: some View {
-        switch viewModel.step {
-        case .example:
             ExampleCardView(
                 prompt: viewModel.example.prompt,
                 candidates: viewModel.example.candidates,
@@ -1167,18 +1042,17 @@ struct OnboardingFlowView: View {
                     defaultValue: "The model's actual guess — these are the words it considered, each with its own probability. Now you try to find a sentence where one word clearly wins."
                 )
             )
-        case .challengeIntro:
-            ChallengeIntroView(
-                onAccept: { viewModel.acceptChallenge(onComplete: onComplete) }
-            )
+            tryItButton
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(.systemGroupedBackground).ignoresSafeArea())
     }
 
-    private var nextButton: some View {
+    private var tryItButton: some View {
         Button {
-            viewModel.goNext()
+            viewModel.acceptChallenge(onComplete: onComplete)
         } label: {
-            Text(String(localized: "onboarding.next", defaultValue: "Next"))
+            Text(String(localized: "onboarding.tryIt", defaultValue: "Let me try"))
                 .font(.headline)
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
@@ -1191,16 +1065,46 @@ struct OnboardingFlowView: View {
 }
 ```
 
-- [ ] **Step 2: Commit**
+Note: `viewModel` is `let`, not `@State`. The VM does not mutate
+after init, so `@State` is unnecessary — SwiftUI observes
+`@Observable` types regardless of storage.
+
+- [ ] **Step 2: Delete obsolete files**
 
 ```bash
-git add llm-visualizer/Views/Onboarding/OnboardingFlowView.swift
-git commit -m "refactor(Views): OnboardingFlowView — switch on step, drop model load"
+git rm llm-visualizer/Views/Onboarding/ChallengeIntroView.swift \
+       llm-visualizer/Views/Common/ChallengeIntroCard.swift
+```
+
+- [ ] **Step 3: Verify the build still passes**
+
+```bash
+xcodebuild build -project llm-visualizer.xcodeproj -scheme llm-visualizer \
+  -destination 'platform=iOS Simulator,name=iPhone 17'
+```
+
+Expected: `** BUILD SUCCEEDED **`. (The Xcode project auto-discovers file deletions; no `project.pbxproj` edit needed — see Task 18 for the same pattern.)
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add -A
+git commit -m "refactor(Views): OnboardingFlowView — single button to Level 1"
 ```
 
 ---
 
-### Task 15: Rewrite `AppRootView`
+## Phase 3: Integration (modify existing call sites)
+
+### ~~Task 14: Rewrite `OnboardingFlowView`~~
+
+> **Task removed.** It was superseded by **Task 13** above, which
+> replaces the `Step`-switching version with the single-button version
+> that goes directly to Level 1.
+
+---
+
+### Task 14: Rewrite `AppRootView`
 
 Switch the body on `appVM.state` instead of the local `showOnboarding: Bool` flag. The state machine handles the initial onboarding check (via `ProgressStore.hasSeenOnboarding` in `bootstrap`) and the post-onboarding flip (via `markOnboardingComplete`).
 
@@ -1283,7 +1187,7 @@ git commit -m "refactor(App): AppRootView — route on AppShellViewModel state"
 
 ---
 
-### Task 16: Remove `bootstrap()` from `LevelShellView`
+### Task 15: Remove `bootstrap()` from `LevelShellView`
 
 The model is loaded once by `AppShellViewModel.bootstrap()`; the level shell no longer needs to bootstrap.
 
@@ -1322,7 +1226,7 @@ git commit -m "refactor(Views): LevelShellView no longer bootstraps model"
 
 ---
 
-### Task 17: Remove `bootstrap()` from `Level1Session`
+### Task 16: Remove `bootstrap()` from `Level1Session`
 
 The shell is the only caller. With it gone, the method is dead.
 
@@ -1348,7 +1252,7 @@ git commit -m "refactor(Models): Level1Session.bootstrap() removed"
 
 ---
 
-### Task 18: Delete obsolete files
+### Task 17: Delete obsolete files
 
 The new design makes `FreePlayView`, `OpeningView`, and the old `OnboardingPhase` enum dead code.
 
@@ -1394,9 +1298,9 @@ git commit -m "refactor: delete obsolete FreePlayView, OpeningView, OnboardingSt
 
 ## Phase 4: Localization + Verification
 
-### Task 19: Update `Localizable.xcstrings`
+### Task 18: Update `Localizable.xcstrings`
 
-Add new strings for the loading view, the next button, and the two example captions. Update the `ChallengeIntroCard` body copy to match the new fixed-text version (without `bestSoFar` interpolation).
+Add new strings for the loading view, the onboarding prompt, the example caption, and the "Try it" button.
 
 **Files:**
 - Modify: `llm-visualizer/Resources/Localizable.xcstrings`
@@ -1409,10 +1313,9 @@ In the JSON catalog, add entries for these keys (both `en` and `zh-Hans`):
 |---|---|---|
 | `loading.model` | `Loading model…` | `正在载入模型` |
 | `error.retry` | `Try again` | `重试` |
-| `onboarding.next` | `Next` | `下一张` |
 | `onboarding.prompt`                 | `Today's weather is really`                                       | `今天天气真`           |
 | `onboarding.example.caption`         | `The model's actual guess — these are the words it considered, each with its own probability. Now you try to find a sentence where one word clearly wins.` | `模型的真实想法——这几个候选词各有不同的概率。下一关看你能不能让某一个词明显胜出。` |
-| `challenge.body` (or whatever key the card uses) | `You just saw how a model thinks. Now try it for real.` | `你已经看到了模型怎么想。现在自己来试试。` |
+| `onboarding.tryIt`                   | `Let me try`                                                                 | `我来试一试`           |
 
 Edit the file directly. The catalog is JSON with a `strings` map; each entry has `comment`, `localizations.en.stringUnit.state` / `localizations.en.stringUnit.value`, and the same for `zh-Hans`.
 
@@ -1429,12 +1332,12 @@ Expected: `** BUILD SUCCEEDED **`.
 
 ```bash
 git add llm-visualizer/Resources/Localizable.xcstrings
-git commit -m "feat(Resources): strings for loading view, next button, example captions, challenge body"
+git commit -m "feat(Resources): strings for loading view, onboarding prompt, example caption, Try it button"
 ```
 
 ---
 
-### Task 20: Manual verification in the simulator
+### Task 19: Manual verification in the simulator
 
 TDD covers the data layer; the SwiftUI views and the integrated flow are verified by hand.
 
@@ -1453,10 +1356,9 @@ xcodebuild -project llm-visualizer.xcodeproj -scheme llm-visualizer \
 Expected:
 1. `ModelLoadingView` appears immediately (no flash of onboarding).
 2. Logo + "Loading model…" + spinner are visible.
-3. After ~5–10s the first example card appears, already populated.
-4. Tap **Next** → second card appears, already populated.
-5. Tap **Next** → `ChallengeIntroView` overlay appears.
-6. Tap the accept button → `LevelShellView` (Level 1) appears.
+3. After ~5–10s the example card appears, already populated.
+4. Read the caption: it states what the dots mean and hands off to Level 1.
+5. Tap **Try it** → `LevelShellView` (Level 1) appears directly.
 
 - [ ] **Step 3: Returning-user happy path**
 
@@ -1497,26 +1399,25 @@ If nothing needed fixing, skip this step.
 
 **Spec coverage:**
 
-- §3 architecture (AppRootView + AppShellViewModel + ModelLoadingView + OnboardingFlowView + LevelShellView) → Tasks 14–17 ✓
-- §3.1 invariants (single model load, pre-fetch the example, errors in loading view, Onboarding ≠ Level 1 structurally) → Tasks 3–7, 11, 15, 17 ✓
-- §4 files (4.1 create, 4.2 delete, 4.3 modify) → Tasks 2, 8, 11, 12, 13, 14, 15, 16, 17, 18, 19 ✓
+- §3 architecture (AppRootView + AppShellViewModel + ModelLoadingView + OnboardingFlowView + LevelShellView) → Tasks 12–15 ✓
+- §3.1 invariants (single model load, pre-fetch the example, errors in loading view, Onboarding ≠ Level 1 structurally) → Tasks 3–7, 11, 14, 15 ✓
+- §4 files (4.1 create, 4.2 delete, 4.3 modify) → Tasks 2, 8, 11, 12, 13, 14, 15, 16, 17, 18 ✓
 - §5.0 OnboardingExample → Task 2 ✓
 - §5.1 AppShellViewModel (state, bootstrap, retry, markOnboardingComplete) → Tasks 3–7 ✓
 - §5.2 ModelLoadingView → Task 11 ✓
 - §5.3 ExampleCardView + §5.3.1 ProbabilityListView (private) → Task 12 ✓
-- §5.5 OnboardingViewModel rewrite → Tasks 8–10 ✓
-- §5.6 AppRootView → Task 15 ✓
-- §6 UI design → Tasks 11, 12, 14 (with manual verification in Task 20) ✓
-- §7 data flow → Tasks 14, 15 + verification ✓
-- §8 state interactions → Tasks 4, 5, 6, 7, 8, 9, 10 (covered by tests) ✓
-- §9 localization → Task 19 ✓
-- §10 open questions (logo placeholder, error localization) → Task 11 uses system icon as placeholder, Task 19 uses `error.localizedDescription` via the VM ✓
+- §5.4 OnboardingViewModel rewrite → Tasks 8, 9 ✓
+- §5.5 AppRootView → Task 14 ✓
+- §6 UI design → Tasks 11, 12, 13 (with manual verification in Task 19) ✓
+- §7 data flow → Tasks 13, 14 + verification ✓
+- §8 state interactions → Tasks 4, 5, 6, 7, 8, 9 (covered by tests) ✓
+- §9 localization → Task 18 ✓
+- §10 open questions (logo placeholder, error localization) → Task 11 uses system icon as placeholder, Task 18 uses `error.localizedDescription` via the VM ✓
 
-**Placeholder scan:** No `TBD`/`TODO`/`fill in` markers. One task (Task 13, Step 1) instructs the engineer to `cat` the file before editing it — this is intentional and not a placeholder for missing content.
+**Placeholder scan:** No `TBD`/`TODO`/`fill in` markers.
 
 **Type consistency:**
-- `AppShellViewModel.State` is referenced as `AppShellViewModel.State` in `ModelLoadingView` and `AppRootView` — defined in Task 3, used in Tasks 11, 15 ✓
-- `OnboardingViewModel.Step` is referenced in `OnboardingFlowView` — defined in Task 8, used in Task 14 ✓
-- `OnboardingExample` is referenced in `AppShellViewModel.example`, `OnboardingViewModel` init, and `OnboardingFlowView` — defined in Task 2, used in Tasks 4, 8, 14, 15 ✓
-- `bootstrap()`, `retry()`, `markOnboardingComplete()` are all public on `AppShellViewModel` — defined Tasks 4, 6, 7, used Task 15 ✓
-- `goNext()` and `acceptChallenge(onComplete:)` are public on `OnboardingViewModel` — defined Tasks 9, 10, used Task 14 ✓
+- `AppShellViewModel.State` is referenced as `AppShellViewModel.State` in `ModelLoadingView` and `AppRootView` — defined in Task 3, used in Tasks 11, 14 ✓
+- `OnboardingExample` is referenced in `AppShellViewModel.example`, `OnboardingViewModel` init, and `OnboardingFlowView` — defined in Task 2, used in Tasks 4, 8, 13, 14 ✓
+- `bootstrap()`, `retry()`, `markOnboardingComplete()` are all public on `AppShellViewModel` — defined Tasks 4, 6, 7, used Task 14 ✓
+- `acceptChallenge(onComplete:)` is public on `OnboardingViewModel` — defined Task 9, used Task 13 ✓
