@@ -1,84 +1,52 @@
-# Onboarding Redesign — Passive Examples + Dedicated Loading Screen
+# Onboarding Redesign — Passive Probability Example + Dedicated Loading Screen
 
-**Date:** 2026-06-26
+**Date:** 2026-06-26 (revised 2026-06-26)
 **Status:** Draft (pending user review)
 **Target:** iOS 17.0+ (iPhone + iPad), Swift 5.9+
 **Replaces:** §6.2 ("Onboarding flow") of `2026-06-23-onboarding-level1-design.md` and the corresponding implementation slice (commits `bade184`..`90cf046`).
 
 ## 1. Goal
 
-The current onboarding's Free Play phase is a near-duplicate of Level 1's
-input UI — same TextField, same send button, same inspiration chips, same
-probability bars, same narrator — minus the pass-evaluation wiring. The
-duplication is real: the two views share ~80% of their body and will
-diverge in maintenance.
+The current onboarding's Free Play phase is a near-duplicate of Level 1's input UI. The duplication is real: the two views share ~80% of their body and will diverge in maintenance. This slice restructures Onboarding along two axes:
 
-This slice restructures Onboarding along two axes:
+1. **Remove duplication.** Onboarding no longer mirrors Level 1's play surface. Free Play is deleted; what replaces it is structurally different (passive observation, not active input).
+2. **Hide model-loading time behind a dedicated screen.** A new full-screen `ModelLoadingView` owns the entire model bootstrap + onboarding-example pre-fetch, so the user never waits inside an onboarding card.
 
-1. **Remove duplication.** Onboarding no longer mirrors Level 1's play
-   surface. Free Play is deleted; what replaces it is structurally
-   different (passive observation, not active input).
-2. **Hide model-loading time behind a dedicated screen.** Today, model
-   loading happens inside `OnboardingFlowView.task` while the user sees
-   the first onboarding card transition through a brief "loading"
-   state. We add a full-screen `ModelLoadingView` that owns the entire
-   model bootstrap + onboarding-example pre-fetch, so the user never
-   waits inside an onboarding card.
+### 1.1 What Onboarding teaches
 
-The pedagogical premise of Onboarding shifts from "tease the user with
-a free copy of Level 1, then challenge them" to "show the user one
-real, pre-canned model prediction with a teaching caption, then hand
-off to Level 1." This treats Onboarding as a **brief classroom**,
-not a **tutorial** that previews the game.
+Onboarding exists to convey **one** insight to the user, before they enter Level 1:
+
+> **The model doesn't pick one word — it assigns a probability to many possible next words.**
+
+Everything in this slice serves this teaching goal. The example card is a single concrete instance of a probability distribution; the caption makes the abstract point explicit; the Level 1 handoff is motivated by it (Level 1 asks the user to find sentences where one word's probability is higher).
+
+### 1.2 What this slice is not
+
+Onboarding is **not** a tutorial that previews Level 1's UI. It is not a "free trial" of Level 1. It does not teach LLM mechanics broadly, language-modeling theory, or tokenization. Those can land in later levels. This slice teaches the single insight above, then hands off.
 
 ## 2. Scope
 
 **In scope (this slice):**
 
-- New `ModelLoadingView` — full-screen page with logo + "Loading
-  model…" text + spinner, or error message + [Try again] button.
-- New `AppShellViewModel` — owns model load + onboarding-example
-  pre-fetch as a single state machine (`loading` / `failed(msg)` /
-  `ready(hasSeenOnboarding)`). One entry point. One retry.
-- New `ExampleCardView` — passive card showing a fixed prompt, a
-  100-dot probability grid, and a teaching caption. No input.
-- New `DotGridView` — 10×10 grid of small circles, colored by
-  top-K candidate proportion. Private subview of `ExampleCardView`.
-- Simplified `OnboardingViewModel` — pure state machine over a
-  2-step enum (`example` / `challengeIntro`). Holds one pre-fetched
-  `[OnboardingExample]`, no `service`, no `modelState`, no `bootstrap()`,
-  no progress tracking.
-- Pre-fetch of **one** onboarding example during model loading
-  (no per-example loading screen).
-- Centralize model loading in `AppRootView`. Remove bootstrap calls
-  from `OnboardingFlowView` and `LevelShellView`/`Level1Session`.
-- Delete `FreePlayView`, `OpeningView`, and the old `OnboardingState`
-  enum (which carried `playsSoFar` and progress fields).
-- Extend `Localizable.xcstrings` with "Loading model…", the
-  onboarding prompt (used by both the model and the example card), and
-  the example caption (English + zh-Hans).
-- Unit tests (TDD-first per project convention): `AppShellViewModel`,
-  `OnboardingViewModel`.
+- New `ModelLoadingView` — full-screen page with logo + "Loading model…" text + spinner, or error message + [Try again] button.
+- New `AppShellViewModel` — owns model load + onboarding-example pre-fetch as a single state machine (`loading` / `failed(msg)` / `ready(hasSeenOnboarding)`). One entry point. One retry.
+- New `ExampleCardView` — passive card showing a fixed prompt, a sorted list of the model's top candidates with bars and percentages, and a teaching caption. No input.
+- Simplified `OnboardingViewModel` — pure state machine over a 2-step enum (`example` / `challengeIntro`). Holds one pre-fetched `OnboardingExample`, no `service`, no `modelState`, no `bootstrap()`, no progress tracking.
+- Pre-fetch of **one** onboarding example during model loading (no per-example loading screen).
+- Centralize model loading in `AppRootView`. Remove bootstrap calls from `OnboardingFlowView` and `LevelShellView`/`Level1Session`.
+- Delete `FreePlayView`, `OpeningView`, and the old `OnboardingState` enum.
+- Extend `Localizable.xcstrings` with "Loading model…", the onboarding prompt (shown on the example card AND sent to the model), and the example caption.
+- Unit tests (TDD-first per project convention): `AppShellViewModel`, `OnboardingViewModel`.
 
 **Out of scope (this slice, deferred to future slices):**
 
-- "Confidence ≠ correct" example (the third "confidently wrong" card
-  considered during brainstorming is not in this slice). That concept
-  will land in a future level.
-- Replacing or augmenting `ProbabilityBarsView` (Level 1's bar chart).
-  The new `DotGridView` is a separate, Onboarding-only component.
-- Resurrecting or deleting `Views/Chat/` (the legacy chat, currently
-  unreferenced from `AppRootView`).
-- Levels 2–7. The `LevelRegistry` and `LevelSession` abstractions
-  are unchanged.
-- Any "On device" / "Running locally" indicator on the example cards.
-  The teaching is done by captions only.
-- Friendly / wrapped error messages. The loading view shows
-  `error.localizedDescription` directly.
-- TDD: tests cover data-layer state machines and the AppShell
-  pre-fetch; SwiftUI view bodies (`ModelLoadingView`,
-  `ExampleCardView`, `DotGridView`) are built directly and verified
-  manually in the simulator against the UI design in §6.
+- "Confidence ≠ correct" or other advanced distribution concepts. The single insight in §1.1 is enough for v1.
+- Replacing or augmenting `ProbabilityBarsView` (Level 1's chart). The Onboarding example uses a different visualization (ranked list with bars, all rows equal weight) — see §5.3.
+- Resurrecting or deleting `Views/Chat/` (legacy chat, unreferenced from `AppRootView`).
+- Levels 2–7. The `LevelRegistry` and `LevelSession` abstractions are unchanged.
+- Any "On device" / "Running locally" indicator on the example card. The teaching is done via captions only.
+- Friendly / wrapped error messages. The loading view shows `error.localizedDescription` directly.
+- TDD: tests cover data-layer state machines and the AppShell pre-fetch; SwiftUI view bodies (`ModelLoadingView`, `ExampleCardView`) are built directly and verified manually against the UI design in §6.
 
 ## 3. Architecture
 
@@ -94,47 +62,38 @@ not a **tutorial** that previews the game.
                                      │      │ ModelLoadingView    │
                                      ▼      │  logo               │
                           ┌──────────────────┤  ⚠ <error message>  │
-                           │ ModelLoadingView │  [ Try again ]      │
-                           │  logo            └─────────────────────┘
-                           │  "Loading model…"
-                           │  ProgressView()
-                           │  .task: appVM.bootstrap()
-                           │   ↳ loadModel()
-                           │   ↳ predictNextTokens(prompt,         topK: 4) → example
-                           │   ↳ state = .ready(hasSeenOnboarding: …)
-                           └──────────────┬───────────────────────────────┘
-                                          │
-                           state: ready(  │
-                           hasSeenOnboarding:  │
-                               false)         │  hasSeenOnboarding: true
-                                          │   │
-                           ┌──────────────▼─┐ ┌▼──────────────────────┐
-                           │ OnboardingFlowView│ │ LevelShellView      │
-                           │  OnboardingVM    │ │  Level1Session      │
-                           │   .example       │ │   → Level1View      │
-                           │   .challengeIntro│ │  (no bootstrap —    │
-                           │                  │ │   model is ready)   │
-                           │ Example pre-pop  │ └─────────────────────┘
-                           │ from appVM.      │
-                           │ example          │
-                           └──────────────────┘
+                          │ ModelLoadingView │  [ Try again ]      │
+                          │  logo            └─────────────────────┘
+                          │  "Loading model…"
+                          │  ProgressView()
+                          │  .task: appVM.bootstrap()
+                          │   ↳ loadModel()
+                          │   ↳ predictNextTokens(prompt,         topK: 4) → example
+                          │   ↳ state = .ready(hasSeenOnboarding: …)
+                          └──────────────┬───────────────────────────────┘
+                                         │
+                          state: ready(  │
+                          hasSeenOnboarding:  │
+                              false)         │  hasSeenOnboarding: true
+                                         │   │
+                          ┌──────────────▼─┐ ┌▼──────────────────────┐
+                          │ OnboardingFlowView│ │ LevelShellView      │
+                          │  OnboardingVM    │ │  Level1Session      │
+                          │   .example       │ │   → Level1View      │
+                          │   .challengeIntro│ │  (no bootstrap —    │
+                          │                  │ │   model is ready)   │
+                          │ Example pre-pop  │ └─────────────────────┘
+                          │ from appVM.      │
+                          │ example          │
+                          └──────────────────┘
 ```
 
 ### 3.1 Key invariants
 
-- **The model is loaded exactly once per app launch.** `AppShellViewModel`
-  is the sole owner. `OnboardingViewModel` and `Level1Session` do not
-  call `service.loadModel()`. `LevelShellView` does not bootstrap.
-- **The onboarding example is pre-fetched during model loading.**
-  The user sees a single continuous loading screen that covers the
-  entire bootstrap. There is no in-onboarding loading state.
-- **All load-time errors land in `ModelLoadingView`.** In-game errors
-  (e.g., `Level1ViewModel.errorBanner` for a failed `predictNextTokens`
-  call mid-play) are a separate, pre-existing pattern and stay as-is.
-- **Onboarding is structurally different from Level 1.** No input
-  field, no send button, no inspiration chips, no submit counter, no
-  best-record chip, no error banner, no pass celebration. The two
-  views share zero UI primitives.
+- **The model is loaded exactly once per app launch.** `AppShellViewModel` is the sole owner. `OnboardingViewModel` and `Level1Session` do not call `service.loadModel()`. `LevelShellView` does not bootstrap.
+- **The onboarding example is pre-fetched during model loading.** The user sees a single continuous loading screen that covers the entire bootstrap. There is no in-onboarding loading state.
+- **All load-time errors land in `ModelLoadingView`.** In-game errors (e.g., `Level1ViewModel.errorBanner` for a failed `predictNextTokens` call mid-play) are a separate, pre-existing pattern and stay as-is.
+- **Onboarding is structurally different from Level 1.** No input field, no send button, no inspiration chips, no submit counter, no best-record chip, no error banner, no pass celebration. The Onboarding card shows a fixed prompt + distribution; Level 1's `Level1View` shows a text input + distribution. The two share zero view components.
 
 ## 4. Files
 
@@ -143,67 +102,41 @@ not a **tutorial** that previews the game.
 ```
 llm-visualizer/
 ├── Models/
-│   └── OnboardingExample.swift        # struct OnboardingExample { prompt: String, candidates: [TokenCandidate] }
-├── Services/                          # (no new files)
+│   └── OnboardingExample.swift           # struct OnboardingExample { prompt, candidates }
 ├── ViewModels/
-│   └── AppShellViewModel.swift        # loading/failed/ready state machine
+│   └── AppShellViewModel.swift           # loading/failed/ready state machine
 └── Views/
     ├── Loading/
-    │   └── ModelLoadingView.swift     # logo + "Loading model…" / error + retry
+    │   └── ModelLoadingView.swift         # logo + spinner / error + retry
     └── Onboarding/
-        └── ExampleCardView.swift      # prompt + DotGridView + caption
-                                      # (DotGridView is a private struct in the same file)
+        └── ExampleCardView.swift          # prompt + ProbabilityListView (private) + caption
 ```
 
-The `OnboardingViewModel.Step` enum (the 3-step state machine for
-onboarding) is a nested type inside `OnboardingViewModel` — it does
-not need its own file.
+`OnboardingViewModel.Step` (`.example` / `.challengeIntro`) is a nested enum inside `OnboardingViewModel` — it does not need its own file.
 
 ### 4.2 To delete
 
 ```
 llm-visualizer/
 ├── Models/
-│   └── OnboardingState.swift          # old OnboardingPhase + playsSoFar/bestSoFar — replaced by OnboardingExample + nested OnboardingViewModel.Step
+│   └── OnboardingState.swift              # old OnboardingPhase + playsSoFar/bestSoFar
 └── Views/
     └── Onboarding/
-        ├── FreePlayView.swift         # duplicate of Level 1 input UI — gone
-        └── OpeningView.swift          # pre-canned example — replaced by ExampleCardView
+        ├── FreePlayView.swift             # duplicate of Level 1 input UI — gone
+        └── OpeningView.swift              # pre-canned example — replaced by ExampleCardView
 ```
 
-Plus the corresponding test files for the deleted sources:
-`OnboardingStateTests.swift`, `FreePlayView`-related test references
-inside `OnboardingViewModelTests` (rewrite the test file).
+Plus the test file `OnboardingStateTests.swift`.
 
 ### 4.3 To modify
 
-- `llm-visualizer/llm_visualizerApp.swift` — no change (still
-  hosts `AppRootView`).
-- `llm-visualizer/AppRootView.swift` — switch body on
-  `appShellVM.state`: loading/failed → `ModelLoadingView`,
-  ready(false) → `OnboardingFlowView`, ready(true) → `LevelShellView`.
-  Construct `AppShellViewModel` with `LLMService()` (real) or
-  `MockLLMService` (test).
-- `llm-visualizer/ViewModels/OnboardingViewModel.swift` — full rewrite:
-  holds one `OnboardingExample`, holds `step: OnboardingViewModel.Step`
-  (nested enum, `.example` / `.challengeIntro`), exposes `goNext()` and
-  `acceptChallenge(onComplete:)`. No `service`, no `modelState`,
-  no `bootstrap()`.
-- `llm-visualizer/Views/Onboarding/OnboardingFlowView.swift` — remove
-  `.task { viewModel.bootstrap() }`. Construct `OnboardingViewModel`
-  with the single pre-fetched example passed in from `AppRootView`.
-  `switch viewModel.step` to choose between `ExampleCardView`
-  (×1) and `ChallengeIntroView`.
-- `llm-visualizer/Views/LevelShell/LevelShellView.swift` — remove
-  `currentSession.bootstrap()` from `.task`. The model is guaranteed
-  loaded by the time we get here.
-- `llm-visualizer/Models/Level1Session.swift` — remove `bootstrap()`
-  method.
-- `llm-visualizer/Resources/Localizable.xcstrings` — add
-  `"Loading model…"` (`loading.model`), the onboarding prompt
-  (`onboarding.prompt`), the example caption
-  (`onboarding.example.caption`), and a `"Try again"` (`error.retry`)
-  string. Both `en` and `zh-Hans`.
+- `llm-visualizer/llm_visualizerApp.swift` — no change (still hosts `AppRootView`).
+- `llm-visualizer/AppRootView.swift` — switch body on `appVM.state`; construct `OnboardingViewModel` from prefetched example; resolve `onboardingPrompt` from `Localizable.xcstrings` at init time.
+- `llm-visualizer/ViewModels/OnboardingViewModel.swift` — full rewrite: holds one `OnboardingExample`, holds `step: OnboardingViewModel.Step` (nested enum), exposes `goNext()` and `acceptChallenge(onComplete:)`. No `service`, no `modelState`, no `bootstrap()`.
+- `llm-visualizer/Views/Onboarding/OnboardingFlowView.swift` — switch on `viewModel.step` to choose between `ExampleCardView` (×1) and `ChallengeIntroView`.
+- `llm-visualizer/Views/LevelShell/LevelShellView.swift` — remove `currentSession.bootstrap()` from `.task`. The model is guaranteed loaded by the time we get here.
+- `llm-visualizer/Models/Level1Session.swift` — remove `bootstrap()` method.
+- `llm-visualizer/Resources/Localizable.xcstrings` — add `loading.model`, `error.retry`, `onboarding.next`, `onboarding.prompt`, `onboarding.example.caption`, plus updated `ChallengeIntroCard` copy. Both `en` and `zh-Hans`.
 
 ## 5. Components
 
@@ -231,6 +164,7 @@ No unit test (pure data type with no behavior).
 @MainActor
 @Observable
 final class AppShellViewModel {
+
     enum State: Equatable {
         case loading
         case failed(String)                       // error.localizedDescription
@@ -239,6 +173,7 @@ final class AppShellViewModel {
 
     var state: State = .loading
     let service: LLMServiceProtocol
+    private let progressStore: ProgressStore
     private let onboardingPrompt: String
 
     private(set) var example: OnboardingExample?
@@ -264,7 +199,7 @@ final class AppShellViewModel {
     /// Flips state to .ready(hasSeenOnboarding: true) so AppRootView
     /// re-routes to LevelShellView.
     func markOnboardingComplete() {
-        if case .ready = state {
+        if case .ready(let hasSeen) = state, !hasSeen {
             state = .ready(hasSeenOnboarding: true)
         }
     }
@@ -286,7 +221,7 @@ final class AppShellViewModel {
   `service.loadModel()` throws; the message equals
   `error.localizedDescription`.
 - `bootstrap()` transitions `.loading → .failed(message)` when
-  `service.predictNextTokens` (any call) throws.
+  `service.predictNextTokens` throws.
 - `retry()` re-runs the full sequence and reaches `.ready` from a
   prior `.failed` state.
 - `retry()` is a no-op (does not crash) when called from `.ready`.
@@ -298,6 +233,7 @@ final class AppShellViewModel {
 
 ```swift
 struct ModelLoadingView: View {
+
     let state: AppShellViewModel.State
     let onRetry: () -> Void
 
@@ -310,36 +246,49 @@ struct ModelLoadingView: View {
         .background(Color(.systemBackground).ignoresSafeArea())
     }
 
-    @ViewBuilder private var content: some View {
+    private var logo: some View {
+        Image(systemName: "circle.hexagongrid.fill")
+            .resizable()
+            .scaledToFit()
+            .frame(width: 80, height: 80)
+            .foregroundStyle(.tint)
+    }
+
+    @ViewBuilder
+    private var content: some View {
         switch state {
         case .loading:
             Text("Loading model…")
+                .font(.body)
+                .foregroundStyle(.secondary)
             ProgressView()
         case .failed(let message):
             Image(systemName: "exclamationmark.triangle.fill")
+                .font(.title)
                 .foregroundStyle(.orange)
             Text(message)
+                .font(.callout)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 32)
             Button("Try again", action: onRetry)
                 .buttonStyle(.borderedProminent)
         case .ready:
-            EmptyView()       // never reached — AppRootView routes around
+            EmptyView()  // unreachable — AppRootView routes around
         }
     }
 }
 ```
 
-The `logo` slot is a placeholder (`Image(systemName: "circle.hexagongrid.fill")`
-or a text lockup). A real logo asset is out of scope for this slice.
+The logo slot is a placeholder (`Image(systemName: "circle.hexagongrid.fill")`).
+A real logo is a future design-asset task.
 
-**No unit test.** Built directly and verified manually against the
-UI design in §6.1.
+**No unit test.** Built directly and verified manually.
 
 ### 5.3 `ExampleCardView`
 
 ```swift
 struct ExampleCardView: View {
+
     let prompt: String
     let candidates: [TokenCandidate]
     let caption: String
@@ -348,66 +297,124 @@ struct ExampleCardView: View {
         VStack(alignment: .leading, spacing: 16) {
             Text(prompt)
                 .font(.title3.weight(.semibold))
-            DotGridView(candidates: candidates)
+            ProbabilityListView(candidates: candidates)
             Text(caption)
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
         }
         .padding(20)
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
     }
 }
 ```
 
-The card has **no Next button** — the Next button is owned by
-`OnboardingFlowView` (the orchestrator) so it can advance
-`OnboardingViewModel.step`. This keeps the card pure-presentational.
+The card has **no Next button** — that lives in `OnboardingFlowView` so
+the orchestrator can advance `OnboardingViewModel.step`.
 
-**No unit test.** Built directly and verified manually against the
-UI design in §6.2.
+**No unit test.** Built directly and verified manually.
 
-### 5.4 `DotGridView` (private to `ExampleCardView.swift`)
+#### 5.3.1 `ProbabilityListView` (private)
 
-A 10×10 grid of small filled circles. The top-K candidates each
-"claim" `round(probability × 100)` circles, in descending order,
-rendered left-to-right, top-to-bottom. Overflow (rounding) goes to
-the last candidate. Unclaimed circles render in `.quaternary` gray.
+A vertical list of the model's top candidates. Each row has a token
+label, a horizontal bar whose width is proportional to the candidate's
+probability, and the percentage as text. All rows use the same visual
+style — there is no spotlight on the top candidate. The teaching
+goal is the **distribution**, not the winner; equal-weight rows
+reinforce that every row is a real possibility the model considered.
 
 ```swift
-private struct DotGridView: View {
+private struct ProbabilityListView: View {
+
     let candidates: [TokenCandidate]
-    private let columns = Array(repeating: GridItem(.fixed(10), spacing: 4), count: 10)
 
     var body: some View {
-        LazyVGrid(columns: columns, spacing: 4) {
-            ForEach(0..<100, id: \.self) { index in
-                Circle()
-                    .fill(color(for: index))
-                    .frame(width: 10, height: 10)
+        VStack(alignment: .leading, spacing: 8) {
+            ForEach(Array(candidates.prefix(4).enumerated()), id: \.offset) { _, c in
+                ProbabilityRow(token: c.text, probability: c.probability)
             }
         }
     }
-    // color(for:) picks the candidate that claims the given dot index
+}
+
+private struct ProbabilityRow: View {
+
+    let token: String
+    let probability: Double
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Text(token)
+                .font(.body.monospaced())
+                .frame(width: 60, alignment: .leading)
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(Color.gray.opacity(0.15))
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(color(for: probability))
+                        .frame(width: geo.size.width * CGFloat(probability))
+                }
+            }
+            .frame(height: 12)
+            Text("\(Int((probability * 100).rounded()))%")
+                .font(.callout.monospacedDigit())
+                .foregroundStyle(.secondary)
+                .frame(width: 40, alignment: .trailing)
+        }
+    }
+
+    private func color(for probability: Double) -> Color {
+        switch probability {
+        case 0.50...: return .green
+        case 0.25..<0.50: return .orange
+        case 0.10..<0.25: return .yellow
+        default: return .red
+        }
+    }
 }
 ```
 
-Color palette: top-1 → green, top-2 → amber, top-3 → orange, top-4 →
-red, unclaimed → `Color.gray.opacity(0.15)`.
+**Color bands** are thresholds on the candidate's own probability,
+not on its rank: top-1 with 12% probability gets red; rank-2 with
+40% probability gets orange. This reinforces "the rank isn't the
+point — the magnitude is."
 
-**No unit test.** Manual verification only.
+**No unit test.** Built directly and verified manually.
 
-### 5.5 `OnboardingViewModel` (rewritten)
+#### 5.3.2 Why a ranked list, not a chart
+
+A ranked list with bars and percentages is the simplest honest
+visualization of a probability distribution:
+
+- A reader needs no legend to interpret "the model is more sure about
+  this word."
+- The numbers (0–100%) are immediately readable; no arbitrary
+  metaphor (no "100 dots", no "pie slices", no abstract shapes).
+- The visualization is **structurally distinct** from Level 1's
+  `ProbabilityBarsView`, which spotlights top-1 as a large card and
+  compresses the rest. The Onboarding list treats all rows equally
+  to emphasize the distribution itself.
+
+### 5.4 `OnboardingViewModel` (rewritten)
 
 ```swift
 @MainActor
 @Observable
 final class OnboardingViewModel {
+
     enum Step { case example, challengeIntro }
     var step: Step = .example
 
     let example: OnboardingExample
 
-    init(example: OnboardingExample) {
+    private let progressStore: ProgressStore
+
+    init(
+        example: OnboardingExample,
+        progressStore: ProgressStore = .shared
+    ) {
         self.example = example
+        self.progressStore = progressStore
     }
 
     func goNext() {
@@ -417,8 +424,8 @@ final class OnboardingViewModel {
         }
     }
 
-    func acceptChallenge(onComplete: () -> Void) {
-        ProgressStore.shared.hasSeenOnboarding = true
+    func acceptChallenge(onComplete: @escaping () -> Void) {
+        progressStore.hasSeenOnboarding = true
         onComplete()
     }
 }
@@ -437,7 +444,7 @@ behavior worth promoting to its own file.
   `ProgressStore.shared.hasSeenOnboarding = true` and invokes
   `onComplete()` exactly once.
 
-### 5.6 `AppRootView` (modified)
+### 5.5 `AppRootView` (modified)
 
 ```swift
 struct AppRootView: View {
@@ -477,7 +484,7 @@ struct AppRootView: View {
         }
         .task {
             // Skip model load during unit/UI tests — Metal doesn't init in simulator.
-            // Same guard pattern as LevelShellView.swift:40.
+            // Same pattern as LevelShellView.swift:40.
             guard ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil else { return }
             await appVM.bootstrap()
         }
@@ -536,22 +543,18 @@ Failed state:
 
 ```
 ┌──────────────────────────────────────┐
-│ 今天天气真                            │   ← title3 semibold (localized via "onboarding.prompt")
+│ 今天天气真                            │   ← title3 semibold
+│                                      │       (localized via "onboarding.prompt")
+│ 好       ████████████████░░ 65%      │   ← equal-weight rows,
+│ 不错     ████░░░░░░░░░░░░░░ 20%      │       colored by probability band
+│ 暖       ██░░░░░░░░░░░░░░░ 8%       │
+│ 冷       ░░░░░░░░░░░░░░░░░ 5%       │
 │                                      │
-│ 🟢🟢🟢🟢🟢🟢🟢🟢🟢·                 │   ← 100 dots, 10×10 grid
-│ 🟢🟢🟢🟢🟢🟢🟢🟢🟢·                 │   ← top-1 = green
-│ 🟢🟢🟢🟢🟢🟢🟢🟢🟡·                 │   ← top-2 = amber
-│ 🟢🟢🟢🟢🟢🟢🟢🟢🟡·                 │
-│ 🟢🟢🟢🟢🟢🟢🟢🟢🟡·                 │
-│ 🟢🟢🟢🟢🟢🟢🟢🟢🟡·                 │
-│ 🟢🟢🟢🟢🟢🟢🟢🟢🟡·                 │
-│ 🟢🟢🟢🟢🟢🟢🟢🟢🟡·                 │
-│ 🟢🟢🟢🟢🟢🟢🟢🟢🟡·                 │
-│ 🟢🟢🟢🟢🟢🟢🟢🟢🟡·                 │
-│                                      │
-│ These 100 dots are what the model    │   ← subhead secondary (localized via "onboarding.example.caption")
-│ on this device really thought. Now   │
-│ you try — can you make it more sure? │
+│ The model's actual guess — these     │   ← subhead secondary
+│ are the words it considered, each     │       (localized via
+│ with its own probability. Now you     │        "onboarding.example.caption")
+│ try to find a sentence where one      │
+│ word clearly wins.                   │
 └──────────────────────────────────────┘
 ```
 
@@ -646,12 +649,13 @@ app), distinct from the bootstrap-time errors this slice addresses.
 
 New strings in `Resources/Localizable.xcstrings` (en Base + zh-Hans):
 
-| Key                                  | en                                                     | zh-Hans                |
-|--------------------------------------|--------------------------------------------------------|------------------------|
-| `loading.model`                      | `Loading model…`                                       | `正在载入模型`         |
-| `error.retry`                        | `Try again`                                            | `重试`                 |
-| `onboarding.prompt`                 | `Today's weather is really`                           | `今天天气真`           |
-| `onboarding.example.caption`         | `These 100 dots are what the model on this device really thought. Now you try — can you make it more sure?` | `这 100 个点是本机模型刚才的真实想法。下一关你来试试，看能不能让它更确定。` |
+| Key                                  | en                                                                                   | zh-Hans                                       |
+|--------------------------------------|--------------------------------------------------------------------------------------|-----------------------------------------------|
+| `loading.model`                      | `Loading model…`                                                                     | `正在载入模型`                                 |
+| `error.retry`                        | `Try again`                                                                          | `重试`                                         |
+| `onboarding.prompt`                 | `Today's weather is really`                                                         | `今天天气真`                                   |
+| `onboarding.example.caption`         | `The model's actual guess — these are the words it considered, each with its own probability. Now you try to find a sentence where one word clearly wins.` | `模型的真实想法——这几个候选词各有不同的概率。下一关看你能不能让某一个词明显胜出。` |
+| `onboarding.next`                    | `Next`                                                                              | `下一关`                                       |
 
 The `onboarding.prompt` key is the text sent to the model **and**
 shown to the user on the example card. It is localized so that en users
@@ -675,6 +679,10 @@ None blocking. Logged for completeness:
   bootstraps. If a future change re-introduces a model swap
   (e.g., for Level 7's `loadModel(name:)`), the bootstrap will
   need to be re-thought — out of scope here.
+- **Distribution-row count.** The current design shows top-4 candidates.
+  Whether 3, 4, or 5 rows is best is an empirical question — a future
+  usability pass can iterate on this without touching the data layer
+  (the model already returns top-K=4).
 
 ## 11. Out of Scope (Reminder)
 
@@ -682,10 +690,14 @@ None blocking. Logged for completeness:
   stay as-is.
 - `Views/Chat/` (legacy chat, unreferenced from `AppRootView`).
   Deletion is a separate concern.
-- TDD for `ModelLoadingView`, `ExampleCardView`, `DotGridView`.
-  These are presentational SwiftUI primitives with no branching
-  logic worth unit-testing. Verified manually.
+- TDD for `ModelLoadingView` and `ExampleCardView`. These are
+  presentational SwiftUI primitives with no branching logic worth
+  unit-testing. Verified manually.
 - Any on-device / running-locally indicator. The teaching is
   delivered via captions only.
-- Replacing `ProbabilityBarsView` (Level 1's bar chart). The new
-  `DotGridView` is a separate, Onboarding-only component.
+- Replacing `ProbabilityBarsView` (Level 1's chart). The new
+  `ProbabilityListView` (Onboarding) is structurally distinct — see
+  §5.3.2.
+- "Confidence ≠ correct" or other advanced distribution concepts
+  (§1.1 covers the single insight; advanced concepts land in later
+  levels).
