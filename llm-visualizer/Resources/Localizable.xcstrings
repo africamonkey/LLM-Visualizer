@@ -402,18 +402,18 @@
       }
     },
     "onboarding.example.framing" : {
-      "comment" : "Small uppercase label above the prompt. Frames the card as a question the model is being asked, not a data display.",
+      "comment" : "Small uppercase label above the prompt. Connects the example to the user's upcoming action in Level 1: type a sentence, see what the model predicts.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The model has to guess what comes next"
+            "value" : "Type a sentence — see what the model predicts"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "模型要猜下一个词"
+            "value" : "输入句子，看模型预测什么"
           }
         }
       }

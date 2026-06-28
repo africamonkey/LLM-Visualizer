@@ -36,7 +36,7 @@ struct ExampleCardView: View {
         VStack(spacing: 10) {
             Text(String(
                 localized: "onboarding.example.framing",
-                defaultValue: "The model has to guess what comes next"
+                defaultValue: "Type a sentence — see what the model predicts"
             ))
             .font(.caption2.weight(.semibold))
             .tracking(1.2)
