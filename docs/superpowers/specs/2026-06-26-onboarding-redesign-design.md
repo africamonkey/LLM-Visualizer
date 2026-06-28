@@ -104,15 +104,17 @@ llm-visualizer/
 ├── Models/
 │   └── OnboardingExample.swift           # struct OnboardingExample { prompt, candidates }
 ├── ViewModels/
-│   └── AppShellViewModel.swift           # loading/failed/ready state machine
+│   ├── AppShellViewModel.swift           # loading/failed/ready state machine
+│   └── OnboardingViewModel.swift         # holds example + acceptChallenge(onComplete:)
 └── Views/
     ├── Loading/
     │   └── ModelLoadingView.swift         # logo + spinner / error + retry
     └── Onboarding/
-        └── ExampleCardView.swift          # prompt + ProbabilityListView (private) + caption
+        ├── ExampleCardView.swift          # prompt + ProbabilityListView (private) + caption
+        └── OnboardingFlowView.swift       # wraps ExampleCardView + single "Try it" button
 ```
 
-`OnboardingViewModel.Step` (`.example` / `.challengeIntro`) is a nested enum inside `OnboardingViewModel` — it does not need its own file.
+`OnboardingViewModel` does not need its own file for an enum anymore — the `Step` state machine was removed when `ChallengeIntroView` was deleted. The VM is now a simple data holder with one method (`acceptChallenge`).
 
 ### 4.2 To delete
 
@@ -121,7 +123,10 @@ llm-visualizer/
 ├── Models/
 │   └── OnboardingState.swift              # old OnboardingPhase + playsSoFar/bestSoFar
 └── Views/
+    ├── Common/
+    │   └── ChallengeIntroCard.swift      # was the modal body; gone with ChallengeIntroView
     └── Onboarding/
+        ├── ChallengeIntroView.swift      # was the intermediate modal between example and Level 1 — gone
         ├── FreePlayView.swift             # duplicate of Level 1 input UI — gone
         └── OpeningView.swift              # pre-canned example — replaced by ExampleCardView
 ```
@@ -132,11 +137,11 @@ Plus the test file `OnboardingStateTests.swift`.
 
 - `llm-visualizer/llm_visualizerApp.swift` — no change (still hosts `AppRootView`).
 - `llm-visualizer/AppRootView.swift` — switch body on `appVM.state`; construct `OnboardingViewModel` from prefetched example; resolve `onboardingPrompt` from `Localizable.xcstrings` at init time.
-- `llm-visualizer/ViewModels/OnboardingViewModel.swift` — full rewrite: holds one `OnboardingExample`, holds `step: OnboardingViewModel.Step` (nested enum), exposes `goNext()` and `acceptChallenge(onComplete:)`. No `service`, no `modelState`, no `bootstrap()`.
-- `llm-visualizer/Views/Onboarding/OnboardingFlowView.swift` — switch on `viewModel.step` to choose between `ExampleCardView` (×1) and `ChallengeIntroView`.
+- `llm-visualizer/ViewModels/OnboardingViewModel.swift` — full rewrite: holds one `OnboardingExample`, exposes `acceptChallenge(onComplete:)`. No `Step` enum, no `goNext()`, no `service`, no `modelState`, no `bootstrap()`.
+- `llm-visualizer/Views/Onboarding/OnboardingFlowView.swift` — renders `ExampleCardView` directly with a single `Try it` button (no `switch` on step, no intermediate `ChallengeIntroView`).
 - `llm-visualizer/Views/LevelShell/LevelShellView.swift` — remove `currentSession.bootstrap()` from `.task`. The model is guaranteed loaded by the time we get here.
 - `llm-visualizer/Models/Level1Session.swift` — remove `bootstrap()` method.
-- `llm-visualizer/Resources/Localizable.xcstrings` — add `loading.model`, `error.retry`, `onboarding.next`, `onboarding.prompt`, `onboarding.example.caption`, plus updated `ChallengeIntroCard` copy. Both `en` and `zh-Hans`.
+- `llm-visualizer/Resources/Localizable.xcstrings` — add `loading.model`, `error.retry`, `onboarding.prompt`, `onboarding.example.caption`, `onboarding.tryIt`. The earlier `challenge.body` and `onboarding.next` keys are deprecated (see §9).
 
 ## 5. Components
 
@@ -402,9 +407,6 @@ visualization of a probability distribution:
 @Observable
 final class OnboardingViewModel {
 
-    enum Step { case example, challengeIntro }
-    var step: Step = .example
-
     let example: OnboardingExample
 
     private let progressStore: ProgressStore
@@ -417,13 +419,6 @@ final class OnboardingViewModel {
         self.progressStore = progressStore
     }
 
-    func goNext() {
-        switch step {
-        case .example:        step = .challengeIntro
-        case .challengeIntro: break
-        }
-    }
-
     func acceptChallenge(onComplete: @escaping () -> Void) {
         progressStore.hasSeenOnboarding = true
         onComplete()
@@ -431,15 +426,14 @@ final class OnboardingViewModel {
 }
 ```
 
-The `Step` enum is nested inside `OnboardingViewModel` — it has no
-behavior worth promoting to its own file.
+There is no longer a `Step` enum or `goNext()` method — the single
+`acceptChallenge(onComplete:)` does the only thing OnboardingFlowView
+needs: persist `hasSeenOnboarding = true`, then invoke the
+caller's completion closure.
 
 **Test contract** (`OnboardingViewModelTests`, rewrite, TDD):
 
 - `init` stores `example`.
-- Initial `step == .example`.
-- `goNext()` from `.example` → `.challengeIntro`.
-- `goNext()` from `.challengeIntro` is a no-op.
 - `acceptChallenge(onComplete:)` sets
   `ProgressStore.shared.hasSeenOnboarding = true` and invokes
   `onComplete()` exactly once.
@@ -558,7 +552,7 @@ Failed state:
 └──────────────────────────────────────┘
 ```
 
-The Next button lives in `OnboardingFlowView`, not in the card.
+The "Try it" button lives in `OnboardingFlowView`, not in the card.
 
 ### 6.3 Onboarding layout
 
@@ -568,7 +562,7 @@ The Next button lives in `OnboardingFlowView`, not in the card.
 │         ExampleCardView              │
 │                                      │
 │                                      │
-│              [ Next → ]              │   ← bottom, full-width capsule
+│           [ Try it → ]                │   ← bottom, full-width capsule
 │                                      │
 └──────────────────────────────────────┘
 ```
@@ -590,24 +584,20 @@ llm_visualizerApp
   → body re-evaluates: state.ready(false)
   → OnboardingFlowView
        OnboardingViewModel(example: appVM.example)
-       body: switch viewModel.step {
-         case .example:       ExampleCardView(prompt: example.prompt, candidates: example.candidates, caption: …)
-         case .challengeIntro: ChallengeIntroView(...)
-       }
+       body: ExampleCardView(prompt: example.prompt, candidates: example.candidates, caption: …)
+             + single "Try it" button
 ```
 
-### 7.2 User taps Next through Onboarding
+### 7.2 User accepts onboarding
 
 ```
-goNext()                // OnboardingViewModel
-  step = .example → .challengeIntro
-  (body re-renders, challenge intro appears)
-[Accept]
-acceptChallenge(onComplete: swapToLevelShell)
-  ProgressStore.hasSeenOnboarding = true
-  appVM.markOnboardingComplete()
-  onComplete()                 // → AppRootView body re-evaluates
-  → state.ready(true) → LevelShellView
+[Try it]                  // OnboardingFlowView button → viewModel.acceptChallenge(onComplete: onComplete)
+  viewModel.acceptChallenge(onComplete: onComplete)
+    ProgressStore.hasSeenOnboarding = true
+    onComplete()           // → AppRootView's closure runs
+                            // → appVM.markOnboardingComplete()
+                            // → state.ready(true) → AppRootView body re-evaluates
+                            // → LevelShellView
 ```
 
 ### 7.3 Model load fails
@@ -640,9 +630,7 @@ app), distinct from the bootstrap-time errors this slice addresses.
 | `loadModel()` throws                      | `appVM.state` = `.loading` → `.failed(localizedDescription)`         |
 | `predictNextTokens` throws               | same as above                                                         |
 | User taps [Try again]                     | `appVM.state` = `.failed(msg)` → `.loading` → (retry path)           |
-| User taps Next on example                 | `OnboardingViewModel.step` = `.example` → `.challengeIntro`          |
-| User taps Next on `.challengeIntro`       | no-op                                                                |
-| User accepts challenge                    | `ProgressStore.hasSeenOnboarding` = true; `appVM.state` → `.ready(true)` |
+| User taps [Try it] on example             | `ProgressStore.hasSeenOnboarding` = true; `appVM.state` → `.ready(true)` |
 | User navigates to Level 1 (post-onboarding) | `Level1ViewModel.submit()` is the only error path; `errorBanner` shown for ~3s on failure |
 
 ## 9. Localization
@@ -655,7 +643,7 @@ New strings in `Resources/Localizable.xcstrings` (en Base + zh-Hans):
 | `error.retry`                        | `Try again`                                                                          | `重试`                                         |
 | `onboarding.prompt`                 | `Today's weather is really`                                                         | `今天天气真`                                   |
 | `onboarding.example.caption`         | `The model's actual guess — these are the words it considered, each with its own probability. Now you try to find a sentence where one word clearly wins.` | `模型的真实想法——这几个候选词各有不同的概率。下一关看你能不能让某一个词明显胜出。` |
-| `onboarding.next`                    | `Next`                                                                              | `下一关`                                       |
+| `onboarding.tryIt`                   | `Let me try`                                                                         | `我来试一试`                                   |
 
 The `onboarding.prompt` key is the text sent to the model **and**
 shown to the user on the example card. It is localized so that en users
@@ -683,6 +671,11 @@ None blocking. Logged for completeness:
   Whether 3, 4, or 5 rows is best is an empirical question — a future
   usability pass can iterate on this without touching the data layer
   (the model already returns top-K=4).
+- **Should Onboarding return to Level 1 with a "summary" recap?** Once
+  the user finishes Level 1, returning to onboarding is gated by
+  `ProgressStore.hasSeenOnboarding = true`. There is no in-app way to
+  re-watch the onboarding. Whether to add a "Replay onboarding" affordance
+  is deferred to a future slice.
 
 ## 11. Out of Scope (Reminder)
 
