@@ -4,7 +4,7 @@
 
 **Goal:** Remove the Onboarding-vs-Level 1 duplication by replacing the 3-step onboarding (Opening → Free Play → Challenge Intro) with a single passive example card (followed by the existing Challenge Intro), and hide model loading behind a dedicated full-screen page. Centralize all model bootstrapping in a new `AppShellViewModel` and pre-fetch the onboarding example during that bootstrap, so the user never sees an in-onboarding loading state.
 
-**Architecture:** New `AppShellViewModel` owns the model-load + onboarding-example pre-fetch as a single state machine (`loading` / `failed(msg)` / `ready(hasSeenOnboarding)`). `AppRootView` switches on this state. `ModelLoadingView` is the visual for `.loading` and `.failed`. Onboarding becomes a 2-card passive example flow (`ExampleCardView` × 2 with `DotGridView`), followed by the existing `ChallengeIntroView` (with a small copy tweak). `OnboardingViewModel` shrinks to a 3-step enum + accept-challenge. `LevelShellView` and `Level1Session` lose their `bootstrap()` calls (model is guaranteed loaded by the time we get there). TDD-first for all data-layer code; SwiftUI primitives built directly and verified manually.
+**Architecture:** New `AppShellViewModel` owns the model-load + onboarding-example pre-fetch as a single state machine (`loading` / `failed(msg)` / `ready(hasSeenOnboarding)`). `AppRootView` switches on this state. `ModelLoadingView` is the visual for `.loading` and `.failed`. Onboarding becomes a single-card passive example flow (`ExampleCardView` with a private `ProbabilityListView`), followed by the existing `ChallengeIntroView`. `OnboardingViewModel` shrinks to a 2-step enum + accept-challenge. `LevelShellView` and `Level1Session` lose their `bootstrap()` calls (model is guaranteed loaded by the time we get there). TDD-first for all data-layer code; SwiftUI primitives built directly and verified manually.
 
 **Tech Stack:** Swift 5.9+, SwiftUI (`@Observable`, `@Bindable`, `LazyVGrid`), Swift Testing (`@Test`, `#expect`, `@Suite(.serialized)`, `@MainActor`), `LLMServiceProtocol` (with `MockLLMService` for tests), `ProgressStore` (UserDefaults-backed), `Localizable.xcstrings` String Catalog.
 
@@ -41,7 +41,7 @@ xcodebuild test -project llm-visualizer.xcodeproj -scheme llm-visualizer \
 
 **Views (new):**
 - `Loading/ModelLoadingView.swift` — logo + spinner / error + retry
-- `Onboarding/ExampleCardView.swift` — prompt + dot grid + caption (DotGridView is a private struct in the same file)
+- `Onboarding/ExampleCardView.swift` — prompt + ProbabilityListView (private, same file) + caption
 
 **Views (modified):**
 - `Onboarding/OnboardingFlowView.swift` — switch on `viewModel.step`, render `ExampleCardView` × 2 then `ChallengeIntroView`
@@ -954,9 +954,9 @@ git commit -m "feat(Views): ModelLoadingView (logo + spinner / error + retry)"
 
 ---
 
-### Task 12: `ExampleCardView` (with private `DotGridView`)
+### Task 12: `ExampleCardView` (with private `ProbabilityListView`)
 
-Two structs in one file: the public `ExampleCardView` (prompt + dot grid + caption) and the private `DotGridView` (10×10 grid of colored circles).
+Two private structs in one file: the public `ExampleCardView` (prompt + list + caption) and the private `ProbabilityListView` (which renders `ProbabilityRow` rows). The list shows top-4 candidates as equal-weight rows — token label, horizontal bar (width = probability), percentage. Color bands by probability threshold, not by rank.
 
 **Files:**
 - Create: `llm-visualizer/Views/Onboarding/ExampleCardView.swift`
@@ -980,7 +980,7 @@ struct ExampleCardView: View {
         VStack(alignment: .leading, spacing: 16) {
             Text(prompt)
                 .font(.title3.weight(.semibold))
-            DotGridView(candidates: candidates)
+            ProbabilityListView(candidates: candidates)
             Text(caption)
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
@@ -990,38 +990,53 @@ struct ExampleCardView: View {
     }
 }
 
-private struct DotGridView: View {
+private struct ProbabilityListView: View {
 
     let candidates: [TokenCandidate]
-    private let columns = Array(
-        repeating: GridItem(.fixed(14), spacing: 4),
-        count: 10
-    )
-
-    private static let palette: [Color] = [
-        .green, .orange, .yellow, .red
-    ]
 
     var body: some View {
-        LazyVGrid(columns: columns, spacing: 4) {
-            ForEach(0..<100, id: \.self) { index in
-                Circle()
-                    .fill(color(for: index))
-                    .frame(width: 14, height: 14)
+        VStack(alignment: .leading, spacing: 8) {
+            ForEach(Array(candidates.prefix(4).enumerated()), id: \.offset) { _, c in
+                ProbabilityRow(token: c.text, probability: c.probability)
             }
         }
     }
+}
 
-    private func color(for index: Int) -> Color {
-        var remaining = index
-        for (i, c) in candidates.prefix(4).enumerated() {
-            let count = Int((c.probability * 100).rounded())
-            if remaining < count {
-                return Self.palette[min(i, Self.palette.count - 1)]
+private struct ProbabilityRow: View {
+
+    let token: String
+    let probability: Double
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Text(token)
+                .font(.body.monospaced())
+                .frame(width: 60, alignment: .leading)
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(Color.gray.opacity(0.15))
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(color(for: probability))
+                        .frame(width: geo.size.width * CGFloat(probability))
+                }
             }
-            remaining -= count
+            .frame(height: 12)
+            Text("\(Int((probability * 100).rounded()))%")
+                .font(.callout.monospacedDigit())
+                .foregroundStyle(.secondary)
+                .frame(width: 40, alignment: .trailing)
         }
-        return Color.gray.opacity(0.15)
+    }
+
+    private func color(for probability: Double) -> Color {
+        switch probability {
+        case 0.50...:        return .green
+        case 0.25..<0.50:    return .orange
+        case 0.10..<0.25:    return .yellow
+        default:             return .red
+        }
     }
 }
 ```
@@ -1030,7 +1045,7 @@ private struct DotGridView: View {
 
 ```bash
 git add llm-visualizer/Views/Onboarding/ExampleCardView.swift
-git commit -m "feat(Views): ExampleCardView with DotGridView"
+git commit -m "feat(Views): ExampleCardView with ProbabilityListView"
 ```
 
 ---
@@ -1149,7 +1164,7 @@ struct OnboardingFlowView: View {
                 candidates: viewModel.example.candidates,
                 caption: String(
                     localized: "onboarding.example.caption",
-                    defaultValue: "These 100 dots are what the model on this device really thought. Now you try — can you make it more sure?"
+                    defaultValue: "The model's actual guess — these are the words it considered, each with its own probability. Now you try to find a sentence where one word clearly wins."
                 )
             )
         case .challengeIntro:
@@ -1396,7 +1411,7 @@ In the JSON catalog, add entries for these keys (both `en` and `zh-Hans`):
 | `error.retry` | `Try again` | `重试` |
 | `onboarding.next` | `Next` | `下一张` |
 | `onboarding.prompt`                 | `Today's weather is really`                                       | `今天天气真`           |
-| `onboarding.example.caption`         | `These 100 dots are what the model on this device really thought. Now you try — can you make it more sure?` | `这 100 个点是本机模型刚才的真实想法。下一关你来试试，看能不能让它更确定。` |
+| `onboarding.example.caption`         | `The model's actual guess — these are the words it considered, each with its own probability. Now you try to find a sentence where one word clearly wins.` | `模型的真实想法——这几个候选词各有不同的概率。下一关看你能不能让某一个词明显胜出。` |
 | `challenge.body` (or whatever key the card uses) | `You just saw how a model thinks. Now try it for real.` | `你已经看到了模型怎么想。现在自己来试试。` |
 
 Edit the file directly. The catalog is JSON with a `strings` map; each entry has `comment`, `localizations.en.stringUnit.state` / `localizations.en.stringUnit.value`, and the same for `zh-Hans`.
@@ -1488,8 +1503,7 @@ If nothing needed fixing, skip this step.
 - §5.0 OnboardingExample → Task 2 ✓
 - §5.1 AppShellViewModel (state, bootstrap, retry, markOnboardingComplete) → Tasks 3–7 ✓
 - §5.2 ModelLoadingView → Task 11 ✓
-- §5.3 ExampleCardView → Task 12 ✓
-- §5.4 DotGridView → Task 12 (same file) ✓
+- §5.3 ExampleCardView + §5.3.1 ProbabilityListView (private) → Task 12 ✓
 - §5.5 OnboardingViewModel rewrite → Tasks 8–10 ✓
 - §5.6 AppRootView → Task 15 ✓
 - §6 UI design → Tasks 11, 12, 14 (with manual verification in Task 20) ✓
