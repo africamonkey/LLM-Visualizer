@@ -35,25 +35,6 @@ struct OnboardingViewModelTests {
         #expect(vm.example.candidates.count == 1)
     }
 
-    @Test func initialStepIsExample() {
-        let vm = makeVM()
-        #expect(vm.step == .example)
-    }
-
-    @Test func goNextFromExampleAdvancesToChallengeIntro() {
-        let vm = makeVM()
-        vm.goNext()
-        #expect(vm.step == .challengeIntro)
-    }
-
-    @Test func goNextFromChallengeIntroIsNoOp() {
-        let vm = makeVM()
-        vm.goNext()
-        #expect(vm.step == .challengeIntro)
-        vm.goNext()
-        #expect(vm.step == .challengeIntro)
-    }
-
     @Test func acceptChallengeWritesPersistenceAndInvokesCallback() {
         let store = freshStore()
         let vm = makeVM(store: store)

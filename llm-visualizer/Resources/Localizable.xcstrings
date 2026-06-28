@@ -4,6 +4,9 @@
     "·" : {
 
     },
+    "%lld%%" : {
+
+    },
     "✓" : {
 
     },
@@ -97,7 +100,8 @@
       }
     },
     "challenge.body" : {
-      "comment" : "Body copy of the ChallengeIntroCard, shown after both example cards. Invites the user to try crafting their own sentence.",
+      "comment" : "DEPRECATED — ChallengeIntroView was removed in onboarding redesign. Kept here only so existing translations are not orphaned; safe to delete in a future cleanup pass.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -395,19 +399,19 @@
         }
       }
     },
-    "onboarding.next" : {
-      "comment" : "Primary CTA on the example onboarding card, advancing to the challenge intro.",
+    "onboarding.tryIt" : {
+      "comment" : "Single CTA on the example onboarding card. Tap → directly enters Level 1.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Next"
+            "value" : "Let me try"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "下一张"
+            "value" : "我来试一试"
           }
         }
       }

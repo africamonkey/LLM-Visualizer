@@ -6,7 +6,7 @@ import SwiftUI
 
 struct OnboardingFlowView: View {
 
-    @State var viewModel: OnboardingViewModel
+    let viewModel: OnboardingViewModel
     let onComplete: () -> Void
 
     init(
@@ -19,39 +19,25 @@ struct OnboardingFlowView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            card
-            if viewModel.step != .challengeIntro {
-                nextButton
-            }
-        }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color(.systemGroupedBackground).ignoresSafeArea())
-    }
-
-    @ViewBuilder
-    private var card: some View {
-        switch viewModel.step {
-        case .example:
             ExampleCardView(
                 prompt: viewModel.example.prompt,
                 candidates: viewModel.example.candidates,
                 caption: String(
                     localized: "onboarding.example.caption",
-                    defaultValue: "These 100 dots are what the model on this device really thought. Now you try — can you make it more sure?"
+                    defaultValue: "The model's actual guess — these are the words it considered, each with its own probability. Now you try to find a sentence where one word clearly wins."
                 )
             )
-        case .challengeIntro:
-            ChallengeIntroView(
-                onAccept: { viewModel.acceptChallenge(onComplete: onComplete) }
-            )
+            tryItButton
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(Color(.systemGroupedBackground).ignoresSafeArea())
     }
 
-    private var nextButton: some View {
+    private var tryItButton: some View {
         Button {
-            viewModel.goNext()
+            viewModel.acceptChallenge(onComplete: onComplete)
         } label: {
-            Text(String(localized: "onboarding.next", defaultValue: "Next"))
+            Text(String(localized: "onboarding.tryIt", defaultValue: "Let me try"))
                 .font(.headline)
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
