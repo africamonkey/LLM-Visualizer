@@ -174,6 +174,7 @@
     },
     "Goal: Get AI's next-word prediction above %d%%" : {
       "comment" : "Long-form Level 1 goal text. The placeholder is the target percentage.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -208,6 +209,7 @@
     },
     "I'm ready" : {
       "comment" : "Button label confirming the user is ready to begin Level 1.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -383,35 +385,35 @@
       }
     },
     "onboarding.example.caption" : {
-      "comment" : "Caption under the example ProbabilityListView. States the teaching point (the model gave several candidates with different probabilities) and hands off to Level 1 (find a sentence where one word clearly wins).",
+      "comment" : "Caption under the example ProbabilityListView. Challenges the user to find a sentence where one word clearly wins — the bridge to Level 1's goal.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "The model's actual guess — these are the words it considered, each with its own probability. Now you try to find a sentence where one word clearly wins."
+            "value" : "Can you make ONE word clearly win?"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "模型的真实想法——这几个候选词各有不同的概率。下一关看你能不能让某一个词明显胜出。"
+            "value" : "你能让某一个词明显胜出吗？"
           }
         }
       }
     },
-    "onboarding.tryIt" : {
-      "comment" : "Single CTA on the example onboarding card. Tap → directly enters Level 1.",
+    "onboarding.example.framing" : {
+      "comment" : "Small uppercase label above the prompt. Frames the card as a question the model is being asked, not a data display.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Let me try"
+            "value" : "The model has to guess what comes next"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "我来试一试"
+            "value" : "模型要猜下一个词"
           }
         }
       }
@@ -429,6 +431,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "今天天气真"
+          }
+        }
+      }
+    },
+    "onboarding.tryIt" : {
+      "comment" : "Single CTA on the example onboarding card. Tap → directly enters Level 1.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Let me try"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "我来试一试"
           }
         }
       }
@@ -539,6 +558,7 @@
     },
     "Sometimes AI is sure, sometimes it's hesitant." : {
       "comment" : "Level 1 insight: model confidence varies depending on context.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -761,6 +781,7 @@
     },
     "You might have noticed…" : {
       "comment" : "Section header introducing an insight the user may have noticed after playing.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
