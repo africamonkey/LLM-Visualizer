@@ -29,7 +29,7 @@ struct PassCelebrationView: View {
                     localized: "You made AI guess right with its eyes closed",
                     defaultValue: "You made AI guess right with its eyes closed"
                 ))
-                    .font(.system(size: 28, weight: .bold))
+                    .font(.title.weight(.bold))
                     .multilineTextAlignment(.center)
                 Text(String(
                     localized: "When the context is clear enough, the model already knows what comes next.",
