@@ -48,6 +48,14 @@ final class ProgressStore: @unchecked Sendable {
         defaults.set(map.mapKeys { String($0) }, forKey: bestKey)
     }
 
+    /// Wipes all persisted progress. Used by the Settings sheet's "Reset" action
+    /// and by "Replay onboarding" (which routes through the same path).
+    func reset() {
+        defaults.removeObject(forKey: seenOnboardingKey)
+        defaults.removeObject(forKey: completedKey)
+        defaults.removeObject(forKey: bestKey)
+    }
+
     private var completedLevels: Set<Int> {
         Set((defaults.array(forKey: completedKey) as? [Int]) ?? [])
     }

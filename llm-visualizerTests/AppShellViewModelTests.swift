@@ -147,4 +147,22 @@ struct AppShellViewModelTests {
         appVM.markOnboardingComplete()
         #expect(appVM.state == .loading)
     }
+
+    @Test func resetFromReadyClearsOnboardingAndRoutesBack() async {
+        let store = freshStore()
+        store.hasSeenOnboarding = true
+        store.setComplete(1, true)
+        let mock = MockLLMService()
+        let appVM = AppShellViewModel(
+            service: mock,
+            progressStore: store,
+            onboardingPrompt: "test"
+        )
+        await appVM.bootstrap()
+        #expect(appVM.state == .ready(hasSeenOnboarding: true))
+        appVM.reset()
+        #expect(appVM.state == .ready(hasSeenOnboarding: false))
+        #expect(store.isComplete(1) == false)
+        #expect(store.hasSeenOnboarding == false)
+    }
 }

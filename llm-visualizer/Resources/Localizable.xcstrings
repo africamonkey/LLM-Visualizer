@@ -836,6 +836,74 @@
         }
       }
     },
+    "settings.title" : {
+      "comment" : "Title of the Settings sheet and VoiceOver label of the entry button in the Level header.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Settings"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "设置"
+          }
+        }
+      }
+    },
+    "settings.replayOnboarding" : {
+      "comment" : "Settings action: replay the onboarding flow from the start.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Replay onboarding"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重新观看引导"
+          }
+        }
+      }
+    },
+    "settings.resetProgress" : {
+      "comment" : "Settings action: clear all progress and best records.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset all progress"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "重置所有进度"
+          }
+        }
+      }
+    },
+    "settings.resetFooter" : {
+      "comment" : "Footer explanation below the destructive Reset action.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clears onboarding state, completed levels, and best records."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "清除引导状态、关卡完成记录和最高分。"
+          }
+        }
+      }
+    },
     "Sometimes AI is sure, sometimes it's hesitant." : {
       "comment" : "Level 1 insight: model confidence varies depending on context.",
       "extractionState" : "stale",

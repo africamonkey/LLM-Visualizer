@@ -58,4 +58,13 @@ final class AppShellViewModel {
             state = .ready(hasSeenOnboarding: true)
         }
     }
+
+    /// Reset all persisted progress and route back to onboarding. Used by
+    /// the Settings sheet's "Replay onboarding" and "Reset progress" actions.
+    func reset() {
+        progressStore.reset()
+        if case .ready = state {
+            state = .ready(hasSeenOnboarding: false)
+        }
+    }
 }

@@ -24,9 +24,20 @@ struct AppRootView: View {
                 )
             case .ready(let hasSeenOnboarding):
                 if hasSeenOnboarding {
-                    LevelShellView(currentSession: Level1Session(
-                        viewModel: Level1ViewModel(service: appVM.service)
-                    ))
+                    LevelShellView(
+                        currentSession: Level1Session(
+                            viewModel: Level1ViewModel(service: appVM.service)
+                        ),
+                        onReset: {
+                            appVM.reset()
+                            // The state flip to .ready(hasSeenOnboarding: false)
+                            // re-routes us to the onboarding branch below on the
+                            // next render. (Note: the example stays in memory from
+                            // the original bootstrap; if a reset+bootstrap cycle is
+                            // needed, AppShellViewModel.bootstrap() can be called
+                            // explicitly here.)
+                        }
+                    )
                 } else if let example = appVM.example {
                     OnboardingFlowView(
                         viewModel: OnboardingViewModel(example: example),
