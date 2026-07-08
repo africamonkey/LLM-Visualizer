@@ -72,7 +72,7 @@ struct ProbabilityBarsView: View {
                         .fill(Color(.systemGray5))
                     RoundedRectangle(cornerRadius: 3)
                         .fill(muted)
-                        .frame(width: geo.size.width * CGFloat(c.probability))
+                        .frame(width: barWidth(for: c.probability, in: geo.size.width))
                 }
             }
             .frame(height: 10)
@@ -87,6 +87,13 @@ struct ProbabilityBarsView: View {
             RoundedRectangle(cornerRadius: 6)
                 .fill(Color(.systemBackground))
         )
+    }
+
+    /// Bar width: 0 for zero probability; at least 4pt for any non-zero probability
+    /// so very small values stay visible.
+    private func barWidth(for probability: Double, in total: CGFloat) -> CGFloat {
+        if probability <= 0 { return 0 }
+        return max(4, total * CGFloat(probability))
     }
 
     private func percentString(_ p: Double?) -> String {
