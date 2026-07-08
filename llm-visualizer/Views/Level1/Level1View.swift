@@ -41,7 +41,6 @@ struct Level1View: View {
                 .padding(.bottom, 4)
             }
             Spacer(minLength: 8)
-            footer
         }
         .animation(.easeInOut(duration: 0.2), value: viewModel.errorBanner)
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
@@ -90,27 +89,5 @@ struct Level1View: View {
         }
         .padding(16)
         .background(Color(.systemBackground))
-    }
-
-    private var footer: some View {
-        HStack {
-            let submitsFormat = String(
-                localized: "Submitted %d times",
-                defaultValue: "Submitted %d times"
-            )
-            Text(String(format: submitsFormat, viewModel.submitCount))
-                .font(.caption)
-                .foregroundStyle(.tertiary)
-            Spacer()
-            let bestFormat = String(
-                localized: "Best record %d%%",
-                defaultValue: "Best record %d%%"
-            )
-            Text(String(format: bestFormat, Int((viewModel.bestSoFar * 100).rounded())))
-                .font(.caption.monospacedDigit())
-                .foregroundStyle(.secondary)
-        }
-        .padding(.horizontal, 16)
-        .padding(.bottom, 12)
     }
 }
