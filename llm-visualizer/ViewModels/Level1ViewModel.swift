@@ -16,7 +16,6 @@ final class Level1ViewModel {
 
     private let service: LLMServiceProtocol
     private let progressStore: ProgressStore
-    private var modelContainer: ModelContainer?
     private var autoClearTask: Task<Void, Never>?
 
     var prompt: String = ""
@@ -33,15 +32,6 @@ final class Level1ViewModel {
         self.bestSoFar = progressStore.bestProbability(1)
     }
 
-    func bootstrap() async {
-        do {
-            let container = try await service.loadModel()
-            modelContainer = container
-        } catch {
-            errorBanner = error.localizedDescription
-        }
-    }
-
     func submit() async {
         let trimmed = prompt.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty, !isLoading else { return }
@@ -50,7 +40,6 @@ final class Level1ViewModel {
         defer { isLoading = false }
 
         do {
-            let container = try await ensureContainer()
             let candidates = try await service.predictNextTokens(
                 prompt: trimmed, topK: 4)
             topCandidates = candidates
@@ -77,13 +66,6 @@ final class Level1ViewModel {
         let top1 = topCandidates.first?.probability ?? 0
         let base = NarratorLineView.sentiment(for: top1)
         return state == .passed ? .passed(current: base) : base
-    }
-
-    private func ensureContainer() async throws -> ModelContainer {
-        if let m = modelContainer { return m }
-        let m = try await service.loadModel()
-        modelContainer = m
-        return m
     }
 
     private func showError(_ message: String) {
