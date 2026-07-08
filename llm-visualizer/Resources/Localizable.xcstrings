@@ -812,23 +812,6 @@
         }
       }
     },
-    "Submitted %d times" : {
-      "comment" : "Level 1 stats line: number of submissions. The placeholder is the submission count.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Submitted %d times"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "已提交 %d 次"
-          }
-        }
-      }
-    },
     "Thinking" : {
       "comment" : "Header label of the collapsible thinking block rendered above the answer bubble when the model emits <think>…</think> content.",
       "localizations" : {
