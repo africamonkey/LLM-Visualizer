@@ -70,11 +70,6 @@ final class Level1ViewModel {
         }
     }
 
-    func continueAfterPass() {
-        // Celebration dismissed; state stays .passed so the ✓ badge
-        // remains in the header and the goal indicator doesn't re-suggest.
-    }
-
     private func ensureContainer() async throws -> ModelContainer {
         if let m = modelContainer { return m }
         let m = try await service.loadModel()
