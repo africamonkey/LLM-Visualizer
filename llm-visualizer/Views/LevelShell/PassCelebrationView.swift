@@ -51,10 +51,6 @@ struct PassCelebrationView: View {
                 }
                 .buttonStyle(.plain)
                 .padding(.top, 12)
-                Text(String(localized: "Next level is on the way", defaultValue: "Next level is on the way"))
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
-                    .padding(.top, 6)
             }
             .padding(20)
         }
