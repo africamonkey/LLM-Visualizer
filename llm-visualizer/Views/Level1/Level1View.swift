@@ -31,14 +31,8 @@ struct Level1View: View {
             .padding(.horizontal, 16)
             .padding(.vertical, 16)
             if showNarrator {
-                NarratorLineView(
-                    sentiment: viewModel.state == .passed
-                        ? .passed
-                        : NarratorLineView.sentiment(
-                            for: viewModel.topCandidates.first?.probability ?? 0
-                        )
-                )
-                .padding(.bottom, 4)
+                NarratorLineView(sentiment: viewModel.currentSentiment)
+                    .padding(.bottom, 4)
             }
             Spacer(minLength: 8)
         }

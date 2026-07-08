@@ -70,6 +70,15 @@ final class Level1ViewModel {
         }
     }
 
+    /// Narrator sentiment: in playing state shows the current top-1's confidence.
+    /// After passing, prefixes the line with "You passed" so the user knows
+    /// their new submission doesn't un-do the achievement.
+    var currentSentiment: NarratorLineView.Sentiment {
+        let top1 = topCandidates.first?.probability ?? 0
+        let base = NarratorLineView.sentiment(for: top1)
+        return state == .passed ? .passed(current: base) : base
+    }
+
     private func ensureContainer() async throws -> ModelContainer {
         if let m = modelContainer { return m }
         let m = try await service.loadModel()

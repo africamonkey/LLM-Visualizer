@@ -503,6 +503,74 @@
         }
       }
     },
+    "narrator.high" : {
+      "comment" : "Level 1 commentary when the model's top-1 probability is high (≥ 70%).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This time AI seems pretty sure."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这次 AI 看起来挺有把握。"
+          }
+        }
+      }
+    },
+    "narrator.low" : {
+      "comment" : "Level 1 commentary when the model is very hesitant (top-1 < 40%).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This time AI is very hesitant — several words have similar scores."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这次 AI 很犹豫——好几个词分数接近。"
+          }
+        }
+      }
+    },
+    "narrator.medium" : {
+      "comment" : "Level 1 commentary when the model is mildly unsure (40% ≤ top-1 < 70%).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This time AI is a bit unsure."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "这次 AI 有点拿不准。"
+          }
+        }
+      }
+    },
+    "narrator.passedPrefix" : {
+      "comment" : "Prefix prepended to narrator lines after the user has passed Level 1.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You passed — "
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你已通关——"
+          }
+        }
+      }
+    },
     "Next level is on the way" : {
       "comment" : "Teaser text on the Level 1 success screen indicating the next level is on its way.",
       "localizations" : {
@@ -757,74 +825,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "思考中"
-          }
-        }
-      }
-    },
-    "This time AI almost guessed right with its eyes closed!" : {
-      "comment" : "Level 1 commentary when the model's top-1 probability is very high.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This time AI almost guessed right with its eyes closed!"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "这次 AI 几乎闭眼都猜对了！"
-          }
-        }
-      }
-    },
-    "This time AI is a bit unsure." : {
-      "comment" : "Level 1 commentary when the model shows mild uncertainty.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This time AI is a bit unsure."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "这次 AI 有点拿不准。"
-          }
-        }
-      }
-    },
-    "This time AI is very hesitant — several words have similar scores." : {
-      "comment" : "Level 1 commentary when the model is very uncertain and several tokens score similarly.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This time AI is very hesitant — several words have similar scores."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "这次 AI 很犹豫，几个词分数差不多。"
-          }
-        }
-      }
-    },
-    "This time AI seems pretty sure." : {
-      "comment" : "Level 1 commentary when the model's top-1 probability is moderately high.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This time AI seems pretty sure."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "这次 AI 挺确定的。"
           }
         }
       }

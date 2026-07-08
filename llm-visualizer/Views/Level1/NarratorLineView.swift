@@ -6,24 +6,27 @@ import SwiftUI
 
 struct NarratorLineView: View {
 
-    enum Sentiment: Equatable {
+    indirect enum Sentiment: Equatable {
         case high     // ≥ 0.70
         case medium   // 0.40 … 0.70
         case low      // < 0.40
-        case passed   // top-1 over the pass threshold (post-pass only)
+        case passed(current: Sentiment)   // user has cleared the level; show "you passed" + current vibe
 
         var text: String {
             switch self {
             case .high:
-                return String(localized: "This time AI seems pretty sure.", defaultValue: "This time AI seems pretty sure.")
+                return String(localized: "narrator.high", defaultValue: "This time AI seems pretty sure.")
             case .medium:
-                return String(localized: "This time AI is a bit unsure.", defaultValue: "This time AI is a bit unsure.")
+                return String(localized: "narrator.medium", defaultValue: "This time AI is a bit unsure.")
             case .low:
-                return String(localized: "This time AI is very hesitant — several words have similar scores.",
+                return String(localized: "narrator.low",
                               defaultValue: "This time AI is very hesitant — several words have similar scores.")
-            case .passed:
-                return String(localized: "This time AI almost guessed right with its eyes closed!",
-                              defaultValue: "This time AI almost guessed right with its eyes closed!")
+            case .passed(let current):
+                let prefix = String(
+                    localized: "narrator.passedPrefix",
+                    defaultValue: "You passed — "
+                )
+                return prefix + current.text
             }
         }
     }
@@ -51,7 +54,8 @@ struct NarratorLineView: View {
         NarratorLineView(sentiment: .high)
         NarratorLineView(sentiment: .medium)
         NarratorLineView(sentiment: .low)
-        NarratorLineView(sentiment: .passed)
+        NarratorLineView(sentiment: .passed(current: .high))
+        NarratorLineView(sentiment: .passed(current: .low))
     }
     .padding()
 }
