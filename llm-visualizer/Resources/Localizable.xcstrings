@@ -126,6 +126,57 @@
         }
       }
     },
+    "error.model.loading" : {
+      "comment" : "Error banner when the model isn't ready (Metal/device not found, etc.).",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Model is still loading. Please wait a moment."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "模型还在加载中，请稍等。"
+          }
+        }
+      }
+    },
+    "error.prompt.empty" : {
+      "comment" : "Error banner when the user's prompt is empty or invalid.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please type a sentence first."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请先输入一句话。"
+          }
+        }
+      }
+    },
+    "error.generic" : {
+      "comment" : "Fallback error banner copy for unknown model errors.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Something went wrong. Please try again."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "出错了，请重试。"
+          }
+        }
+      }
+    },
     "FIRST CLEAR" : {
       "comment" : "Badge label displayed the first time the user clears Level 1.",
       "localizations" : {

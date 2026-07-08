@@ -66,7 +66,7 @@ final class Level1ViewModel {
                 state = .passed
             }
         } catch {
-            showError(error.localizedDescription)
+            showError(LevelError.humanize(error))
         }
     }
 
