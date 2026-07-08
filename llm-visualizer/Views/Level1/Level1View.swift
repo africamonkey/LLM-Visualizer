@@ -71,17 +71,29 @@ struct Level1View: View {
                 Button {
                     Task { await viewModel.submit() }
                 } label: {
-                    Image(systemName: "arrow.up")
-                        .font(.body.weight(.bold))
-                        .foregroundStyle(.white)
-                        .frame(width: 32, height: 32)
-                        .background(Circle().fill(Color.accentColor))
+                    if viewModel.isLoading {
+                        ProgressView()
+                            .progressViewStyle(.circular)
+                            .tint(.white)
+                            .frame(width: 32, height: 32)
+                            .background(Circle().fill(Color.accentColor))
+                    } else {
+                        Image(systemName: "arrow.up")
+                            .font(.body.weight(.bold))
+                            .foregroundStyle(.white)
+                            .frame(width: 32, height: 32)
+                            .background(Circle().fill(Color.accentColor))
+                    }
                 }
                 .buttonStyle(.plain)
                 .disabled(
                     viewModel.prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
                     || viewModel.isLoading
                 )
+                .accessibilityLabel(String(
+                    localized: "level1.submit",
+                    defaultValue: "Submit"
+                ))
             }
             InspirationButtonsView(fragments: fragments) { fragment in
                 viewModel.prompt = fragment
