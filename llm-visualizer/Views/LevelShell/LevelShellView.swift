@@ -32,7 +32,12 @@ struct LevelShellView: View {
                level1.viewModel.state == .passed,
                !dismissed {
                 PassCelebrationView(
-                    onContinue: { withAnimation { dismissed = true } }
+                    echoedPrompt: level1.viewModel.prompt,
+                    onContinue: {
+                        withAnimation(.spring(response: 0.45, dampingFraction: 0.7)) {
+                            dismissed = true
+                        }
+                    }
                 )
             }
         }

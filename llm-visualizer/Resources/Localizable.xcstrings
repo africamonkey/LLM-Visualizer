@@ -108,6 +108,23 @@
         }
       }
     },
+    "celebration.yourSentence" : {
+      "comment" : "Header above the user's echoed prompt in the Level 1 celebration overlay.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your sentence"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你的句子"
+          }
+        }
+      }
+    },
     "error.retry" : {
       "comment" : "Retry button label on the ModelLoadingView when the model fails to load.",
       "extractionState" : "stale",

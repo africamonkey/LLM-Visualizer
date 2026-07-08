@@ -6,6 +6,7 @@ import SwiftUI
 
 struct PassCelebrationView: View {
 
+    let echoedPrompt: String?
     let onContinue: () -> Void
 
     var body: some View {
@@ -31,6 +32,23 @@ struct PassCelebrationView: View {
                 ))
                     .font(.title.weight(.bold))
                     .multilineTextAlignment(.center)
+                if let prompt = echoedPrompt, !prompt.isEmpty {
+                    VStack(spacing: 4) {
+                        Text(String(
+                            localized: "celebration.yourSentence",
+                            defaultValue: "Your sentence"
+                        ))
+                        .font(.caption.weight(.semibold))
+                        .tracking(1)
+                        .foregroundStyle(.secondary)
+                        .textCase(.uppercase)
+                        Text(prompt)
+                            .font(.title3.weight(.semibold))
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 24)
+                    }
+                    .padding(.vertical, 8)
+                }
                 Text(String(
                     localized: "When the context is clear enough, the model already knows what comes next.",
                     defaultValue: "When the context is clear enough, the model already knows what comes next."
@@ -54,10 +72,10 @@ struct PassCelebrationView: View {
             }
             .padding(20)
         }
-        .transition(.opacity.combined(with: .scale(scale: 0.95)))
+        .transition(.opacity.combined(with: .scale(scale: 0.92)))
     }
 }
 
 #Preview {
-    PassCelebrationView(onContinue: {})
+    PassCelebrationView(echoedPrompt: "中华人民共和", onContinue: {})
 }
