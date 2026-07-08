@@ -15,6 +15,7 @@ final class Level1ViewModel {
     static let passThreshold: Double = 0.90
 
     private let service: LLMServiceProtocol
+    private let progressStore: ProgressStore
     private var modelContainer: ModelContainer?
     private var autoClearTask: Task<Void, Never>?
 
@@ -26,8 +27,10 @@ final class Level1ViewModel {
     var isLoading: Bool = false
     var errorBanner: String?
 
-    init(service: LLMServiceProtocol) {
+    init(service: LLMServiceProtocol, progressStore: ProgressStore = .shared) {
         self.service = service
+        self.progressStore = progressStore
+        self.bestSoFar = progressStore.bestProbability(1)
     }
 
     func bootstrap() async {
@@ -53,7 +56,10 @@ final class Level1ViewModel {
             topCandidates = candidates
             submitCount += 1
             let maxProb = candidates.map(\.probability).max() ?? 0
-            bestSoFar = max(bestSoFar, maxProb)
+            if maxProb > bestSoFar {
+                bestSoFar = maxProb
+                progressStore.setBestProbability(1, maxProb)
+            }
             if let top1 = candidates.first,
                top1.probability > Self.passThreshold,
                state != .passed {

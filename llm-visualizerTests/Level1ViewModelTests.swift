@@ -15,7 +15,8 @@ struct Level1ViewModelTests {
     private func vm(stubbed: [TokenCandidate]) -> Level1ViewModel {
         let mock = MockLLMService()
         mock.stubbedPredictTopK = stubbed
-        return Level1ViewModel(service: mock)
+        let store = ProgressStore(defaults: UserDefaults(suiteName: "test.\(UUID().uuidString)")!)
+        return Level1ViewModel(service: mock, progressStore: store)
     }
 
     @Test func initialState() {
