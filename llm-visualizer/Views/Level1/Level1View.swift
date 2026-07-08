@@ -73,6 +73,11 @@ struct Level1View: View {
                     RoundedRectangle(cornerRadius: 18)
                         .fill(Color(.systemBackground))
                 )
+                .onChange(of: viewModel.prompt) { _, newValue in
+                    if newValue.count > 200 {
+                        viewModel.prompt = String(newValue.prefix(200))
+                    }
+                }
                 Button {
                     Task { await viewModel.submit() }
                 } label: {
