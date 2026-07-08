@@ -434,6 +434,23 @@
         }
       }
     },
+    "level1.emptyState" : {
+      "comment" : "Guidance shown in Level 1's main panel before the first submit.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type a sentence above — the bars below show how sure the AI is about its next word."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在上方输入一句话，下方的概率条会显示 AI 对下一个词有多确定。"
+          }
+        }
+      }
+    },
     "LLM Visualizer" : {
       "comment" : "Navigation bar title of the main chat view.",
       "localizations" : {

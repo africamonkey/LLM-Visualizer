@@ -24,12 +24,23 @@ struct Level1View: View {
                     .transition(.opacity)
             }
             inputSection
-            ProbabilityBarsView(
-                candidates: viewModel.topCandidates,
-                isPassed: viewModel.state == .passed
-            )
-            .padding(.horizontal, 16)
-            .padding(.vertical, 16)
+            if viewModel.topCandidates.isEmpty {
+                EmptyStateView(
+                    message: String(
+                        localized: "level1.emptyState",
+                        defaultValue: "Type a sentence above — the bars below show how sure the AI is about its next word."
+                    )
+                )
+                .padding(.horizontal, 16)
+                .padding(.vertical, 24)
+            } else {
+                ProbabilityBarsView(
+                    candidates: viewModel.topCandidates,
+                    isPassed: viewModel.state == .passed
+                )
+                .padding(.horizontal, 16)
+                .padding(.vertical, 16)
+            }
             if showNarrator {
                 NarratorLineView(sentiment: viewModel.currentSentiment)
                     .padding(.bottom, 4)
