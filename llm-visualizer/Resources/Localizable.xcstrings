@@ -242,6 +242,125 @@
         }
       }
     },
+    "inspiration.fragment.capital" : {
+      "comment" : "Inspiration sentence fragment shown in Level 1 input bar.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The capital of China is"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "中国的首都是"
+          }
+        }
+      }
+    },
+    "inspiration.fragment.eat" : {
+      "comment" : "Inspiration sentence fragment shown in Level 1 input bar.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I like to eat"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "我爱吃"
+          }
+        }
+      }
+    },
+    "inspiration.fragment.life" : {
+      "comment" : "Inspiration sentence fragment shown in Level 1 input bar.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The most important thing in life is"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "人生最重要的是"
+          }
+        }
+      }
+    },
+    "inspiration.fragment.math" : {
+      "comment" : "Inspiration sentence fragment shown in Level 1 input bar.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 + 2 ="
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "2 + 2 ="
+          }
+        }
+      }
+    },
+    "inspiration.fragment.sun" : {
+      "comment" : "Inspiration sentence fragment shown in Level 1 input bar.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The sun rises from the east"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "太阳从东边"
+          }
+        }
+      }
+    },
+    "inspiration.fragment.tomorrow" : {
+      "comment" : "Inspiration sentence fragment shown in Level 1 input bar.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tomorrow I will go to"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "明天我要去"
+          }
+        }
+      }
+    },
+    "inspiration.fragment.weather" : {
+      "comment" : "Inspiration sentence fragment shown in Level 1 input bar.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Today's weather is"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "今天天气真"
+          }
+        }
+      }
+    },
     "Is that real? Let me try" : {
       "comment" : "Level 1 prompt encouraging the user to test the claim about model confidence.",
       "extractionState" : "stale",

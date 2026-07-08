@@ -7,13 +7,13 @@ import SwiftUI
 struct InspirationButtonsView: View {
 
     static let defaultFragments: [String] = [
-        "我爱吃",
-        "明天我要去",
-        "人生最重要的是",
-        "今天天气真",
-        "太阳从东边",
-        "2 + 2 =",
-        "中国的首都是",
+        String(localized: "inspiration.fragment.eat", defaultValue: "I like to eat"),
+        String(localized: "inspiration.fragment.tomorrow", defaultValue: "Tomorrow I will go to"),
+        String(localized: "inspiration.fragment.life", defaultValue: "The most important thing in life is"),
+        String(localized: "inspiration.fragment.weather", defaultValue: "Today's weather is"),
+        String(localized: "inspiration.fragment.sun", defaultValue: "The sun rises from the east"),
+        String(localized: "inspiration.fragment.math", defaultValue: "2 + 2 ="),
+        String(localized: "inspiration.fragment.capital", defaultValue: "The capital of China is"),
     ]
 
     let fragments: [String]
