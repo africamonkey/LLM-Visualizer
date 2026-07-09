@@ -8,30 +8,16 @@ import Foundation
 @Observable
 final class OnboardingViewModel {
 
-    enum Step { case firstExample, secondExample, challengeIntro }
-    var step: Step = .firstExample
-
-    let firstExample: OnboardingExample
-    let secondExample: OnboardingExample
+    let example: OnboardingExample
 
     private let progressStore: ProgressStore
 
     init(
-        firstExample: OnboardingExample,
-        secondExample: OnboardingExample,
+        example: OnboardingExample,
         progressStore: ProgressStore = .shared
     ) {
-        self.firstExample = firstExample
-        self.secondExample = secondExample
+        self.example = example
         self.progressStore = progressStore
-    }
-
-    func goNext() {
-        switch step {
-        case .firstExample:  step = .secondExample
-        case .secondExample: step = .challengeIntro
-        case .challengeIntro: break
-        }
     }
 
     func acceptChallenge(onComplete: @escaping () -> Void) {

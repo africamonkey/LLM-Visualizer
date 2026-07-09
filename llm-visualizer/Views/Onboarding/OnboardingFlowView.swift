@@ -6,7 +6,7 @@ import SwiftUI
 
 struct OnboardingFlowView: View {
 
-    @State var viewModel: OnboardingViewModel
+    let viewModel: OnboardingViewModel
     let onComplete: () -> Void
 
     init(
@@ -19,48 +19,25 @@ struct OnboardingFlowView: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            card
-            if viewModel.step != .challengeIntro {
-                nextButton
-            }
+            ExampleCardView(
+                prompt: viewModel.example.prompt,
+                candidates: viewModel.example.candidates,
+                caption: String(
+                    localized: "onboarding.example.caption",
+                    defaultValue: "The model's actual guess — these are the words it considered, each with its own probability. Now you try to find a sentence where one word clearly wins."
+                )
+            )
+            tryItButton
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
     }
 
-    @ViewBuilder
-    private var card: some View {
-        switch viewModel.step {
-        case .firstExample:
-            ExampleCardView(
-                prompt: viewModel.firstExample.prompt,
-                candidates: viewModel.firstExample.candidates,
-                caption: String(
-                    localized: "onboarding.example1.caption",
-                    defaultValue: "These 100 dots are what the model on this device just predicted for that sentence."
-                )
-            )
-        case .secondExample:
-            ExampleCardView(
-                prompt: viewModel.secondExample.prompt,
-                candidates: viewModel.secondExample.candidates,
-                caption: String(
-                    localized: "onboarding.example2.caption",
-                    defaultValue: "Same model, different sentence — and the dots spread out."
-                )
-            )
-        case .challengeIntro:
-            ChallengeIntroView(
-                onAccept: { viewModel.acceptChallenge(onComplete: onComplete) }
-            )
-        }
-    }
-
-    private var nextButton: some View {
+    private var tryItButton: some View {
         Button {
-            viewModel.goNext()
+            viewModel.acceptChallenge(onComplete: onComplete)
         } label: {
-            Text(String(localized: "onboarding.next", defaultValue: "Next"))
+            Text(String(localized: "onboarding.tryIt", defaultValue: "Let me try"))
                 .font(.headline)
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)

@@ -8,10 +8,13 @@ struct LevelShellView: View {
 
     @State var currentSession: LevelSession
     @State private var dismissed: Bool = false
+    @State private var showSettings: Bool = false
+    let onReset: () -> Void
 
     @MainActor
-    init(currentSession: LevelSession) {
+    init(currentSession: LevelSession, onReset: @escaping () -> Void) {
         self.currentSession = currentSession
+        self.onReset = onReset
     }
 
     var body: some View {
@@ -22,7 +25,19 @@ struct LevelShellView: View {
                     subtitle: currentSession.subtitle,
                     goalDescription: currentSession.goalDescription,
                     bestSoFar: bestSoFar,
-                    isComplete: currentSession.isComplete
+                    isComplete: currentSession.isComplete,
+                    trailing: {
+                        Button {
+                            showSettings = true
+                        } label: {
+                            Image(systemName: "ellipsis.circle")
+                                .font(.title3)
+                        }
+                        .accessibilityLabel(String(
+                            localized: "settings.title",
+                            defaultValue: "Settings"
+                        ))
+                    }
                 )
                 Divider()
                 currentSession.makeContentView()
@@ -32,9 +47,20 @@ struct LevelShellView: View {
                level1.viewModel.state == .passed,
                !dismissed {
                 PassCelebrationView(
-                    onContinue: { withAnimation { dismissed = true } }
+                    echoedPrompt: level1.viewModel.prompt,
+                    onContinue: {
+                        withAnimation(.spring(response: 0.45, dampingFraction: 0.7)) {
+                            dismissed = true
+                        }
+                    }
                 )
             }
+        }
+        .sheet(isPresented: $showSettings) {
+            SettingsView(
+                onReplayOnboarding: onReset,
+                onReset: onReset
+            )
         }
         .task {
             // Model is already loaded by AppShellViewModel before we get here.

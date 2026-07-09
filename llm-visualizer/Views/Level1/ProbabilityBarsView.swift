@@ -39,12 +39,12 @@ struct ProbabilityBarsView: View {
                 .font(.caption)
                 .foregroundStyle(.secondary)
             Text(top1?.text ?? "—")
-                .font(.system(size: 48, weight: .bold))
+                .font(.largeTitle.weight(.bold))
                 .foregroundStyle(.primary)
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
             Text(percentString(top1?.probability))
-                .font(.system(size: 22, weight: .semibold))
+                .font(.title2.weight(.semibold))
                 .foregroundStyle(accent)
         }
         .frame(maxWidth: .infinity)
@@ -58,6 +58,14 @@ struct ProbabilityBarsView: View {
                 .stroke(isPassed ? passColor : Color.clear, lineWidth: 2)
         )
         .shadow(color: .black.opacity(0.05), radius: 3, x: 0, y: 1)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(top1AccessibilityLabel)
+    }
+
+    private var top1AccessibilityLabel: String {
+        let token = top1?.text ?? "no prediction"
+        let pct = Int(((top1?.probability ?? 0) * 100).rounded())
+        return "\(token), \(pct) percent"
     }
 
     private func row(for c: TokenCandidate) -> some View {
@@ -72,7 +80,7 @@ struct ProbabilityBarsView: View {
                         .fill(Color(.systemGray5))
                     RoundedRectangle(cornerRadius: 3)
                         .fill(muted)
-                        .frame(width: geo.size.width * CGFloat(c.probability))
+                        .frame(width: barWidth(for: c.probability, in: geo.size.width))
                 }
             }
             .frame(height: 10)
@@ -87,6 +95,15 @@ struct ProbabilityBarsView: View {
             RoundedRectangle(cornerRadius: 6)
                 .fill(Color(.systemBackground))
         )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(c.text), \(Int((c.probability * 100).rounded())) percent")
+    }
+
+    /// Bar width: 0 for zero probability; at least 4pt for any non-zero probability
+    /// so very small values stay visible.
+    private func barWidth(for probability: Double, in total: CGFloat) -> CGFloat {
+        if probability <= 0 { return 0 }
+        return max(4, total * CGFloat(probability))
     }
 
     private func percentString(_ p: Double?) -> String {

@@ -4,13 +4,30 @@
 
 import SwiftUI
 
-struct LevelHeaderView: View {
+struct LevelHeaderView<Trailing: View>: View {
 
     let levelNumber: Int
     let subtitle: String
     let goalDescription: String
     let bestSoFar: Double
     let isComplete: Bool
+    @ViewBuilder let trailing: () -> Trailing
+
+    init(
+        levelNumber: Int,
+        subtitle: String,
+        goalDescription: String,
+        bestSoFar: Double,
+        isComplete: Bool,
+        @ViewBuilder trailing: @escaping () -> Trailing = { EmptyView() }
+    ) {
+        self.levelNumber = levelNumber
+        self.subtitle = subtitle
+        self.goalDescription = goalDescription
+        self.bestSoFar = bestSoFar
+        self.isComplete = isComplete
+        self.trailing = trailing
+    }
 
     private var titleText: String {
         let format = String(
@@ -53,6 +70,8 @@ struct LevelHeaderView: View {
                         .font(.headline)
                         .foregroundStyle(Color(red: 0.13, green: 0.77, blue: 0.37))
                 }
+                Spacer()
+                trailing()
             }
             HStack(spacing: 8) {
                 Text(goalText)

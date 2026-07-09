@@ -15,7 +15,7 @@ final class Level1ViewModel {
     static let passThreshold: Double = 0.90
 
     private let service: LLMServiceProtocol
-    private var modelContainer: ModelContainer?
+    private let progressStore: ProgressStore
     private var autoClearTask: Task<Void, Never>?
 
     var prompt: String = ""
@@ -26,17 +26,10 @@ final class Level1ViewModel {
     var isLoading: Bool = false
     var errorBanner: String?
 
-    init(service: LLMServiceProtocol) {
+    init(service: LLMServiceProtocol, progressStore: ProgressStore = .shared) {
         self.service = service
-    }
-
-    func bootstrap() async {
-        do {
-            let container = try await service.loadModel()
-            modelContainer = container
-        } catch {
-            errorBanner = error.localizedDescription
-        }
+        self.progressStore = progressStore
+        self.bestSoFar = progressStore.bestProbability(1)
     }
 
     func submit() async {
@@ -47,33 +40,32 @@ final class Level1ViewModel {
         defer { isLoading = false }
 
         do {
-            let container = try await ensureContainer()
             let candidates = try await service.predictNextTokens(
                 prompt: trimmed, topK: 4)
             topCandidates = candidates
             submitCount += 1
             let maxProb = candidates.map(\.probability).max() ?? 0
-            bestSoFar = max(bestSoFar, maxProb)
+            if maxProb > bestSoFar {
+                bestSoFar = maxProb
+                progressStore.setBestProbability(1, maxProb)
+            }
             if let top1 = candidates.first,
                top1.probability > Self.passThreshold,
                state != .passed {
                 state = .passed
             }
         } catch {
-            showError(error.localizedDescription)
+            showError(LevelError.humanize(error))
         }
     }
 
-    func continueAfterPass() {
-        // Celebration dismissed; state stays .passed so the ✓ badge
-        // remains in the header and the goal indicator doesn't re-suggest.
-    }
-
-    private func ensureContainer() async throws -> ModelContainer {
-        if let m = modelContainer { return m }
-        let m = try await service.loadModel()
-        modelContainer = m
-        return m
+    /// Narrator sentiment: in playing state shows the current top-1's confidence.
+    /// After passing, prefixes the line with "You passed" so the user knows
+    /// their new submission doesn't un-do the achievement.
+    var currentSentiment: NarratorLineView.Sentiment {
+        let top1 = topCandidates.first?.probability ?? 0
+        let base = NarratorLineView.sentiment(for: top1)
+        return state == .passed ? .passed(current: base) : base
     }
 
     private func showError(_ message: String) {

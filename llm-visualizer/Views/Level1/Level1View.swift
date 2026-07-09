@@ -24,24 +24,28 @@ struct Level1View: View {
                     .transition(.opacity)
             }
             inputSection
-            ProbabilityBarsView(
-                candidates: viewModel.topCandidates,
-                isPassed: viewModel.state == .passed
-            )
-            .padding(.horizontal, 16)
-            .padding(.vertical, 16)
-            if showNarrator {
-                NarratorLineView(
-                    sentiment: viewModel.state == .passed
-                        ? .passed
-                        : NarratorLineView.sentiment(
-                            for: viewModel.topCandidates.first?.probability ?? 0
-                        )
+            if viewModel.topCandidates.isEmpty {
+                EmptyStateView(
+                    message: String(
+                        localized: "level1.emptyState",
+                        defaultValue: "Type a sentence above — the bars below show how sure the AI is about its next word."
+                    )
                 )
-                .padding(.bottom, 4)
+                .padding(.horizontal, 16)
+                .padding(.vertical, 24)
+            } else {
+                ProbabilityBarsView(
+                    candidates: viewModel.topCandidates,
+                    isPassed: viewModel.state == .passed
+                )
+                .padding(.horizontal, 16)
+                .padding(.vertical, 16)
+            }
+            if showNarrator {
+                NarratorLineView(sentiment: viewModel.currentSentiment)
+                    .padding(.bottom, 4)
             }
             Spacer(minLength: 8)
-            footer
         }
         .animation(.easeInOut(duration: 0.2), value: viewModel.errorBanner)
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
@@ -69,48 +73,48 @@ struct Level1View: View {
                     RoundedRectangle(cornerRadius: 18)
                         .fill(Color(.systemBackground))
                 )
+                .onChange(of: viewModel.prompt) { _, newValue in
+                    if newValue.count > 200 {
+                        viewModel.prompt = String(newValue.prefix(200))
+                    }
+                }
                 Button {
                     Task { await viewModel.submit() }
                 } label: {
-                    Image(systemName: "arrow.up")
-                        .font(.body.weight(.bold))
-                        .foregroundStyle(.white)
-                        .frame(width: 32, height: 32)
-                        .background(Circle().fill(Color.accentColor))
+                    if viewModel.isLoading {
+                        ProgressView()
+                            .progressViewStyle(.circular)
+                            .tint(.white)
+                            .frame(width: 32, height: 32)
+                            .background(Circle().fill(Color.accentColor))
+                    } else {
+                        Image(systemName: "arrow.up")
+                            .font(.body.weight(.bold))
+                            .foregroundStyle(.white)
+                            .frame(width: 32, height: 32)
+                            .background(Circle().fill(Color.accentColor))
+                    }
                 }
                 .buttonStyle(.plain)
                 .disabled(
                     viewModel.prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
                     || viewModel.isLoading
                 )
+                .accessibilityLabel(String(
+                    localized: "level1.submit",
+                    defaultValue: "Submit"
+                ))
             }
             InspirationButtonsView(fragments: fragments) { fragment in
-                viewModel.prompt = fragment
+                let trimmed = viewModel.prompt.trimmingCharacters(in: .whitespacesAndNewlines)
+                if trimmed.isEmpty {
+                    viewModel.prompt = fragment
+                } else {
+                    viewModel.prompt = trimmed + fragment
+                }
             }
         }
         .padding(16)
         .background(Color(.systemBackground))
-    }
-
-    private var footer: some View {
-        HStack {
-            let submitsFormat = String(
-                localized: "Submitted %d times",
-                defaultValue: "Submitted %d times"
-            )
-            Text(String(format: submitsFormat, viewModel.submitCount))
-                .font(.caption)
-                .foregroundStyle(.tertiary)
-            Spacer()
-            let bestFormat = String(
-                localized: "Best record %d%%",
-                defaultValue: "Best record %d%%"
-            )
-            Text(String(format: bestFormat, Int((viewModel.bestSoFar * 100).rounded())))
-                .font(.caption.monospacedDigit())
-                .foregroundStyle(.secondary)
-        }
-        .padding(.horizontal, 16)
-        .padding(.bottom, 12)
     }
 }

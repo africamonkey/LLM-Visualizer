@@ -66,3 +66,6 @@ fastlane/test_output
 
 # Git worktrees for feature isolation
 .worktrees/
+
+# Local Xcode build artifacts (created via `xcodebuild -derivedDataPath build`)
+build/

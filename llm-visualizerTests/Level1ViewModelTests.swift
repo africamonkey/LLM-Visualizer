@@ -15,7 +15,8 @@ struct Level1ViewModelTests {
     private func vm(stubbed: [TokenCandidate]) -> Level1ViewModel {
         let mock = MockLLMService()
         mock.stubbedPredictTopK = stubbed
-        return Level1ViewModel(service: mock)
+        let store = ProgressStore(defaults: UserDefaults(suiteName: "test.\(UUID().uuidString)")!)
+        return Level1ViewModel(service: mock, progressStore: store)
     }
 
     @Test func initialState() {
@@ -86,5 +87,17 @@ struct Level1ViewModelTests {
         v.prompt = "x"
         await v.submit()
         #expect(v.state == .playing)
+    }
+
+    @Test func submitDoesNotReloadedModelWhenServiceIsAlreadyCached() async throws {
+        let mock = MockLLMService()
+        mock.stubbedPredictTopK = [TokenCandidate(id: 1, text: "x", probability: 0.5)]
+        let store = ProgressStore(defaults: UserDefaults(suiteName: "test.\(UUID().uuidString)")!)
+        _ = try await mock.loadModel()
+        let callsAfterBootstrap = mock.loadModelCallCount
+        let v = Level1ViewModel(service: mock, progressStore: store)
+        v.prompt = "hi"
+        await v.submit()
+        #expect(mock.loadModelCallCount == callsAfterBootstrap)
     }
 }

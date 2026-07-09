@@ -10,12 +10,15 @@ import MLXNN
 import Tokenizers
 
 protocol LLMServiceProtocol: Sendable {
+    @MainActor
     func loadModel() async throws -> ModelContainer
+    @MainActor
     func generate(
         messages: [Message],
         model: ModelContainer,
         onToken: @escaping @Sendable (Int) -> Void
     ) async throws -> AsyncStream<Generation>
+    @MainActor
     func predictNextTokens(prompt: String, topK: Int) async throws -> [TokenCandidate]
 }
 
@@ -24,6 +27,7 @@ final class LLMService: LLMServiceProtocol, @unchecked Sendable {
 
     init() {}
 
+    @MainActor
     func loadModel() async throws -> ModelContainer {
         if let cached { return cached }
         Memory.cacheLimit = 20 * 1024 * 1024
@@ -32,6 +36,7 @@ final class LLMService: LLMServiceProtocol, @unchecked Sendable {
         return container
     }
 
+    @MainActor
     func generate(
         messages: [Message],
         model: ModelContainer,
@@ -84,6 +89,7 @@ final class LLMService: LLMServiceProtocol, @unchecked Sendable {
         }
     }
 
+    @MainActor
     func predictNextTokens(prompt: String, topK: Int) async throws -> [TokenCandidate] {
         let container = try await ensureContainer()
         return try await container.perform { context in
@@ -240,6 +246,7 @@ final class MockLLMService: LLMServiceProtocol, @unchecked Sendable {
         }
     }
 
+    @MainActor
     func predictNextTokens(prompt: String, topK: Int) async throws -> [TokenCandidate] {
         if let error = predictNextTokensError { throw error }
         let clamped = max(0, topK)

@@ -39,6 +39,7 @@ enum LevelRegistry {
     /// not-yet-complete one as the current level. Future slices
     /// append entries here.
     static let all: [LevelSession.Type] = [
-        Level1Session.self
+        Level1Session.self,
+        Level2Session.self
     ]
 }

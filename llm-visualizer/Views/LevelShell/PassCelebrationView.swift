@@ -6,6 +6,7 @@ import SwiftUI
 
 struct PassCelebrationView: View {
 
+    let echoedPrompt: String?
     let onContinue: () -> Void
 
     var body: some View {
@@ -29,8 +30,25 @@ struct PassCelebrationView: View {
                     localized: "You made AI guess right with its eyes closed",
                     defaultValue: "You made AI guess right with its eyes closed"
                 ))
-                    .font(.system(size: 28, weight: .bold))
+                    .font(.title.weight(.bold))
                     .multilineTextAlignment(.center)
+                if let prompt = echoedPrompt, !prompt.isEmpty {
+                    VStack(spacing: 4) {
+                        Text(String(
+                            localized: "celebration.yourSentence",
+                            defaultValue: "Your sentence"
+                        ))
+                        .font(.caption.weight(.semibold))
+                        .tracking(1)
+                        .foregroundStyle(.secondary)
+                        .textCase(.uppercase)
+                        Text(prompt)
+                            .font(.title3.weight(.semibold))
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 24)
+                    }
+                    .padding(.vertical, 8)
+                }
                 Text(String(
                     localized: "When the context is clear enough, the model already knows what comes next.",
                     defaultValue: "When the context is clear enough, the model already knows what comes next."
@@ -51,17 +69,13 @@ struct PassCelebrationView: View {
                 }
                 .buttonStyle(.plain)
                 .padding(.top, 12)
-                Text(String(localized: "Next level is on the way", defaultValue: "Next level is on the way"))
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
-                    .padding(.top, 6)
             }
             .padding(20)
         }
-        .transition(.opacity.combined(with: .scale(scale: 0.95)))
+        .transition(.opacity.combined(with: .scale(scale: 0.92)))
     }
 }
 
 #Preview {
-    PassCelebrationView(onContinue: {})
+    PassCelebrationView(echoedPrompt: "中华人民共和", onContinue: {})
 }

@@ -18,27 +18,25 @@ struct AppShellViewModelTests {
     @Test func initialStateIsLoading() {
         let appVM = AppShellViewModel(
             service: MockLLMService(),
-            progressStore: freshStore()
+            progressStore: freshStore(),
+            onboardingPrompt: "test"
         )
         #expect(appVM.state == .loading)
-        #expect(appVM.example1 == nil)
-        #expect(appVM.example2 == nil)
+        #expect(appVM.example == nil)
     }
 
     @Test func bootstrapHappyPathWhenOnboardingNotSeen() async {
         let store = freshStore()
         let mock = MockLLMService()
         mock.stubbedPredictTopK = [
-            TokenCandidate(id: 1, text: "a", probability: 0.7),
-            TokenCandidate(id: 2, text: "b", probability: 0.2),
+            TokenCandidate(id: 1, text: "好", probability: 0.7),
+            TokenCandidate(id: 2, text: "不错", probability: 0.2),
         ]
-        let appVM = AppShellViewModel(service: mock, progressStore: store)
+        let appVM = AppShellViewModel(service: mock, progressStore: store, onboardingPrompt: "今天天气真")
         await appVM.bootstrap()
         #expect(appVM.state == .ready(hasSeenOnboarding: false))
-        #expect(appVM.example1?.prompt == "Today's weather is")
-        #expect(appVM.example2?.prompt == "I love eating")
-        #expect(appVM.example1?.candidates.count == 2)
-        #expect(appVM.example2?.candidates.count == 2)
+        #expect(appVM.example?.prompt == "今天天气真")
+        #expect(appVM.example?.candidates.count == 2)
     }
 
     @Test func bootstrapHappyPathWhenOnboardingAlreadySeen() async {
@@ -46,9 +44,9 @@ struct AppShellViewModelTests {
         store.hasSeenOnboarding = true
         let mock = MockLLMService()
         mock.stubbedPredictTopK = [
-            TokenCandidate(id: 1, text: "a", probability: 0.5)
+            TokenCandidate(id: 1, text: "好", probability: 0.5)
         ]
-        let appVM = AppShellViewModel(service: mock, progressStore: store)
+        let appVM = AppShellViewModel(service: mock, progressStore: store, onboardingPrompt: "test")
         await appVM.bootstrap()
         #expect(appVM.state == .ready(hasSeenOnboarding: true))
     }
@@ -61,12 +59,12 @@ struct AppShellViewModelTests {
         )
         let appVM = AppShellViewModel(
             service: mock,
-            progressStore: freshStore()
+            progressStore: freshStore(),
+            onboardingPrompt: "test"
         )
         await appVM.bootstrap()
         #expect(appVM.state == .failed("model not found"))
-        #expect(appVM.example1 == nil)
-        #expect(appVM.example2 == nil)
+        #expect(appVM.example == nil)
     }
 
     @Test func bootstrapFailsWhenPredictNextTokensThrows() async {
@@ -77,7 +75,8 @@ struct AppShellViewModelTests {
         )
         let appVM = AppShellViewModel(
             service: mock,
-            progressStore: freshStore()
+            progressStore: freshStore(),
+            onboardingPrompt: "test"
         )
         await appVM.bootstrap()
         #expect(appVM.state == .failed("forward pass crashed"))
@@ -91,29 +90,30 @@ struct AppShellViewModelTests {
         )
         let appVM = AppShellViewModel(
             service: mock,
-            progressStore: freshStore()
+            progressStore: freshStore(),
+            onboardingPrompt: "test"
         )
         await appVM.bootstrap()
         #expect(appVM.state == .failed("first call fails"))
 
-        // Clear the error so the next call succeeds.
         mock.loadModelError = nil
         mock.stubbedPredictTopK = [
-            TokenCandidate(id: 1, text: "a", probability: 0.5)
+            TokenCandidate(id: 1, text: "好", probability: 0.5)
         ]
         await appVM.retry()
         #expect(appVM.state == .ready(hasSeenOnboarding: false))
-        #expect(appVM.example1 != nil)
+        #expect(appVM.example != nil)
     }
 
     @Test func retryFromReadyIsNoOp() async {
         let mock = MockLLMService()
         mock.stubbedPredictTopK = [
-            TokenCandidate(id: 1, text: "a", probability: 0.5)
+            TokenCandidate(id: 1, text: "好", probability: 0.5)
         ]
         let appVM = AppShellViewModel(
             service: mock,
-            progressStore: freshStore()
+            progressStore: freshStore(),
+            onboardingPrompt: "test"
         )
         await appVM.bootstrap()
         #expect(appVM.state == .ready(hasSeenOnboarding: false))
@@ -124,11 +124,12 @@ struct AppShellViewModelTests {
     @Test func markOnboardingCompleteFlipsReadyFalseToReadyTrue() async {
         let mock = MockLLMService()
         mock.stubbedPredictTopK = [
-            TokenCandidate(id: 1, text: "a", probability: 0.5)
+            TokenCandidate(id: 1, text: "好", probability: 0.5)
         ]
         let appVM = AppShellViewModel(
             service: mock,
-            progressStore: freshStore()
+            progressStore: freshStore(),
+            onboardingPrompt: "test"
         )
         await appVM.bootstrap()
         #expect(appVM.state == .ready(hasSeenOnboarding: false))
@@ -139,10 +140,29 @@ struct AppShellViewModelTests {
     @Test func markOnboardingCompleteFromLoadingIsNoOp() {
         let appVM = AppShellViewModel(
             service: MockLLMService(),
-            progressStore: freshStore()
+            progressStore: freshStore(),
+            onboardingPrompt: "test"
         )
         #expect(appVM.state == .loading)
         appVM.markOnboardingComplete()
         #expect(appVM.state == .loading)
+    }
+
+    @Test func resetFromReadyClearsOnboardingAndRoutesBack() async {
+        let store = freshStore()
+        store.hasSeenOnboarding = true
+        store.setComplete(1, true)
+        let mock = MockLLMService()
+        let appVM = AppShellViewModel(
+            service: mock,
+            progressStore: store,
+            onboardingPrompt: "test"
+        )
+        await appVM.bootstrap()
+        #expect(appVM.state == .ready(hasSeenOnboarding: true))
+        appVM.reset()
+        #expect(appVM.state == .ready(hasSeenOnboarding: false))
+        #expect(store.isComplete(1) == false)
+        #expect(store.hasSeenOnboarding == false)
     }
 }
