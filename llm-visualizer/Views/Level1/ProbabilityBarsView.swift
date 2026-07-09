@@ -75,7 +75,7 @@ struct ProbabilityBarsView: View {
                 .foregroundStyle(.primary)
                 .lineLimit(2)
                 .multilineTextAlignment(.leading)
-                .frame(maxWidth: 120, alignment: .leading)
+                .frame(minWidth: 60, idealWidth: 60, maxWidth: 120, alignment: .leading)
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
                     RoundedRectangle(cornerRadius: 3)
