@@ -10,6 +10,8 @@ struct Level1View: View {
     let session: Level1Session
     let showNarrator: Bool
 
+    @FocusState private var promptFocused: Bool
+
     private let fragments = InspirationButtonsView.defaultFragments
 
     var body: some View {
@@ -51,6 +53,7 @@ struct Level1View: View {
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .onChange(of: viewModel.state) { _, newValue in
             if newValue == .passed {
+                promptFocused = false
                 session.evaluate()
             }
         }
@@ -66,6 +69,7 @@ struct Level1View: View {
                     String(localized: "Type your sentence…", defaultValue: "Type your sentence…"),
                     text: $viewModel.prompt
                 )
+                .focused($promptFocused)
                 .textFieldStyle(.plain)
                 .padding(.horizontal, 12)
                 .padding(.vertical, 10)
@@ -116,5 +120,19 @@ struct Level1View: View {
         }
         .padding(16)
         .background(Color(.systemBackground))
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button {
+                    promptFocused = false
+                } label: {
+                    Text(String(
+                        localized: "keyboard.done",
+                        defaultValue: "Done"
+                    ))
+                        .fontWeight(.semibold)
+                }
+            }
+        }
     }
 }
