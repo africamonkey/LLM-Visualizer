@@ -126,12 +126,16 @@ struct Level1View: View {
                 Button {
                     promptFocused = false
                 } label: {
-                    Text(String(
-                        localized: "keyboard.done",
-                        defaultValue: "Done"
-                    ))
-                        .fontWeight(.semibold)
+                    Image(systemName: "keyboard.chevron.compact.down.fill")
+                        .imageScale(.large)
+                        .frame(width: 32, height: 32)
+                        .contentShape(Rectangle())
                 }
+                .padding(.bottom, 4)
+                .accessibilityLabel(String(
+                    localized: "keyboard.done",
+                    defaultValue: "Done"
+                ))
             }
         }
     }
