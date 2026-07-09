@@ -125,6 +125,40 @@
         }
       }
     },
+    "celebration.aiNextWord" : {
+      "comment" : "Header above the model's top-1 next-word prediction in the Level 1 celebration overlay.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI's next word"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI 的下一个词"
+          }
+        }
+      }
+    },
+    "celebration.probability" : {
+      "comment" : "Header above the model's top-1 probability percentage in the Level 1 celebration overlay.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Probability"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "概率"
+          }
+        }
+      }
+    },
     "error.retry" : {
       "comment" : "Retry button label on the ModelLoadingView when the model fails to load.",
       "extractionState" : "stale",

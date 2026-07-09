@@ -48,6 +48,7 @@ struct LevelShellView: View {
                !dismissed {
                 PassCelebrationView(
                     echoedPrompt: level1.viewModel.prompt,
+                    topCandidate: level1.viewModel.topCandidates.first,
                     onContinue: {
                         withAnimation(.spring(response: 0.45, dampingFraction: 0.7)) {
                             dismissed = true
