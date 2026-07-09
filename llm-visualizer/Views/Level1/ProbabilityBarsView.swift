@@ -69,11 +69,13 @@ struct ProbabilityBarsView: View {
     }
 
     private func row(for c: TokenCandidate) -> some View {
-        HStack(spacing: 10) {
+        HStack(alignment: .center, spacing: 10) {
             Text(c.text)
                 .font(.body)
                 .foregroundStyle(.primary)
-                .frame(width: 36, alignment: .leading)
+                .lineLimit(2)
+                .multilineTextAlignment(.leading)
+                .frame(maxWidth: 120, alignment: .leading)
             GeometryReader { geo in
                 ZStack(alignment: .leading) {
                     RoundedRectangle(cornerRadius: 3)
@@ -113,7 +115,7 @@ struct ProbabilityBarsView: View {
 }
 
 #Preview {
-    VStack {
+    VStack(spacing: 24) {
         ProbabilityBarsView(candidates: [
             TokenCandidate(id: 1, text: " good", probability: 0.32),
             TokenCandidate(id: 2, text: " not", probability: 0.18),
@@ -123,6 +125,12 @@ struct ProbabilityBarsView: View {
         ProbabilityBarsView(candidates: [
             TokenCandidate(id: 1, text: " country", probability: 0.95),
         ], isPassed: true)
+        ProbabilityBarsView(candidates: [
+            TokenCandidate(id: 1, text: " internationalization", probability: 0.42),
+            TokenCandidate(id: 2, text: " not", probability: 0.18),
+            TokenCandidate(id: 3, text: " supercalifragilisticexpialidocious", probability: 0.14),
+            TokenCandidate(id: 4, text: " the", probability: 0.09),
+        ])
     }
     .padding()
     .background(Color(.systemGroupedBackground))
