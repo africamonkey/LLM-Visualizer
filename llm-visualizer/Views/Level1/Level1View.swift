@@ -110,12 +110,7 @@ struct Level1View: View {
                 ))
             }
             InspirationButtonsView(fragments: fragments) { fragment in
-                let trimmed = viewModel.prompt.trimmingCharacters(in: .whitespacesAndNewlines)
-                if trimmed.isEmpty {
-                    viewModel.prompt = fragment
-                } else {
-                    viewModel.prompt = trimmed + fragment
-                }
+                viewModel.prompt = fragment
             }
         }
         .padding(16)

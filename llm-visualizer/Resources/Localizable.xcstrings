@@ -90,41 +90,6 @@
         }
       }
     },
-    "challenge.body" : {
-      "comment" : "DEPRECATED — ChallengeIntroView was removed in onboarding redesign. Kept here only so existing translations are not orphaned; safe to delete in a future cleanup pass.",
-      "extractionState" : "stale",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "You just saw how a model thinks. Now try it for real."
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "你已经看到了模型怎么想。现在自己来试试。"
-          }
-        }
-      }
-    },
-    "celebration.yourSentence" : {
-      "comment" : "Header above the user's echoed prompt in the Level 1 celebration overlay.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Your sentence"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "你的句子"
-          }
-        }
-      }
-    },
     "celebration.aiNextWord" : {
       "comment" : "Header above the model's top-1 next-word prediction in the Level 1 celebration overlay.",
       "localizations" : {
@@ -159,20 +124,54 @@
         }
       }
     },
-    "error.retry" : {
-      "comment" : "Retry button label on the ModelLoadingView when the model fails to load.",
-      "extractionState" : "stale",
+    "celebration.yourSentence" : {
+      "comment" : "Header above the user's echoed prompt in the Level 1 celebration overlay.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Try again"
+            "value" : "Your sentence"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "重试"
+            "value" : "你的句子"
+          }
+        }
+      }
+    },
+    "challenge.body" : {
+      "comment" : "DEPRECATED — ChallengeIntroView was removed in onboarding redesign. Kept here only so existing translations are not orphaned; safe to delete in a future cleanup pass.",
+      "extractionState" : "stale",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You just saw how a model thinks. Now try it for real."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你已经看到了模型怎么想。现在自己来试试。"
+          }
+        }
+      }
+    },
+    "error.generic" : {
+      "comment" : "Fallback error banner copy for unknown model errors.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Something went wrong. Please try again."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "出错了，请重试。"
           }
         }
       }
@@ -211,19 +210,20 @@
         }
       }
     },
-    "error.generic" : {
-      "comment" : "Fallback error banner copy for unknown model errors.",
+    "error.retry" : {
+      "comment" : "Retry button label on the ModelLoadingView when the model fails to load.",
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Something went wrong. Please try again."
+            "value" : "Try again"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "出错了，请重试。"
+            "value" : "重试"
           }
         }
       }
@@ -392,13 +392,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2 + 2 ="
+            "value" : "2+2="
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "2 + 2 ="
+            "value" : "2+2="
           }
         }
       }
@@ -527,23 +527,6 @@
         }
       }
     },
-    "level1.submit" : {
-      "comment" : "VoiceOver label for the Level 1 submit button.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Submit"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "提交"
-          }
-        }
-      }
-    },
     "level1.emptyState" : {
       "comment" : "Guidance shown in Level 1's main panel before the first submit.",
       "localizations" : {
@@ -557,6 +540,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "在上方输入一句话，下方的概率条会显示 AI 对下一个词有多确定。"
+          }
+        }
+      }
+    },
+    "level1.submit" : {
+      "comment" : "VoiceOver label for the Level 1 submit button.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Submit"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "提交"
           }
         }
       }
@@ -887,23 +887,6 @@
         }
       }
     },
-    "settings.title" : {
-      "comment" : "Title of the Settings sheet and VoiceOver label of the entry button in the Level header.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Settings"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "设置"
-          }
-        }
-      }
-    },
     "settings.replayOnboarding" : {
       "comment" : "Settings action: replay the onboarding flow from the start.",
       "localizations" : {
@@ -917,6 +900,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "重新观看引导"
+          }
+        }
+      }
+    },
+    "settings.resetFooter" : {
+      "comment" : "Footer explanation below the destructive Reset action.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Clears onboarding state, completed levels, and best records."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "清除引导状态、关卡完成记录和最高分。"
           }
         }
       }
@@ -938,19 +938,19 @@
         }
       }
     },
-    "settings.resetFooter" : {
-      "comment" : "Footer explanation below the destructive Reset action.",
+    "settings.title" : {
+      "comment" : "Title of the Settings sheet and VoiceOver label of the entry button in the Level header.",
       "localizations" : {
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Clears onboarding state, completed levels, and best records."
+            "value" : "Settings"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "清除引导状态、关卡完成记录和最高分。"
+            "value" : "设置"
           }
         }
       }
