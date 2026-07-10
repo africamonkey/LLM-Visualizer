@@ -20,6 +20,8 @@ protocol LLMServiceProtocol: Sendable {
     ) async throws -> AsyncStream<Generation>
     @MainActor
     func predictNextTokens(prompt: String, topK: Int) async throws -> [TokenCandidate]
+    @MainActor
+    func tokenize(_ text: String) async throws -> [TokenPiece]
 }
 
 final class LLMService: LLMServiceProtocol, @unchecked Sendable {
@@ -141,6 +143,22 @@ final class LLMService: LLMServiceProtocol, @unchecked Sendable {
                 out.append(TokenCandidate(id: tokenId, text: text, probability: prob))
             }
             return out
+        }
+    }
+
+    @MainActor
+    func tokenize(_ text: String) async throws -> [TokenPiece] {
+        if text.isEmpty { return [] }
+        let container = try await ensureContainer()
+        return try await container.perform { context in
+            let ids = try context.tokenizer.encode(text: text)
+            let tokenizer = context.tokenizer
+            return ids.map { id in
+                TokenPiece(
+                    id: id,
+                    text: tokenizer.decode(tokens: [id], skipSpecialTokens: false)
+                )
+            }
         }
     }
 
