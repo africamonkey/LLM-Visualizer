@@ -224,6 +224,8 @@ final class MockLLMService: LLMServiceProtocol, @unchecked Sendable {
     var stubbedPredictTopK: [TokenCandidate] = []
     var loadModelError: Error?
     var predictNextTokensError: Error?
+    var stubbedTokens: [String: [TokenPiece]] = [:]
+    var tokenizeError: Error?
 
     init() {}
 
@@ -269,6 +271,13 @@ final class MockLLMService: LLMServiceProtocol, @unchecked Sendable {
         if let error = predictNextTokensError { throw error }
         let clamped = max(0, topK)
         return Array(stubbedPredictTopK.prefix(clamped))
+    }
+
+    @MainActor
+    func tokenize(_ text: String) async throws -> [TokenPiece] {
+        if let error = tokenizeError { throw error }
+        if text.isEmpty { return [] }
+        return stubbedTokens[text] ?? stubbedTokens[""] ?? []
     }
 
     private func makeStubContainer() -> ModelContainer {
