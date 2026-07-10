@@ -50,13 +50,27 @@ final class Level1ViewModel {
                 progressStore.setBestProbability(1, maxProb)
             }
             if let top1 = candidates.first,
-               top1.probability > Self.passThreshold,
-               state != .passed {
+               top1.probability > Self.passThreshold {
                 state = .passed
             }
         } catch {
             showError(LevelError.humanize(error))
         }
+    }
+
+    /// Reset the transient `.passed` state back to `.playing` so the next
+    /// pass-eligible submission can re-fire the celebration. The persistent
+    /// "level complete" flag lives on `LevelSession.isComplete` and is
+    /// unaffected.
+    func dismissCelebration() {
+        if state == .passed { state = .playing }
+    }
+
+    /// Whether the *current* top-1 token exceeds the pass threshold.
+    /// Independent of `state` — used to color the probability bars and
+    /// determine whether the current submission is a winner.
+    var currentTop1IsPass: Bool {
+        (topCandidates.first?.probability ?? 0) > Self.passThreshold
     }
 
     /// Narrator sentiment: in playing state shows the current top-1's confidence.
