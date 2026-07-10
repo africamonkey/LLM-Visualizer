@@ -52,6 +52,7 @@ struct LevelShellView: View {
                     onContinue: {
                         withAnimation(.spring(response: 0.45, dampingFraction: 0.7)) {
                             dismissed = true
+                            level1.viewModel.dismissCelebration()
                         }
                     }
                 )
@@ -63,10 +64,21 @@ struct LevelShellView: View {
                 onReset: onReset
             )
         }
+        .onChange(of: level1State) { _, newValue in
+            // Re-enable the celebration overlay after each new .passed transition,
+            // so the second / third / nth pass still re-fires it.
+            if newValue == .passed {
+                dismissed = false
+            }
+        }
         .task {
             // Model is already loaded by AppShellViewModel before we get here.
             // (No-op task keeps SwiftUI's lifecycle behavior identical.)
         }
+    }
+
+    private var level1State: Level1ViewModel.State? {
+        (currentSession as? Level1Session)?.viewModel.state
     }
 
     private var bestSoFar: Double {

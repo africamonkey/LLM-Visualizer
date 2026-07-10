@@ -100,4 +100,67 @@ struct Level1ViewModelTests {
         await v.submit()
         #expect(mock.loadModelCallCount == callsAfterBootstrap)
     }
+
+    @Test func dismissCelebrationResetsStateToPlaying() async {
+        let v = vm(stubbed: [
+            TokenCandidate(id: 1, text: "国", probability: 0.95),
+        ])
+        v.prompt = "中华人民共和"
+        await v.submit()
+        #expect(v.state == .passed)
+        v.dismissCelebration()
+        #expect(v.state == .playing)
+    }
+
+    @Test func dismissCelebrationWhenNotPassedIsNoOp() {
+        let v = vm(stubbed: [])
+        #expect(v.state == .playing)
+        v.dismissCelebration()
+        #expect(v.state == .playing)
+    }
+
+    @Test func currentTop1IsPassReflectsLatestCandidates() async {
+        let v = vm(stubbed: [
+            TokenCandidate(id: 1, text: "x", probability: 0.30),
+        ])
+        #expect(v.currentTop1IsPass == false)
+        v.prompt = "low"
+        await v.submit()
+        #expect(v.currentTop1IsPass == false)
+        v.prompt = "high"
+        // swap stubbed to a passing value mid-flight
+        v.topCandidates = [TokenCandidate(id: 2, text: "y", probability: 0.95)]
+        #expect(v.currentTop1IsPass == true)
+    }
+
+    @Test func currentTop1IsPassIsTrueEvenAfterStateDismissed() async {
+        let v = vm(stubbed: [
+            TokenCandidate(id: 1, text: "国", probability: 0.95),
+        ])
+        v.prompt = "中华人民共和"
+        await v.submit()
+        #expect(v.state == .passed)
+        #expect(v.currentTop1IsPass == true)
+        v.dismissCelebration()
+        #expect(v.state == .playing)
+        // currentTop1IsPass stays true because candidates haven't changed
+        #expect(v.currentTop1IsPass == true)
+    }
+
+    @Test func secondPassRefiresStateChange() async {
+        // A second submission that also passes should still set state to .passed
+        // (a no-op assignment, but the equality change enables SwiftUI's
+        // .onChange to fire the celebration again).
+        let v = vm(stubbed: [
+            TokenCandidate(id: 1, text: "国", probability: 0.95),
+        ])
+        v.prompt = "first"
+        await v.submit()
+        #expect(v.state == .passed)
+        v.dismissCelebration()
+        #expect(v.state == .playing)
+        v.prompt = "second"
+        await v.submit()
+        #expect(v.state == .passed)
+    }
 }

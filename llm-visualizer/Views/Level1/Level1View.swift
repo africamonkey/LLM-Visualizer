@@ -38,7 +38,7 @@ struct Level1View: View {
             } else {
                 ProbabilityBarsView(
                     candidates: viewModel.topCandidates,
-                    isPassed: viewModel.state == .passed
+                    isPassed: viewModel.currentTop1IsPass
                 )
                 .padding(.horizontal, 16)
                 .padding(.vertical, 16)
