@@ -29,6 +29,10 @@ final class Level2Session: LevelSession {
         AnyView(Level2FlowView(viewModel: viewModel))
     }
 
+    override var bestSoFar: LevelSession.BestSoFarKind {
+        .characterCount(viewModel.bestCharCount)
+    }
+
     override func evaluate() {
         if viewModel.bestCharCount > 0, !isComplete {
             isComplete = true
