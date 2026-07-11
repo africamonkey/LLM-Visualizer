@@ -7,7 +7,7 @@ An iOS app that turns an LLM into a tactile teaching toy. Each "level" poses a t
 | # | Title | Goal |
 |---|-------|------|
 | 1 | Make AI guess right with its eyes closed | Find a sentence where the model's Top-1 next-token probability is above 90%. |
-| 2 | Coming soon | — |
+| 2 | It reads the world in blocks | Find content that fits inside a single tokenizer block; chase 3 stars by packing as many characters as possible into one block. |
 
 ## Stack
 
