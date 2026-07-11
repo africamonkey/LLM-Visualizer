@@ -70,16 +70,16 @@ struct PassedView: View {
                             .fill(Color(.systemBackground))
                     )
             }
-            HStack {
+            HStack(alignment: .firstTextBaseline) {
+                Text("\(viewModel.bestCharCount) ")
+                    .font(.title.weight(.bold))
+                    .foregroundStyle(.primary)
                 Text(String(
                     localized: "level2.passed.summary.intoBlocks",
-                    defaultValue: "characters into 1 block"
+                    defaultValue: "characters packed into 1 block"
                 ))
                 .font(.subheadline)
                 Spacer()
-                Text("\(viewModel.bestCharCount)")
-                    .font(.title.weight(.bold))
-                    .foregroundStyle(.primary)
             }
         }
         .padding(16)

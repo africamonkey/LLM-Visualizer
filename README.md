@@ -46,7 +46,7 @@ llm-visualizer/
     Common/      # LevelHeaderView, InspirationButtonsView, EmptyStateView
     LevelShell/  # LevelShellView, PassCelebrationView
     Level1/      # Level1View, ProbabilityBarsView, NarratorLineView
-    Level2/      # Level2View (placeholder)
+    Level2/      # Level2FlowView, demo, playing, passed views
     Onboarding/  # ExampleCardView, OnboardingFlowView
     Loading/     # ModelLoadingView
     Settings/    # SettingsView

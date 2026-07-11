@@ -924,13 +924,30 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "characters into 1 block"
+            "value" : "characters packed into 1 block"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "个字，AI 只用 1 块"
+          }
+        }
+      }
+    },
+    "level2.passed.summary.youPacked" : {
+      "comment" : "",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You packed"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你装下了"
           }
         }
       }

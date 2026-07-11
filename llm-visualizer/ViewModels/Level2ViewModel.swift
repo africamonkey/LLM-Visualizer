@@ -28,6 +28,7 @@ final class Level2ViewModel {
     let service: LLMServiceProtocol
     private let progressStore: ProgressStore
     private let hint2ExampleText: String
+    private var errorAutoClearTask: Task<Void, Never>?
 
     var step: Step = .hook
 
@@ -76,6 +77,16 @@ final class Level2ViewModel {
         await tokenizeTask?.value
     }
 
+    private func showError(_ message: String) {
+        errorBanner = message
+        errorAutoClearTask?.cancel()
+        errorAutoClearTask = Task { @MainActor [weak self] in
+            try? await Task.sleep(for: .seconds(3))
+            guard let self else { return }
+            if self.errorBanner == message { self.errorBanner = nil }
+        }
+    }
+
     private func onRawTextChanged() {
         tokenizeTask?.cancel()
         tokenizeTask = Task { [weak self] in
@@ -88,7 +99,7 @@ final class Level2ViewModel {
                 self.checkPassAndPersist()
             } catch {
                 guard !Task.isCancelled else { return }
-                self.errorBanner = LevelError.humanize(error)
+                self.showError(LevelError.humanize(error))
             }
         }
     }
