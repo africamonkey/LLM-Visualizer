@@ -9,10 +9,23 @@ struct Level1View: View {
     @Bindable var viewModel: Level1ViewModel
     let session: Level1Session
     let showNarrator: Bool
+    let onGoToNextLevel: (() -> Void)?
 
     @FocusState private var promptFocused: Bool
 
     private let fragments = InspirationButtonsView.defaultFragments
+
+    init(
+        viewModel: Level1ViewModel,
+        session: Level1Session,
+        showNarrator: Bool,
+        onGoToNextLevel: (() -> Void)? = nil
+    ) {
+        self.viewModel = viewModel
+        self.session = session
+        self.showNarrator = showNarrator
+        self.onGoToNextLevel = onGoToNextLevel
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -48,6 +61,9 @@ struct Level1View: View {
                     .padding(.bottom, 4)
             }
             Spacer(minLength: 8)
+            if session.isComplete, let onGoToNextLevel {
+                nextLevelButton(action: onGoToNextLevel)
+            }
         }
         .animation(.easeInOut(duration: 0.2), value: viewModel.errorBanner)
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
@@ -57,6 +73,24 @@ struct Level1View: View {
                 session.evaluate()
             }
         }
+    }
+
+    private func nextLevelButton(action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Text(String(
+                localized: "level.nextLevel",
+                defaultValue: "Next level →"
+            ))
+            .font(.title3.weight(.bold))
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 18)
+            .background(Capsule().fill(Color.accentColor))
+            .foregroundStyle(.white)
+        }
+        .buttonStyle(.plain)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .transition(.move(edge: .bottom).combined(with: .opacity))
     }
 
     private var inputSection: some View {

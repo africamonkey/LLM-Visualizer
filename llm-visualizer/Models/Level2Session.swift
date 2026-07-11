@@ -38,4 +38,10 @@ final class Level2Session: LevelSession {
             isComplete = true
         }
     }
+
+    /// Construct a Level2Session with its view model wired to the given service.
+    /// Used by the level navigation logic in `AppRootView`.
+    static func make(service: LLMServiceProtocol) -> Level2Session {
+        Level2Session(viewModel: Level2ViewModel(service: service))
+    }
 }

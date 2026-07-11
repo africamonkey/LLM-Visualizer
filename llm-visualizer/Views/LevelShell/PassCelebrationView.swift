@@ -9,6 +9,9 @@ struct PassCelebrationView: View {
     let echoedPrompt: String?
     let topCandidate: TokenCandidate?
     let onContinue: () -> Void
+    /// Optional closure invoked when the user taps "Next level →".
+    /// Pass `nil` to hide the button (e.g., on the last level).
+    let onGoToNextLevel: (() -> Void)?
 
     private var passColor: Color { Color(red: 0.13, green: 0.77, blue: 0.37) }
 
@@ -39,22 +42,43 @@ struct PassCelebrationView: View {
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 32)
-                Button(action: onContinue) {
-                    Text(String(localized: "Try again", defaultValue: "Try again"))
-                        .font(.body.weight(.semibold))
-                        .padding(.horizontal, 32)
-                        .padding(.vertical, 12)
-                        .background(
-                            Capsule().fill(Color.accentColor)
-                        )
-                        .foregroundStyle(.white)
-                }
-                .buttonStyle(.plain)
-                .padding(.top, 12)
+                actionButtons
+                    .padding(.top, 12)
             }
             .padding(20)
         }
         .transition(.opacity.combined(with: .scale(scale: 0.92)))
+    }
+
+    private var actionButtons: some View {
+        VStack(spacing: 10) {
+            Button(action: onContinue) {
+                Text(String(localized: "Try again", defaultValue: "Try again"))
+                    .font(.body.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal, 32)
+                    .padding(.vertical, 12)
+                    .background(Capsule().fill(Color.accentColor))
+                    .foregroundStyle(.white)
+            }
+            .buttonStyle(.plain)
+
+            if let onGoToNextLevel {
+                Button(action: onGoToNextLevel) {
+                    Text(String(
+                        localized: "level.nextLevel",
+                        defaultValue: "Next level →"
+                    ))
+                    .font(.body.weight(.semibold))
+                    .frame(maxWidth: .infinity)
+                    .padding(.horizontal, 32)
+                    .padding(.vertical, 12)
+                    .background(Capsule().fill(Color(.secondarySystemBackground)))
+                    .foregroundStyle(.primary)
+                }
+                .buttonStyle(.plain)
+            }
+        }
     }
 
     @ViewBuilder
@@ -130,6 +154,7 @@ struct PassCelebrationView: View {
     PassCelebrationView(
         echoedPrompt: "中华人民共和",
         topCandidate: TokenCandidate(id: 1, text: "国", probability: 0.95),
-        onContinue: {}
+        onContinue: {},
+        onGoToNextLevel: {}
     )
 }
