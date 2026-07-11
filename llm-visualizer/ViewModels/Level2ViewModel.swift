@@ -33,7 +33,6 @@ final class Level2ViewModel {
 
     var rawText: String = "" {
         didSet {
-            guard oldValue != rawText else { return }
             onRawTextChanged()
         }
     }
@@ -63,7 +62,9 @@ final class Level2ViewModel {
     func acknowledgeDemo()      { step = .challengeIntro }
     func acknowledgeChallenge() { step = .playing }
     func acknowledgePassed()    { step = .playing }
-    func applyHint2Example() {}
+    func applyHint2Example() {
+        rawText = hint2ExampleText
+    }
 
     var earnedStars: Int {
         if bestCharCount >= Level2Constants.star3Threshold { return 3 }
@@ -114,6 +115,11 @@ final class Level2ViewModel {
             hintTier = .none
         } else if tokenCount > 1 {
             attemptCount += 1
+            if attemptCount >= Level2Constants.hint2AttemptThreshold {
+                hintTier = .example
+            } else if attemptCount >= Level2Constants.hint1AttemptThreshold {
+                hintTier = .direction
+            }
         }
     }
 }
