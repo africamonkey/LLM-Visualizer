@@ -33,6 +33,7 @@ final class Level2ViewModel {
 
     var rawText: String = "" {
         didSet {
+            guard oldValue != rawText else { return }
             onRawTextChanged()
         }
     }

@@ -21,37 +21,36 @@ struct Level2ViewModelHintTierTests {
         return vm
     }
 
-    private func failOnce(vm: Level2ViewModel) async {
-        // Multi-token stub forces a non-pass path; rawText each call so
-        // attemptCount increments per failed edit.
-        vm.rawText = "ai"
+    private func failOnce(vm: Level2ViewModel, _ text: String) async {
+        // Multi-token stub forces a non-pass path.
+        vm.rawText = text
         await vm.waitForPendingTokenize()
     }
 
     @Test func noHintBelowThreshold() async {
         let vm = playingVM()
-        for _ in 0..<4 { await failOnce(vm: vm) }
+        for i in 0..<4 { await failOnce(vm: vm, "ai\(i)") }
         #expect(vm.attemptCount == 4)
         #expect(vm.hintTier == .none)
     }
 
     @Test func directionHintAtThreshold() async {
         let vm = playingVM()
-        for _ in 0..<5 { await failOnce(vm: vm) }
+        for i in 0..<5 { await failOnce(vm: vm, "ai\(i)") }
         #expect(vm.attemptCount == 5)
         #expect(vm.hintTier == .direction)
     }
 
     @Test func exampleHintAtSecondThreshold() async {
         let vm = playingVM()
-        for _ in 0..<10 { await failOnce(vm: vm) }
+        for i in 0..<10 { await failOnce(vm: vm, "ai\(i)") }
         #expect(vm.attemptCount == 10)
         #expect(vm.hintTier == .example)
     }
 
     @Test func passResetsHintState() async {
         let vm = playingVM()
-        for _ in 0..<10 { await failOnce(vm: vm) }
+        for i in 0..<10 { await failOnce(vm: vm, "ai\(i)") }
         #expect(vm.hintTier == .example)
 
         // Configure a single-token stub and pass.
