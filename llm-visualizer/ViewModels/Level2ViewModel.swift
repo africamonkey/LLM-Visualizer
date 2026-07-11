@@ -59,10 +59,10 @@ final class Level2ViewModel {
 
     // --- stubs; real bodies land in Tasks 7-10 ---
 
-    func acknowledgeHook() {}
-    func acknowledgeDemo() {}
-    func acknowledgeChallenge() {}
-    func acknowledgePassed() {}
+    func acknowledgeHook()      { step = .demo }
+    func acknowledgeDemo()      { step = .challengeIntro }
+    func acknowledgeChallenge() { step = .playing }
+    func acknowledgePassed()    { step = .playing }
     func applyHint2Example() {}
 
     var earnedStars: Int {
