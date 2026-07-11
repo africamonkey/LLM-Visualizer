@@ -20,6 +20,8 @@ protocol LLMServiceProtocol: Sendable {
     ) async throws -> AsyncStream<Generation>
     @MainActor
     func predictNextTokens(prompt: String, topK: Int) async throws -> [TokenCandidate]
+    @MainActor
+    func tokenize(_ text: String) async throws -> [TokenPiece]
 }
 
 final class LLMService: LLMServiceProtocol, @unchecked Sendable {
@@ -113,7 +115,7 @@ final class LLMService: LLMServiceProtocol, @unchecked Sendable {
             // a 2D `(batch=1, seq_len)` input; the `[.newAxis]` subscript adds the
             // batch dimension (matches what `TokenIterator.step` does internally for
             // generation).
-            let promptTokens = try context.tokenizer.encode(text: prompt)
+            let promptTokens = context.tokenizer.encode(text: prompt)
             let text = MLXArray(promptTokens)[.newAxis]
             // `LanguageModel` has two `callAsFunction` overloads — one taking
             // `LMInput.Text` (returns `LMOutput`) and one taking `MLXArray`
@@ -141,6 +143,22 @@ final class LLMService: LLMServiceProtocol, @unchecked Sendable {
                 out.append(TokenCandidate(id: tokenId, text: text, probability: prob))
             }
             return out
+        }
+    }
+
+    @MainActor
+    func tokenize(_ text: String) async throws -> [TokenPiece] {
+        if text.isEmpty { return [] }
+        let container = try await ensureContainer()
+        return try await container.perform { context in
+            let ids = context.tokenizer.encode(text: text)
+            let tokenizer = context.tokenizer
+            return ids.map { id in
+                TokenPiece(
+                    id: id,
+                    text: tokenizer.decode(tokens: [id], skipSpecialTokens: false)
+                )
+            }
         }
     }
 
@@ -206,6 +224,11 @@ final class MockLLMService: LLMServiceProtocol, @unchecked Sendable {
     var stubbedPredictTopK: [TokenCandidate] = []
     var loadModelError: Error?
     var predictNextTokensError: Error?
+    // Per-prompt stubs keyed by exact text. The empty-string key `""` is the
+    // catch-all fallback for any unmatched input (lets a test set one stub
+    // that applies to every text).
+    var stubbedTokens: [String: [TokenPiece]] = [:]
+    var tokenizeError: Error?
 
     init() {}
 
@@ -251,6 +274,13 @@ final class MockLLMService: LLMServiceProtocol, @unchecked Sendable {
         if let error = predictNextTokensError { throw error }
         let clamped = max(0, topK)
         return Array(stubbedPredictTopK.prefix(clamped))
+    }
+
+    @MainActor
+    func tokenize(_ text: String) async throws -> [TokenPiece] {
+        if let error = tokenizeError { throw error }
+        if text.isEmpty { return [] }
+        return stubbedTokens[text] ?? stubbedTokens[""] ?? []
     }
 
     private func makeStubContainer() -> ModelContainer {

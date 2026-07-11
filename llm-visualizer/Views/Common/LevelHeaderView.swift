@@ -9,7 +9,7 @@ struct LevelHeaderView<Trailing: View>: View {
     let levelNumber: Int
     let subtitle: String
     let goalDescription: String
-    let bestSoFar: Double
+    let bestSoFar: LevelSession.BestSoFarKind
     let isComplete: Bool
     @ViewBuilder let trailing: () -> Trailing
 
@@ -17,7 +17,7 @@ struct LevelHeaderView<Trailing: View>: View {
         levelNumber: Int,
         subtitle: String,
         goalDescription: String,
-        bestSoFar: Double,
+        bestSoFar: LevelSession.BestSoFarKind,
         isComplete: Bool,
         @ViewBuilder trailing: @escaping () -> Trailing = { EmptyView() }
     ) {
@@ -46,13 +46,24 @@ struct LevelHeaderView<Trailing: View>: View {
         return String(format: format, pct)
     }
 
-    private var bestText: String {
-        let pct = Int((bestSoFar * 100).rounded())
-        let format = String(
-            localized: "Best record: %d%%",
-            defaultValue: "Best record: %d%%"
-        )
-        return String(format: format, pct)
+    private var bestText: String? {
+        switch bestSoFar {
+        case .probability(let value):
+            let pct = Int((value * 100).rounded())
+            let format = String(
+                localized: "Best record: %d%%",
+                defaultValue: "Best record: %d%%"
+            )
+            return String(format: format, pct)
+        case .characterCount(let count):
+            let format = String(
+                localized: "Best record: %d chars",
+                defaultValue: "Best record: %d chars"
+            )
+            return String(format: format, count)
+        case .none:
+            return nil
+        }
     }
 
     var body: some View {
@@ -77,12 +88,14 @@ struct LevelHeaderView<Trailing: View>: View {
                 Text(goalText)
                     .font(.caption)
                     .foregroundStyle(.secondary)
-                Text("·")
-                    .font(.caption)
-                    .foregroundStyle(.tertiary)
-                Text(bestText)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                if let bestText {
+                    Text("·")
+                        .font(.caption)
+                        .foregroundStyle(.tertiary)
+                    Text(bestText)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -98,15 +111,29 @@ struct LevelHeaderView<Trailing: View>: View {
             levelNumber: 1,
             subtitle: "Make AI guess right with its eyes closed",
             goalDescription: "Get Top-1 probability above 90%",
-            bestSoFar: 0.32,
+            bestSoFar: .probability(0.32),
             isComplete: false
         )
         LevelHeaderView(
             levelNumber: 1,
             subtitle: "Make AI guess right with its eyes closed",
             goalDescription: "Get Top-1 probability above 90%",
-            bestSoFar: 0.95,
+            bestSoFar: .probability(0.95),
             isComplete: true
+        )
+        LevelHeaderView(
+            levelNumber: 2,
+            subtitle: "It reads the world in blocks",
+            goalDescription: "Find content that fits in a single block",
+            bestSoFar: .characterCount(42),
+            isComplete: false
+        )
+        LevelHeaderView(
+            levelNumber: 3,
+            subtitle: "Placeholder",
+            goalDescription: "TBD",
+            bestSoFar: .none,
+            isComplete: false
         )
     }
 }

@@ -81,7 +81,7 @@ struct LevelShellView: View {
         (currentSession as? Level1Session)?.viewModel.state
     }
 
-    private var bestSoFar: Double {
-        (currentSession as? Level1Session)?.viewModel.bestSoFar ?? 0.0
+    private var bestSoFar: LevelSession.BestSoFarKind {
+        currentSession.bestSoFar
     }
 }

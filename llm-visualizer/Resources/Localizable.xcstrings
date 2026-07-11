@@ -561,6 +561,448 @@
         }
       }
     },
+    "level2.challengeIntro.body" : {
+      "comment" : "",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "If AI chops by blocks, what could make it fit everything into a single block? Find the longest content you can that still fits in one block. Below: left is your character count, right is AI's block count. Keep the block count at 1 and the character count as high as possible."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "既然 AI 按积木切，那什么能让它一整块就装下？找一段尽可能长的内容，但让 AI 只用一块积木就装下它。下方：左是你写的字数，右是 AI 切出的块数。让块数保持在一块，字越多越好。"
+          }
+        }
+      }
+    },
+    "level2.challengeIntro.cta" : {
+      "comment" : "",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "开始挑战"
+          }
+        }
+      }
+    },
+    "level2.counters.blocks" : {
+      "comment" : "",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "blocks"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "块"
+          }
+        }
+      }
+    },
+    "level2.counters.chars" : {
+      "comment" : "",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "characters"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "字"
+          }
+        }
+      }
+    },
+    "level2.counters.passed" : {
+      "comment" : "",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "✨ passed"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "✨ 通过"
+          }
+        }
+      }
+    },
+    "level2.demo.cta" : {
+      "comment" : "",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "I'll try"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "我来试一试"
+          }
+        }
+      }
+    },
+    "level2.demo.prompt" : {
+      "comment" : "",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type a few characters and see how AI chops them up."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "输入几个字，看看 AI 是怎么切的"
+          }
+        }
+      }
+    },
+    "level2.demo.reveal" : {
+      "comment" : "",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "See? AI doesn't read character by character. It chops text into blocks — those blocks are called tokens. AI only knows tokens."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "看到了吗，AI 不按字读。它把文字切成一块块积木，这些积木叫 token。AI 只认识 token。"
+          }
+        }
+      }
+    },
+    "level2.goal" : {
+      "comment" : "",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Find content that fits in a single block"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "找到一段内容，让 AI 用一块积木就装下它"
+          }
+        }
+      }
+    },
+    "level2.hint.tier1" : {
+      "comment" : "",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try a word AI sees a lot — common words are more likely to fit in one block."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "试试 AI 更熟悉的词——越日常的词越可能被它一整块装下。"
+          }
+        }
+      }
+    },
+    "level2.hint.tier2" : {
+      "comment" : "",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Look — AI packs this whole word into a single block. The field is now filled with an example."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "看这个——AI 把这一整个词装进了一块。输入框已经预填了示范词，试着改一改。"
+          }
+        }
+      }
+    },
+    "level2.hint.tier2.button" : {
+      "comment" : "",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try this word"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "试试这个词"
+          }
+        }
+      }
+    },
+    "level2.hook.body" : {
+      "comment" : "",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI actually doesn't know any characters at all. The world it sees looks very strange."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "AI 其实根本不认识字。它眼中的世界，长得很奇怪。"
+          }
+        }
+      }
+    },
+    "level2.hook.cta" : {
+      "comment" : "",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Show me"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "带我看看"
+          }
+        }
+      }
+    },
+    "level2.input.caption" : {
+      "comment" : "",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Your input"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你的输入"
+          }
+        }
+      }
+    },
+    "level2.input.placeholder" : {
+      "comment" : "",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type here…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "在这里输入…"
+          }
+        }
+      }
+    },
+    "level2.level3Toast" : {
+      "comment" : "",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Level 3 coming soon"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Level 3 即将上线"
+          }
+        }
+      }
+    },
+    "level2.passed.bridge" : {
+      "comment" : "",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Now you know how AI reads. But here's a strange thing — give it the same sentence twice, and it picks different words each time. There's a knob behind that."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "现在你知道 AI 怎么读你的字了。可是同样一句话喂给它，它每次接的词却都不一样——这背后藏着一个旋钮。"
+          }
+        }
+      }
+    },
+    "level2.passed.continueGrinding" : {
+      "comment" : "",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Try again for more stars"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "再刷一次"
+          }
+        }
+      }
+    },
+    "level2.passed.goToLevel3" : {
+      "comment" : "",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Level 3 →"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Level 3 →"
+          }
+        }
+      }
+    },
+    "level2.passed.recap" : {
+      "comment" : "",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You just discovered how AI reads — no characters, only blocks. The more familiar something is, the bigger the block. The less familiar, the more fragmented."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你刚刚发现了——AI 眼里没有字，只有积木块。越熟悉的内容切得越整越大块，越陌生的内容切得越碎。"
+          }
+        }
+      }
+    },
+    "level2.passed.summary.intoBlocks" : {
+      "comment" : "",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "characters packed into 1 block"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "个字，AI 只用 1 块"
+          }
+        }
+      }
+    },
+    "level2.passed.summary.youPacked" : {
+      "comment" : "",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You packed"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你装下了"
+          }
+        }
+      }
+    },
+    "level2.passed.title" : {
+      "comment" : "",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "You did it"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "你做到了"
+          }
+        }
+      }
+    },
+    "level2.subtitle" : {
+      "comment" : "",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "It reads the world in blocks"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "它眼中的世界"
+          }
+        }
+      }
+    },
+    "level2.title" : {
+      "comment" : "",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Level 2"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "第二关"
+          }
+        }
+      }
+    },
     "LLM Visualizer" : {
       "comment" : "Navigation bar title of the main chat view.",
       "localizations" : {

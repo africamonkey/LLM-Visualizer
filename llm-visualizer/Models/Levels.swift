@@ -12,6 +12,16 @@ class LevelSession {
     let subtitle: String
     let goalDescription: String
 
+    /// What to show in the header's "best so far" pill.
+    enum BestSoFarKind: Equatable {
+        case probability(Double)
+        case characterCount(Int)
+        case none
+    }
+
+    /// Subclasses override to expose their persisted best metric.
+    var bestSoFar: BestSoFarKind { .none }
+
     var isComplete: Bool {
         didSet { ProgressStore.shared.setComplete(id, isComplete) }
     }

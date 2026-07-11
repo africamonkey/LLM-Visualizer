@@ -12,6 +12,7 @@ final class ProgressStore: @unchecked Sendable {
     private let seenOnboardingKey = "llmviz.hasSeenOnboarding"
     private let completedKey = "llmviz.completedLevels"
     private let bestKey = "llmviz.bestProbabilities"
+    private let characterCountKey = "llmviz.bestCharacterCounts"
 
     init(defaults: UserDefaults) {
         self.defaults = defaults
@@ -48,12 +49,25 @@ final class ProgressStore: @unchecked Sendable {
         defaults.set(map.mapKeys { String($0) }, forKey: bestKey)
     }
 
+    func bestCharacterCount(_ levelId: Int) -> Int {
+        bestCharMap[levelId] ?? 0
+    }
+
+    func setBestCharacterCount(_ levelId: Int, _ value: Int) {
+        let clamped = max(0, value)
+        var map = bestCharMap
+        if let existing = map[levelId], existing >= clamped { return }
+        map[levelId] = clamped
+        defaults.set(map.mapKeys { String($0) }, forKey: characterCountKey)
+    }
+
     /// Wipes all persisted progress. Used by the Settings sheet's "Reset" action
     /// and by "Replay onboarding" (which routes through the same path).
     func reset() {
         defaults.removeObject(forKey: seenOnboardingKey)
         defaults.removeObject(forKey: completedKey)
         defaults.removeObject(forKey: bestKey)
+        defaults.removeObject(forKey: characterCountKey)
     }
 
     private var completedLevels: Set<Int> {
@@ -67,6 +81,17 @@ final class ProgressStore: @unchecked Sendable {
             guard let id = Int(k) else { continue }
             if let n = v as? Double { out[id] = n }
             else if let n = v as? NSNumber { out[id] = n.doubleValue }
+        }
+        return out
+    }
+
+    private var bestCharMap: [Int: Int] {
+        guard let raw = defaults.dictionary(forKey: characterCountKey) else { return [:] }
+        var out: [Int: Int] = [:]
+        for (k, v) in raw {
+            guard let id = Int(k) else { continue }
+            if let n = v as? Int { out[id] = n }
+            else if let n = v as? NSNumber { out[id] = n.intValue }
         }
         return out
     }

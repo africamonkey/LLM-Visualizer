@@ -35,6 +35,10 @@ final class Level1Session: LevelSession {
         )
     }
 
+    override var bestSoFar: BestSoFarKind {
+        .probability(viewModel.bestSoFar)
+    }
+
     override func evaluate() {
         if viewModel.state == .passed, !isComplete {
             isComplete = true
