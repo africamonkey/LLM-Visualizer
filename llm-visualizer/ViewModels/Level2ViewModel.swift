@@ -76,6 +76,44 @@ final class Level2ViewModel {
         await tokenizeTask?.value
     }
 
-    private func onRawTextChanged() {}
-    private func checkPassAndPersist() {}
+    private func onRawTextChanged() {
+        tokenizeTask?.cancel()
+        tokenizeTask = Task { [weak self] in
+            guard let self else { return }
+            let text = rawText
+            do {
+                let pieces = try await service.tokenize(text)
+                guard !Task.isCancelled else { return }
+                self.tokens = pieces
+                self.checkPassAndPersist()
+            } catch {
+                guard !Task.isCancelled else { return }
+                self.errorBanner = LevelError.humanize(error)
+            }
+        }
+    }
+
+    private func checkPassAndPersist() {
+        let charCount = rawText.count
+        let trimmedNonWhitespace = rawText.trimmingCharacters(
+            in: .whitespacesAndNewlines
+        ).count
+        let tokenCount = tokens.count
+        let pass = tokenCount == Level2Constants.passTokenCount
+            && trimmedNonWhitespace >= Level2Constants.passMinNonWhitespace
+
+        self.isPassing = pass
+
+        if pass {
+            if charCount > bestCharCount {
+                bestCharCount = charCount
+                progressStore.setBestCharacterCount(2, charCount)
+            }
+            step = .passed
+            attemptCount = 0
+            hintTier = .none
+        } else if tokenCount > 1 {
+            attemptCount += 1
+        }
+    }
 }
