@@ -22,20 +22,30 @@ struct Level2ViewModelPassDetectionTests {
     }
 
     @Test func singleTokenPassesAndPersists() async {
-        let vm = playingVM(stubbed: ["我": [TokenPiece(id: 1, text: "我")]])
+        let store = freshStore()
+        let mock = MockLLMService()
+        mock.stubbedTokens = ["我": [TokenPiece(id: 1, text: "我")]]
+        let vm = Level2ViewModel(service: mock, progressStore: store)
+        vm.step = .playing
         vm.rawText = "我"
         await vm.waitForPendingTokenize()
         #expect(vm.step == .passed)
         #expect(vm.bestCharCount == 1)
+        #expect(store.bestCharacterCount(2) == 1)
+        #expect(vm.isPassing == true)
         #expect(vm.attemptCount == 0)
     }
 
     @Test func emptyInputDoesNotPass() async {
         let vm = playingVM(stubbed: [:])
+        vm.rawText = "x"
+        await vm.waitForPendingTokenize()
+        // Now clear back to empty; pipeline runs again, tokens becomes [].
         vm.rawText = ""
         await vm.waitForPendingTokenize()
         #expect(vm.step == .playing)
         #expect(vm.bestCharCount == 0)
+        #expect(vm.isPassing == false)
     }
 
     @Test func whitespaceOnlyDoesNotPass() async {
@@ -44,6 +54,7 @@ struct Level2ViewModelPassDetectionTests {
         await vm.waitForPendingTokenize()
         // 1 token, but trimmed grapheme count is 0 → pass should NOT fire.
         #expect(vm.step == .playing)
+        #expect(vm.isPassing == false)
     }
 
     @Test func multiTokenDoesNotPassAndIncrementsAttempts() async {
@@ -54,6 +65,7 @@ struct Level2ViewModelPassDetectionTests {
         await vm.waitForPendingTokenize()
         #expect(vm.step == .playing)
         #expect(vm.attemptCount == 1)
+        #expect(vm.isPassing == false)
     }
 
     @Test func bestCharCountPersistsAcrossLongerPass() async {
@@ -74,6 +86,7 @@ struct Level2ViewModelPassDetectionTests {
         await vm.waitForPendingTokenize()
         #expect(vm.step == .playing)
         #expect(vm.attemptCount == 1)
+        #expect(vm.isPassing == false)
 
         // Second attempt: single-token packed 4-char word → pass.
         mock.stubbedTokens = ["五星红旗": [
@@ -85,6 +98,7 @@ struct Level2ViewModelPassDetectionTests {
         // bestCharCount now 4 (was 3 from store).
         #expect(vm.bestCharCount == 4)
         #expect(vm.attemptCount == 0)
+        #expect(vm.isPassing == true)
     }
 
     @Test func lowerScoreAfterPassDoesNotLower() async {
@@ -101,6 +115,7 @@ struct Level2ViewModelPassDetectionTests {
         let highScore = vm.bestCharCount
         #expect(vm.step == .passed)
         #expect(highScore == 4)
+        #expect(vm.isPassing == true)
 
         // Continue grinding; pass again at 1 char.
         vm.acknowledgePassed()
@@ -109,5 +124,6 @@ struct Level2ViewModelPassDetectionTests {
         await vm.waitForPendingTokenize()
         // bestCharCount must not decrease.
         #expect(vm.bestCharCount == highScore)
+        #expect(vm.isPassing == true)
     }
 }
