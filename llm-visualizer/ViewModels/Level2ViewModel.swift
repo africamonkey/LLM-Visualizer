@@ -57,8 +57,6 @@ final class Level2ViewModel {
         self.bestCharCount = progressStore.bestCharacterCount(2)
     }
 
-    // --- stubs; real bodies land in Tasks 7-10 ---
-
     func acknowledgeHook()      { step = .demo }
     func acknowledgeDemo()      { step = .challengeIntro }
     func acknowledgeChallenge() { step = .playing }

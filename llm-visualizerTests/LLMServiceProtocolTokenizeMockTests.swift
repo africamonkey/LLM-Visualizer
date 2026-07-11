@@ -48,4 +48,13 @@ struct LLMServiceProtocolTokenizeMockTests {
             _ = try await mock.tokenize("anything")
         }
     }
+
+    @Test func errorOverridesEmptyInput() async {
+        struct StubError: Error {}
+        let mock = MockLLMService()
+        mock.tokenizeError = StubError()
+        await #expect(throws: StubError.self) {
+            _ = try await mock.tokenize("")
+        }
+    }
 }

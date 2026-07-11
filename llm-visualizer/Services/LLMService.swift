@@ -115,7 +115,7 @@ final class LLMService: LLMServiceProtocol, @unchecked Sendable {
             // a 2D `(batch=1, seq_len)` input; the `[.newAxis]` subscript adds the
             // batch dimension (matches what `TokenIterator.step` does internally for
             // generation).
-            let promptTokens = try context.tokenizer.encode(text: prompt)
+            let promptTokens = context.tokenizer.encode(text: prompt)
             let text = MLXArray(promptTokens)[.newAxis]
             // `LanguageModel` has two `callAsFunction` overloads — one taking
             // `LMInput.Text` (returns `LMOutput`) and one taking `MLXArray`
@@ -151,7 +151,7 @@ final class LLMService: LLMServiceProtocol, @unchecked Sendable {
         if text.isEmpty { return [] }
         let container = try await ensureContainer()
         return try await container.perform { context in
-            let ids = try context.tokenizer.encode(text: text)
+            let ids = context.tokenizer.encode(text: text)
             let tokenizer = context.tokenizer
             return ids.map { id in
                 TokenPiece(
@@ -224,6 +224,9 @@ final class MockLLMService: LLMServiceProtocol, @unchecked Sendable {
     var stubbedPredictTopK: [TokenCandidate] = []
     var loadModelError: Error?
     var predictNextTokensError: Error?
+    // Per-prompt stubs keyed by exact text. The empty-string key `""` is the
+    // catch-all fallback for any unmatched input (lets a test set one stub
+    // that applies to every text).
     var stubbedTokens: [String: [TokenPiece]] = [:]
     var tokenizeError: Error?
 
