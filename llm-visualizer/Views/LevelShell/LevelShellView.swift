@@ -6,7 +6,11 @@ import SwiftUI
 
 struct LevelShellView: View {
 
-    @State var currentSession: LevelSession
+    // currentSession comes from the parent (AppRootView). It must NOT be
+    // @State — @State ignores subsequent init values, which would silently
+    // freeze LevelShellView on whatever session was passed first. The two
+    // @State properties below are owned by this view (UI-only flags).
+    var currentSession: LevelSession
     @State private var dismissed: Bool = false
     @State private var showSettings: Bool = false
     let hasNextLevel: Bool
