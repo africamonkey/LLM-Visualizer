@@ -44,12 +44,46 @@ class LevelSession {
     func evaluate() {}
 }
 
+/// Compact level metadata shown by the Settings → Levels picker.
+struct LevelSummary: Equatable, Hashable {
+    let id: Int
+    let title: String
+    let subtitle: String
+}
+
 enum LevelRegistry {
-    /// Ordered list of level classes. App picks the first
-    /// not-yet-complete one as the current level. Future slices
-    /// append entries here.
-    static let all: [LevelSession.Type] = [
-        Level1Session.self,
-        Level2Session.self
+    /// Each entry pairs the session class with picker-display metadata so
+    /// the Settings → Levels screen can show what's available without
+    /// instantiating a real session.
+    struct Entry {
+        let type: LevelSession.Type
+        let summary: LevelSummary
+    }
+
+    /// Ordered list of level entries. App picks the first not-yet-complete
+    /// one as the current level. Future slices append entries here.
+    static let all: [Entry] = [
+        Entry(
+            type: Level1Session.self,
+            summary: LevelSummary(
+                id: 1,
+                title: String(localized: "Level 1", defaultValue: "Level 1"),
+                subtitle: String(
+                    localized: "Make AI guess right with its eyes closed",
+                    defaultValue: "Make AI guess right with its eyes closed"
+                )
+            )
+        ),
+        Entry(
+            type: Level2Session.self,
+            summary: LevelSummary(
+                id: 2,
+                title: String(localized: "Level 2", defaultValue: "Level 2"),
+                subtitle: String(
+                    localized: "It reads the world in blocks",
+                    defaultValue: "It reads the world in blocks"
+                )
+            )
+        ),
     ]
 }

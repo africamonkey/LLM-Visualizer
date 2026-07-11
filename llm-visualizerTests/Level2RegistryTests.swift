@@ -17,7 +17,7 @@ struct Level2RegistryTests {
     }
 
     @Test func levelTwoIsInRegistry() {
-        let names = LevelRegistry.all.map { String(describing: $0) }
+        let names = LevelRegistry.all.map { String(describing: $0.type) }
         #expect(names.contains("Level2Session"))
     }
 

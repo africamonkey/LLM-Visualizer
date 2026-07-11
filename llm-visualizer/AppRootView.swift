@@ -13,6 +13,7 @@ struct AppRootView: View {
             defaultValue: "今天天气真"
         )
     )
+    @State private var currentLevelIndex: Int = 0
 
     var body: some View {
         Group {
@@ -25,17 +26,16 @@ struct AppRootView: View {
             case .ready(let hasSeenOnboarding):
                 if hasSeenOnboarding {
                     LevelShellView(
-                        currentSession: Level1Session(
-                            viewModel: Level1ViewModel(service: appVM.service)
-                        ),
+                        currentSession: sessionForCurrentIndex(),
+                        hasNextLevel: hasNextLevel(),
+                        onAdvanceLevel: { jumpToLevel(currentLevelIndex + 1) },
+                        onJumpToLevel: { jumpToLevel($0) },
                         onReset: {
                             appVM.reset()
-                            // The state flip to .ready(hasSeenOnboarding: false)
+                            // State flip to .ready(hasSeenOnboarding: false)
                             // re-routes us to the onboarding branch below on the
-                            // next render. (Note: the example stays in memory from
-                            // the original bootstrap; if a reset+bootstrap cycle is
-                            // needed, AppShellViewModel.bootstrap() can be called
-                            // explicitly here.)
+                            // next render. After reset, restart at level 0.
+                            currentLevelIndex = 0
                         }
                     )
                 } else if let example = appVM.example {
@@ -53,9 +53,34 @@ struct AppRootView: View {
             }
         }
         .task {
-            // Skip model load during unit/UI tests — Metal doesn't init in simulator
+            // Skip model load during unit/UI tests — Metal doesn't init in simulator.
             guard ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil else { return }
             await appVM.bootstrap()
         }
+    }
+
+    // MARK: - Level navigation
+
+    /// Construct the session for `currentLevelIndex`. Factories live on each
+    /// `LevelSession` subclass so AppRootView stays decoupled.
+    private func sessionForCurrentIndex() -> LevelSession {
+        let type = LevelRegistry.all[currentLevelIndex].type
+        switch type {
+        case let t as Level1Session.Type:
+            return t.make(service: appVM.service)
+        case let t as Level2Session.Type:
+            return t.make(service: appVM.service)
+        default:
+            fatalError("Unknown level type: \(type)")
+        }
+    }
+
+    private func hasNextLevel() -> Bool {
+        currentLevelIndex + 1 < LevelRegistry.all.count
+    }
+
+    private func jumpToLevel(_ index: Int) {
+        let clamped = max(0, min(index, LevelRegistry.all.count - 1))
+        currentLevelIndex = clamped
     }
 }

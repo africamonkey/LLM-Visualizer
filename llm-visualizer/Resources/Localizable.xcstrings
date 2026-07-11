@@ -1397,6 +1397,40 @@
         }
       }
     },
+    "settings.levelsHeader" : {
+      "comment" : "Section header in the Settings sheet listing available levels.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Levels"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "关卡"
+          }
+        }
+      }
+    },
+    "level.nextLevel" : {
+      "comment" : "Button to advance from a completed level to the next. Shown on the Level 1 page bottom when complete, and in the celebration overlay.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Next level →"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下一关 →"
+          }
+        }
+      }
+    },
     "Sometimes AI is sure, sometimes it's hesitant." : {
       "comment" : "Level 1 insight: model confidence varies depending on context.",
       "extractionState" : "stale",
