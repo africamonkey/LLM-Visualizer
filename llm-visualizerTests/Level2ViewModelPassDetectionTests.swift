@@ -212,4 +212,20 @@ struct Level2ViewModelPassDetectionTests {
         #expect(vm.step == .challengeIntro)
         #expect(vm.bestCharCount == 0)
     }
+
+    /// PassedView uses `earnedStars(for: charCount)` to show stars for THIS
+    /// attempt's char count, not the all-time best. So a user who passed
+    /// at 7 chars and then at 3 chars should see 1 star (3 chars → 1 star)
+    /// on the second celebration, not 3 stars (the all-time best).
+    @Test func earnedStarsIsForThisAttempt() {
+        let vm = Level2ViewModel(service: MockLLMService(), progressStore: freshStore())
+        #expect(vm.earnedStars(for: 0) == 0)
+        #expect(vm.earnedStars(for: 2) == 0)
+        #expect(vm.earnedStars(for: 3) == 1)
+        #expect(vm.earnedStars(for: 4) == 1)
+        #expect(vm.earnedStars(for: 5) == 2)
+        #expect(vm.earnedStars(for: 6) == 2)
+        #expect(vm.earnedStars(for: 7) == 3)
+        #expect(vm.earnedStars(for: 50) == 3)
+    }
 }

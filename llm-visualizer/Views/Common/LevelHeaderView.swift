@@ -38,12 +38,11 @@ struct LevelHeaderView<Trailing: View>: View {
     }
 
     private var goalText: String {
-        let pct = Int((Level1ViewModel.passThreshold * 100).rounded())
-        let format = String(
-            localized: "Goal: Get Top-1 probability above %d%%",
-            defaultValue: "Goal: Get Top-1 probability above %d%%"
-        )
-        return String(format: format, pct)
+        // Goal text comes straight from the session's `goalDescription`. The
+        // previous implementation hardcoded "Top-1 probability above 90%"
+        // using `Level1ViewModel.passThreshold`, which meant Level 2 also
+        // showed Level 1's goal — wrong.
+        goalDescription
     }
 
     private var bestText: String? {
