@@ -30,10 +30,7 @@ final class Level2ViewModel {
     private let hint2ExampleText: String
     private var errorAutoClearTask: Task<Void, Never>?
 
-    /// When true, the user starts the session already at `.playing` instead
-    /// of walking the hook → demo → challengeIntro flow. Used when the user
-    /// advances from Level 1 via the "Next level →" affordance.
-    var step: Step
+    var step: Step = .hook
 
     var rawText: String = "" {
         didSet {
@@ -60,13 +57,11 @@ final class Level2ViewModel {
 
     init(service: LLMServiceProtocol,
          progressStore: ProgressStore = .shared,
-         hint2ExampleText: String = Level2Constants.hint2ExampleText,
-         skipIntro: Bool = false) {
+         hint2ExampleText: String = Level2Constants.hint2ExampleText) {
         self.service = service
         self.progressStore = progressStore
         self.hint2ExampleText = hint2ExampleText
         self.bestCharCount = progressStore.bestCharacterCount(2)
-        self.step = skipIntro ? .playing : .hook
     }
 
     func acknowledgeHook()      { step = .demo }
