@@ -21,10 +21,12 @@ struct Level2ViewModelHintTierTests {
         return vm
     }
 
+    /// B3: attemptCount only increments on explicit submit. Each `failOnce`
+    /// now sets text + submits, which is one "failed attempt".
     private func failOnce(vm: Level2ViewModel, _ text: String) async {
-        // Multi-token stub forces a non-pass path.
         vm.rawText = text
         await vm.waitForPendingTokenize()
+        vm.submit()
     }
 
     @Test func noHintBelowThreshold() async {
@@ -48,25 +50,36 @@ struct Level2ViewModelHintTierTests {
         #expect(vm.hintTier == .example)
     }
 
+    /// B2: hint tier escalates only via submit() (not via rawText change).
+    @Test func typingAloneDoesNotEscalateHint() async {
+        let vm = playingVM()
+        for i in 0..<10 {
+            vm.rawText = "ai\(i)"
+            await vm.waitForPendingTokenize()
+        }
+        // No submit was called. attemptCount should still be 0.
+        #expect(vm.attemptCount == 0)
+        #expect(vm.hintTier == .none)
+    }
+
     @Test func passResetsHintState() async {
         let vm = playingVM()
         for i in 0..<10 { await failOnce(vm: vm, "ai\(i)") }
         #expect(vm.hintTier == .example)
 
         // Configure a single-token stub and pass.
-        // `service` is non-`private` on the VM (see Task 6 scaffold),
-        // so the test can mutate the mock directly.
         if let mock = vm.service as? MockLLMService {
             mock.stubbedTokens = ["ok": [TokenPiece(id: 100, text: "ok")]]
         }
         vm.rawText = "ok"
         await vm.waitForPendingTokenize()
+        vm.submit()
         #expect(vm.step == .passed)
         #expect(vm.attemptCount == 0)
         #expect(vm.hintTier == .none)
     }
 
-    @Test func applyHint2ExampleSetsRawText() async {
+    @Test func applyHint2ExampleSetsRawTextWithoutAutoSubmit() async {
         let store = freshStore()
         let mock = MockLLMService()
         mock.stubbedTokens["我"] = [TokenPiece(id: 1, text: "我")]
@@ -80,5 +93,9 @@ struct Level2ViewModelHintTierTests {
         await vm.waitForPendingTokenize()
         #expect(vm.rawText == "我")
         #expect(vm.tokens == [TokenPiece(id: 1, text: "我")])
+        // applyHint2Example autofills rawText but does NOT auto-submit. User
+        // can still edit before tapping Submit.
+        #expect(vm.step == .playing)
+        #expect(vm.attemptCount == 0)
     }
 }

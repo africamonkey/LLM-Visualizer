@@ -21,7 +21,10 @@ struct Level2ViewModelPassDetectionTests {
         return vm
     }
 
-    @Test func singleTokenPassesAndPersists() async {
+    /// B1: pass detection is gated behind an explicit `submit()` call. Typing
+    /// in the field updates tokens visually (via `isPassing`) but does NOT
+    /// flip step or persist best. Only submit does.
+    @Test func typingAloneDoesNotPass() async {
         let store = freshStore()
         let mock = MockLLMService()
         mock.stubbedTokens = ["我": [TokenPiece(id: 1, text: "我")]]
@@ -29,20 +32,37 @@ struct Level2ViewModelPassDetectionTests {
         vm.step = .playing
         vm.rawText = "我"
         await vm.waitForPendingTokenize()
+        // No submit yet — still playing.
+        #expect(vm.step == .playing)
+        #expect(vm.bestCharCount == 0)
+        #expect(store.bestCharacterCount(2) == 0)
+        // isPassing updates in real time (visual feedback), independent of submit.
+        #expect(vm.isPassing == true)
+    }
+
+    @Test func submitOnSingleTokenPassesAndPersists() async {
+        let store = freshStore()
+        let mock = MockLLMService()
+        mock.stubbedTokens = ["我": [TokenPiece(id: 1, text: "我")]]
+        let vm = Level2ViewModel(service: mock, progressStore: store)
+        vm.step = .playing
+        vm.rawText = "我"
+        await vm.waitForPendingTokenize()
+        vm.submit()
         #expect(vm.step == .passed)
         #expect(vm.bestCharCount == 1)
         #expect(store.bestCharacterCount(2) == 1)
-        #expect(vm.isPassing == true)
         #expect(vm.attemptCount == 0)
+        #expect(vm.isNewRecord == true)
     }
 
     @Test func emptyInputDoesNotPass() async {
         let vm = playingVM(stubbed: [:])
         vm.rawText = "x"
         await vm.waitForPendingTokenize()
-        // Now clear back to empty; pipeline runs again, tokens becomes [].
         vm.rawText = ""
         await vm.waitForPendingTokenize()
+        vm.submit()
         #expect(vm.step == .playing)
         #expect(vm.bestCharCount == 0)
         #expect(vm.isPassing == false)
@@ -52,17 +72,21 @@ struct Level2ViewModelPassDetectionTests {
         let vm = playingVM(stubbed: ["   ": [TokenPiece(id: 5, text: " ")]])
         vm.rawText = "   "
         await vm.waitForPendingTokenize()
+        vm.submit()
         // 1 token, but trimmed grapheme count is 0 → pass should NOT fire.
         #expect(vm.step == .playing)
         #expect(vm.isPassing == false)
     }
 
-    @Test func multiTokenDoesNotPassAndIncrementsAttempts() async {
+    /// B3: attemptCount only increments on submit, not on every keystroke.
+    @Test func submitOnMultiTokenIncrementsAttemptsOnce() async {
         let vm = playingVM(stubbed: [
             "我爱": [TokenPiece(id: 1, text: "我"), TokenPiece(id: 2, text: "爱")]
         ])
         vm.rawText = "我爱"
         await vm.waitForPendingTokenize()
+        #expect(vm.attemptCount == 0) // no submit yet
+        vm.submit()
         #expect(vm.step == .playing)
         #expect(vm.attemptCount == 1)
         #expect(vm.isPassing == false)
@@ -70,11 +94,9 @@ struct Level2ViewModelPassDetectionTests {
 
     @Test func bestCharCountPersistsAcrossLongerPass() async {
         let store = freshStore()
-        // Seed prior best of 3 chars.
         store.setBestCharacterCount(2, 3)
 
         let mock = MockLLMService()
-        // First attempt: 2-token stub → no pass.
         mock.stubbedTokens = ["爱我": [
             TokenPiece(id: 1, text: "爱"),
             TokenPiece(id: 2, text: "我"),
@@ -84,6 +106,7 @@ struct Level2ViewModelPassDetectionTests {
         vm.step = .playing
         vm.rawText = "爱我"
         await vm.waitForPendingTokenize()
+        vm.submit()
         #expect(vm.step == .playing)
         #expect(vm.attemptCount == 1)
         #expect(vm.isPassing == false)
@@ -94,11 +117,32 @@ struct Level2ViewModelPassDetectionTests {
         ]]
         vm.rawText = "五星红旗"
         await vm.waitForPendingTokenize()
+        vm.submit()
         #expect(vm.step == .passed)
-        // bestCharCount now 4 (was 3 from store).
         #expect(vm.bestCharCount == 4)
         #expect(vm.attemptCount == 0)
         #expect(vm.isPassing == true)
+        #expect(vm.isNewRecord == true)
+    }
+
+    /// B11: acknowledgePassed clears rawText/tokens/attemptCount/hintTier so
+    /// the next playing round starts fresh.
+    @Test func acknowledgePassedResetsRound() async {
+        let mock = MockLLMService()
+        mock.stubbedTokens = ["我": [TokenPiece(id: 1, text: "我")]]
+        let vm = Level2ViewModel(service: mock, progressStore: freshStore())
+        vm.step = .playing
+        vm.rawText = "我"
+        await vm.waitForPendingTokenize()
+        vm.submit()
+        #expect(vm.step == .passed)
+        vm.acknowledgePassed()
+        #expect(vm.step == .playing)
+        #expect(vm.rawText == "")
+        #expect(vm.tokens.isEmpty)
+        #expect(vm.isPassing == false)
+        #expect(vm.attemptCount == 0)
+        #expect(vm.isNewRecord == false)
     }
 
     @Test func lowerScoreAfterPassDoesNotLower() async {
@@ -112,18 +156,60 @@ struct Level2ViewModelPassDetectionTests {
         mock.stubbedTokens = ["五星红旗": [TokenPiece(id: 1, text: "五星红旗")]]
         vm.rawText = "五星红旗"
         await vm.waitForPendingTokenize()
+        vm.submit()
         let highScore = vm.bestCharCount
         #expect(vm.step == .passed)
         #expect(highScore == 4)
-        #expect(vm.isPassing == true)
+        #expect(vm.isNewRecord == true)
 
         // Continue grinding; pass again at 1 char.
         vm.acknowledgePassed()
         mock.stubbedTokens = ["我": [TokenPiece(id: 2, text: "我")]]
         vm.rawText = "我"
         await vm.waitForPendingTokenize()
+        vm.submit()
         // bestCharCount must not decrease.
         #expect(vm.bestCharCount == highScore)
-        #expect(vm.isPassing == true)
+        // 4 < 4 → not a new record this time.
+        #expect(vm.isNewRecord == false)
+    }
+
+    /// B6: isNewRecord is true only when this pass set a NEW high water mark.
+    @Test func isNewRecordOnlyWhenBeatingBest() async {
+        let store = freshStore()
+        store.setBestCharacterCount(2, 5)
+        let mock = MockLLMService()
+        let vm = Level2ViewModel(service: mock, progressStore: store)
+        vm.step = .playing
+        mock.stubbedTokens = ["我": [TokenPiece(id: 1, text: "我")]]
+        vm.rawText = "我"
+        await vm.waitForPendingTokenize()
+        vm.submit()
+        #expect(vm.bestCharCount == 5) // unchanged
+        #expect(vm.isNewRecord == false)
+    }
+
+    /// B2: submit() during demo / challengeIntro / passed is a no-op.
+    /// The user can type freely during the demo phase without accidentally
+    /// triggering a pass transition.
+    @Test func submitIsNoOpOutsidePlaying() async {
+        let store = freshStore()
+        let mock = MockLLMService()
+        mock.stubbedTokens = ["我": [TokenPiece(id: 1, text: "我")]]
+        let vm = Level2ViewModel(service: mock, progressStore: store)
+
+        // demo: type and submit; nothing happens.
+        vm.step = .demo
+        vm.rawText = "我"
+        await vm.waitForPendingTokenize()
+        vm.submit()
+        #expect(vm.step == .demo)
+        #expect(vm.bestCharCount == 0)
+
+        // challengeIntro: same.
+        vm.step = .challengeIntro
+        vm.submit()
+        #expect(vm.step == .challengeIntro)
+        #expect(vm.bestCharCount == 0)
     }
 }

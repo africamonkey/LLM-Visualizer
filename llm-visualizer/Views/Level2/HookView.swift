@@ -11,9 +11,11 @@ struct HookView: View {
         VStack(spacing: 24) {
             Spacer(minLength: 24)
             VStack(spacing: 16) {
+                Text("🧩")
+                    .font(.system(size: 56))
                 Text(String(
                     localized: "level2.hook.body",
-                    defaultValue: "AI actually doesn't know any characters at all. The world it sees looks very strange."
+                    defaultValue: "Here's a secret: AI doesn't actually read characters. When you feed it text, it chops what you wrote into blocks first — like pieces of a puzzle. Want to see what its world looks like?"
                 ))
                 .font(.title3.weight(.semibold))
                 .multilineTextAlignment(.center)
