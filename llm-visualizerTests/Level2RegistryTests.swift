@@ -10,15 +10,11 @@ import Testing
 @MainActor
 struct Level2RegistryTests {
 
-    private func makeSession(skipIntro: Bool = false) -> Level2Session {
+    private func makeSession() -> Level2Session {
         let mock = MockLLMService()
         let store = ProgressStore(defaults: UserDefaults(suiteName: "llmviz.test.\(UUID().uuidString)")!)
         return Level2Session(
-            viewModel: Level2ViewModel(
-                service: mock,
-                progressStore: store,
-                skipIntro: skipIntro
-            )
+            viewModel: Level2ViewModel(service: mock, progressStore: store)
         )
     }
 
@@ -39,12 +35,6 @@ struct Level2RegistryTests {
 
     @Test func levelTwoContentViewRenders() {
         let _ = makeSession().makeContentView()
-    }
-
-    /// B4: `skipIntro: true` makes the session start at .playing instead of .hook.
-    @Test func skipIntroLandsAtPlaying() {
-        let s = makeSession(skipIntro: true)
-        #expect(s.viewModel.step == .playing)
     }
 
     @Test func defaultSessionStartsAtHook() {

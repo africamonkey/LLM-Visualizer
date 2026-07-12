@@ -40,11 +40,7 @@ final class Level2Session: LevelSession {
     }
 
     /// Construct a Level2Session with its view model wired to the given service.
-    /// Pass `skipIntro: true` when entering Level 2 from another level so the
-    /// user lands directly on the playing surface (B4).
-    static func make(service: LLMServiceProtocol, skipIntro: Bool = false) -> Level2Session {
-        Level2Session(
-            viewModel: Level2ViewModel(service: service, skipIntro: skipIntro)
-        )
+    static func make(service: LLMServiceProtocol) -> Level2Session {
+        Level2Session(viewModel: Level2ViewModel(service: service))
     }
 }
