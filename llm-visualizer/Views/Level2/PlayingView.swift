@@ -22,7 +22,6 @@ struct PlayingView: View {
                 onApplyExample: { viewModel.applyHint2Example() }
             )
             Spacer()
-            submitButton
         }
         .padding(16)
         .overlay(alignment: .top) {
@@ -68,6 +67,25 @@ struct PlayingView: View {
                     }
                 }
                 .onSubmit { viewModel.submit() }
+                // B1: submit button lives inline to the right of the TextField,
+                // matching Level 1's pattern. Without this, pass detection
+                // would fire on every keystroke (B1) — the button gates it.
+                Button {
+                    promptFocused = false
+                    viewModel.submit()
+                } label: {
+                    Image(systemName: "arrow.up")
+                        .font(.body.weight(.bold))
+                        .foregroundStyle(.white)
+                        .frame(width: 32, height: 32)
+                        .background(Circle().fill(canSubmit ? Color.accentColor : Color.gray.opacity(0.4)))
+                }
+                .buttonStyle(.plain)
+                .disabled(!canSubmit)
+                .accessibilityLabel(String(
+                    localized: "level2.submit",
+                    defaultValue: "Submit"
+                ))
             }
             HStack(spacing: 6) {
                 ForEach(commonWords, id: \.self) { w in
@@ -129,31 +147,6 @@ struct PlayingView: View {
     private var blocksSection: some View {
         TokenBlocksView(tokens: viewModel.tokens)
             .padding(.vertical, 8)
-    }
-
-    /// B1: explicit Submit button. Without this, every keystroke would fire
-    /// pass detection and instantly yank the user to PassedView on the first
-    /// single-token character.
-    private var submitButton: some View {
-        Button {
-            promptFocused = false
-            viewModel.submit()
-        } label: {
-            HStack(spacing: 6) {
-                Image(systemName: "paperplane.fill")
-                    .font(.body.weight(.semibold))
-                Text(String(localized: "level2.submit", defaultValue: "Submit"))
-                    .font(.body.weight(.semibold))
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 14)
-            .background(
-                Capsule().fill(canSubmit ? Color.accentColor : Color.gray.opacity(0.4))
-            )
-            .foregroundStyle(.white)
-        }
-        .buttonStyle(.plain)
-        .disabled(!canSubmit)
     }
 
     private var canSubmit: Bool {
