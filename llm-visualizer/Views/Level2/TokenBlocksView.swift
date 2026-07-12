@@ -80,15 +80,16 @@ struct TokenBlocksView: View {
     }
 
     private func blockColor(for piece: TokenPiece) -> Color {
+        // Deterministic hash → palette index. 8 colors is enough for a row.
         let palette: [Color] = [
-            Color(red: 1.00, green: 0.84, blue: 0.04),
-            Color(red: 0.20, green: 0.78, blue: 0.35),
-            Color(red: 1.00, green: 0.27, blue: 0.23),
-            Color(red: 0.04, green: 0.52, blue: 1.00),
-            Color(red: 0.34, green: 0.78, blue: 0.98),
-            Color(red: 0.75, green: 0.35, blue: 0.95),
-            Color(red: 1.00, green: 0.45, blue: 0.70),
-            Color(red: 0.40, green: 0.85, blue: 0.55),
+            Color(red: 1.00, green: 0.84, blue: 0.04),  // yellow
+            Color(red: 0.20, green: 0.78, blue: 0.35),  // green
+            Color(red: 1.00, green: 0.27, blue: 0.23),  // red
+            Color(red: 0.04, green: 0.52, blue: 1.00),  // blue
+            Color(red: 0.34, green: 0.78, blue: 0.98),  // sky
+            Color(red: 0.75, green: 0.35, blue: 0.95),  // purple
+            Color(red: 1.00, green: 0.45, blue: 0.70),  // pink
+            Color(red: 0.40, green: 0.85, blue: 0.55),  // mint
         ]
         let idx = abs(piece.id.hashValue) % palette.count
         return palette[idx]
