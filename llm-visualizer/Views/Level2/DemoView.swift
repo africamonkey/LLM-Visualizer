@@ -9,13 +9,11 @@ struct DemoView: View {
     @Bindable var viewModel: Level2ViewModel
     let onContinue: () -> Void
 
-    @State private var hasTyped: Bool = false
-
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text(String(
                 localized: "level2.demo.prompt",
-                defaultValue: "Type a few characters and see how AI chops them up."
+                defaultValue: "Try typing anything. See how AI chops it into blocks."
             ))
             .font(.body.weight(.medium))
 
@@ -34,23 +32,22 @@ struct DemoView: View {
             Button(action: onContinue) {
                 Text(String(
                     localized: "level2.demo.cta",
-                    defaultValue: "I'll try"
+                    defaultValue: "I've got it — show me the challenge"
                 ))
                 .font(.body.weight(.semibold))
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 14)
-                    .background(Capsule().fill(hasTyped ? Color.accentColor : Color.gray.opacity(0.4)))
-                    .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 14)
+                .background(Capsule().fill(Color.accentColor))
+                .foregroundStyle(.white)
             }
             .buttonStyle(.plain)
-            .disabled(!hasTyped)
         }
         .padding(20)
         .onAppear {
-            if !hasTyped {
-                viewModel.rawText = "我爱北京"
-                hasTyped = true
-            }
+            // B10: always force the pre-fill on entry. Don't gate on hasTyped,
+            // because re-entering DemoView (e.g., via Settings → Levels) should
+            // still show the example, not whatever rawText was left over.
+            viewModel.rawText = "我爱北京"
         }
     }
 
@@ -70,7 +67,6 @@ struct DemoView: View {
                 RoundedRectangle(cornerRadius: 18)
                     .fill(Color(.systemBackground))
             )
-            .onChange(of: viewModel.rawText) { _, _ in hasTyped = true }
         }
     }
 
@@ -78,14 +74,13 @@ struct DemoView: View {
         HStack(spacing: 8) {
             chip("我爱北京")
             chip("unbelievable")
-            chip("\u{1F327}\u{FE0F}")
+            chip("asdfqwerty")  // B5: explicit gibberish, not a weather emoji
         }
     }
 
     private func chip(_ text: String) -> some View {
         Button {
             viewModel.rawText = text
-            hasTyped = true
         } label: {
             Text(text)
                 .font(.caption)
@@ -100,9 +95,10 @@ struct DemoView: View {
     }
 
     private var revealText: some View {
+        // B8: hint at the discovery the user should make in the playing phase.
         Text(String(
             localized: "level2.demo.reveal",
-            defaultValue: "See? AI doesn't read character by character. It chops text into blocks — those blocks are called tokens. AI only knows tokens."
+            defaultValue: "Those blocks are called tokens — that's how AI reads text, not character by character. Try the challenge: can you pack something into a single block?"
         ))
         .font(.subheadline)
         .foregroundStyle(.secondary)

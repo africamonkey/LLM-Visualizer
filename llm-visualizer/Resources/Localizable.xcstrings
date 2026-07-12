@@ -652,13 +652,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "I'll try"
+            "value" : "I've got it — show me the challenge"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "我来试一试"
+            "value" : "我懂了 — 进入挑战"
           }
         }
       }
@@ -669,13 +669,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Type a few characters and see how AI chops them up."
+            "value" : "Try typing anything. See how AI chops it into blocks."
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "输入几个字，看看 AI 是怎么切的"
+            "value" : "随便输点什么，看看 AI 是怎么切的。"
           }
         }
       }
@@ -686,13 +686,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "See? AI doesn't read character by character. It chops text into blocks — those blocks are called tokens. AI only knows tokens."
+            "value" : "Those blocks are called tokens — that's how AI reads text, not character by character. Try the challenge: can you pack something into a single block?"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "看到了吗，AI 不按字读。它把文字切成一块块积木，这些积木叫 token。AI 只认识 token。"
+            "value" : "这些块叫 token——AI 看文字的方式，不是按字，是按块。挑战来了：你能把一段内容装进单独一块里吗？"
           }
         }
       }
@@ -771,13 +771,13 @@
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "AI actually doesn't know any characters at all. The world it sees looks very strange."
+            "value" : "Here's a secret: AI doesn't actually read characters. When you feed it text, it chops what you wrote into blocks first — like pieces of a puzzle. Want to see what its world looks like?"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "AI 其实根本不认识字。它眼中的世界，长得很奇怪。"
+            "value" : "说个秘密：AI 根本不识字。你喂给它的文字，它会先切成一块一块的——像拼图碎片。想看看它眼中的世界长什么样吗？"
           }
         }
       }
@@ -901,6 +901,23 @@
         }
       }
     },
+    "level2.passed.newRecord" : {
+      "comment" : "Badge shown on PassedView when the current attempt set a new bestCharCount record.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NEW BEST"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新纪录"
+          }
+        }
+      }
+    },
     "level2.passed.recap" : {
       "comment" : "",
       "localizations" : {
@@ -982,6 +999,23 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "它眼中的世界"
+          }
+        }
+      }
+    },
+    "level2.submit" : {
+      "comment" : "Submit button label on PlayingView. Triggers pass evaluation.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Submit"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "提交"
           }
         }
       }

@@ -16,6 +16,20 @@ struct PassedView: View {
                 Text(String(localized: "level2.passed.title", defaultValue: "You did it"))
                     .font(.title.weight(.bold))
 
+                if viewModel.isNewRecord {
+                    // B6: celebrate when this attempt beat the previous best.
+                    Text(String(
+                        localized: "level2.passed.newRecord",
+                        defaultValue: "NEW BEST"
+                    ))
+                    .font(.caption.weight(.bold))
+                    .tracking(2)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Capsule().fill(Color.accentColor))
+                    .foregroundStyle(.white)
+                }
+
                 summaryCard
 
                 starDisplay
@@ -103,7 +117,7 @@ struct PassedView: View {
     private var recap: some View {
         Text(String(
             localized: "level2.passed.recap",
-            defaultValue: "You just discovered how AI reads - no characters, only blocks. The more familiar something is, the bigger the block."
+            defaultValue: "You just discovered how AI reads — no characters, only blocks. The more familiar something is, the bigger the block."
         ))
         .font(.subheadline)
         .foregroundStyle(.secondary)

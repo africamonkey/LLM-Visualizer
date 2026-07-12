@@ -91,7 +91,7 @@ struct LevelShellView: View {
                 },
                 onReplayOnboarding: onReset,
                 onReset: onReset,
-                currentLevelIndex: currentSession.id - 1,
+                currentLevelIndex: LevelRegistry.all.firstIndex { $0.type == type(of: currentSession) } ?? 0,
                 levels: LevelRegistry.all.map { $0.summary }
             )
         }

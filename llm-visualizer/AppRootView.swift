@@ -14,6 +14,10 @@ struct AppRootView: View {
         )
     )
     @State private var currentLevelIndex: Int = 0
+    /// True for one body evaluation cycle after the user navigates to a
+    /// different level. Used to pass `skipIntro: true` to Level 2 when the
+    /// user advances from Level 1 (B4).
+    @State private var didJustAdvance: Bool = false
 
     var body: some View {
         Group {
@@ -32,10 +36,8 @@ struct AppRootView: View {
                         onJumpToLevel: { jumpToLevel($0) },
                         onReset: {
                             appVM.reset()
-                            // State flip to .ready(hasSeenOnboarding: false)
-                            // re-routes us to the onboarding branch below on the
-                            // next render. After reset, restart at level 0.
                             currentLevelIndex = 0
+                            didJustAdvance = false
                         }
                     )
                 } else if let example = appVM.example {
@@ -46,14 +48,11 @@ struct AppRootView: View {
                         }
                     )
                 } else {
-                    // Defensive: .ready(false) should always have examples.
-                    // Render an empty view rather than crash.
                     EmptyView()
                 }
             }
         }
         .task {
-            // Skip model load during unit/UI tests — Metal doesn't init in simulator.
             guard ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil else { return }
             await appVM.bootstrap()
         }
@@ -61,15 +60,19 @@ struct AppRootView: View {
 
     // MARK: - Level navigation
 
-    /// Construct the session for `currentLevelIndex`. Factories live on each
-    /// `LevelSession` subclass so AppRootView stays decoupled.
+    /// Construct the session for `currentLevelIndex`. For Level 2 (and any
+    /// future level with an intro flow), pass `skipIntro: true` if the user
+    /// just advanced from a previous level — they shouldn't have to walk the
+    /// hook/demo/challengeIntro again (B4).
     private func sessionForCurrentIndex() -> LevelSession {
         let type = LevelRegistry.all[currentLevelIndex].type
+        let skipIntro = didJustAdvance && currentLevelIndex > 0
+        didJustAdvance = false  // consume — applies for one body cycle only
         switch type {
         case let t as Level1Session.Type:
             return t.make(service: appVM.service)
         case let t as Level2Session.Type:
-            return t.make(service: appVM.service)
+            return t.make(service: appVM.service, skipIntro: skipIntro)
         default:
             fatalError("Unknown level type: \(type)")
         }
@@ -81,6 +84,9 @@ struct AppRootView: View {
 
     private func jumpToLevel(_ index: Int) {
         let clamped = max(0, min(index, LevelRegistry.all.count - 1))
+        if clamped != currentLevelIndex {
+            didJustAdvance = true
+        }
         currentLevelIndex = clamped
     }
 }
