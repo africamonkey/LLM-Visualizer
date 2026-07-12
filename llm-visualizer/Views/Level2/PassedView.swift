@@ -74,7 +74,10 @@ struct PassedView: View {
     }
 
     private var summaryCard: some View {
-        VStack(alignment: .leading, spacing: 10) {
+        // Show THIS attempt's stats, not bestCharCount. The user wants to see
+        // what they just achieved; the header still shows their all-time best.
+        let thisAttemptCount = viewModel.rawText.count
+        return VStack(alignment: .leading, spacing: 10) {
             if !viewModel.rawText.isEmpty {
                 Text(viewModel.rawText)
                     .font(.body.monospaced())
@@ -85,7 +88,7 @@ struct PassedView: View {
                     )
             }
             HStack(alignment: .firstTextBaseline) {
-                Text("\(viewModel.bestCharCount) ")
+                Text("\(thisAttemptCount) ")
                     .font(.title.weight(.bold))
                     .foregroundStyle(.primary)
                 Text(String(
@@ -94,6 +97,26 @@ struct PassedView: View {
                 ))
                 .font(.subheadline)
                 Spacer()
+            }
+            if viewModel.bestCharCount > thisAttemptCount {
+                // Show the all-time best only when this attempt didn't beat it.
+                HStack(spacing: 4) {
+                    Text(String(
+                        localized: "level2.passed.bestSoFar",
+                        defaultValue: "Your best so far:"
+                    ))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    Text("\(viewModel.bestCharCount)")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(.secondary)
+                    Text(String(
+                        localized: "level2.passed.bestChars",
+                        defaultValue: "chars"
+                    ))
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                }
             }
         }
         .padding(16)
@@ -105,11 +128,13 @@ struct PassedView: View {
     }
 
     private var starDisplay: some View {
-        HStack(spacing: 12) {
+        // Stars for THIS attempt, not the all-time best.
+        let thisAttemptStars = viewModel.earnedStars(for: viewModel.rawText.count)
+        return HStack(spacing: 12) {
             ForEach(0..<3) { i in
-                Image(systemName: i < viewModel.earnedStars ? "star.fill" : "star")
+                Image(systemName: i < thisAttemptStars ? "star.fill" : "star")
                     .font(.system(size: 36))
-                    .foregroundStyle(i < viewModel.earnedStars ? Color.yellow : Color.gray.opacity(0.4))
+                    .foregroundStyle(i < thisAttemptStars ? Color.yellow : Color.gray.opacity(0.4))
             }
         }
     }

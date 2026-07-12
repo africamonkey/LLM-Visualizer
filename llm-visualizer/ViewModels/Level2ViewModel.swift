@@ -98,6 +98,16 @@ final class Level2ViewModel {
         return 0
     }
 
+    /// Stars for THIS attempt's char count (not the all-time best). Used by
+    /// PassedView so the celebration shows what the user just achieved, not
+    /// a stale high water mark.
+    func earnedStars(for charCount: Int) -> Int {
+        if charCount >= Level2Constants.star3Threshold { return 3 }
+        if charCount >= Level2Constants.star2Threshold { return 2 }
+        if charCount >= Level2Constants.star1Threshold { return 1 }
+        return 0
+    }
+
     func waitForPendingTokenize() async {
         await tokenizeTask?.value
     }

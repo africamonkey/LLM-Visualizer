@@ -47,8 +47,18 @@ class LevelSession {
 /// Compact level metadata shown by the Settings → Levels picker.
 struct LevelSummary: Equatable, Hashable {
     let id: Int
-    let title: String
     let subtitle: String
+
+    /// Title is computed from the level id, not stored, so both Level 1 and
+    /// Level 2 (and any future level) use the same localized "Level %d" key
+    /// and stay in sync across languages.
+    var title: String {
+        let format = String(
+            localized: "Level %d",
+            defaultValue: "Level %d"
+        )
+        return String(format: format, id)
+    }
 }
 
 enum LevelRegistry {
@@ -60,14 +70,13 @@ enum LevelRegistry {
         let summary: LevelSummary
     }
 
-    /// Ordered list of level entries. App picks the first not-yet-complete
+/// Ordered list of level entries. App picks the first not-yet-complete
     /// one as the current level. Future slices append entries here.
     static let all: [Entry] = [
         Entry(
             type: Level1Session.self,
             summary: LevelSummary(
                 id: 1,
-                title: String(localized: "Level 1", defaultValue: "Level 1"),
                 subtitle: String(
                     localized: "Make AI guess right with its eyes closed",
                     defaultValue: "Make AI guess right with its eyes closed"
@@ -78,7 +87,6 @@ enum LevelRegistry {
             type: Level2Session.self,
             summary: LevelSummary(
                 id: 2,
-                title: String(localized: "Level 2", defaultValue: "Level 2"),
                 subtitle: String(
                     localized: "It reads the world in blocks",
                     defaultValue: "It reads the world in blocks"

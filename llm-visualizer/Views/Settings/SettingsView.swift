@@ -88,8 +88,8 @@ struct SettingsView: View {
         onReset: {},
         currentLevelIndex: 0,
         levels: [
-            LevelSummary(id: 1, title: "Level 1", subtitle: "Make AI guess right"),
-            LevelSummary(id: 2, title: "Level 2", subtitle: "It reads the world in blocks"),
+            LevelSummary(id: 1, subtitle: "Make AI guess right"),
+            LevelSummary(id: 2, subtitle: "It reads the world in blocks"),
         ]
     )
 }
