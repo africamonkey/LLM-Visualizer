@@ -5,28 +5,46 @@
 import SwiftUI
 
 struct TokenBlocksView: View {
+    enum Style { case standard, compact }
+
     let tokens: [TokenPiece]
+    var style: Style = .standard
 
     var body: some View {
         if tokens.isEmpty {
             EmptyView()
-        } else if tokens.count == 1 {
+        } else if tokens.count == 1 && style == .standard {
             singleBlockExplosion(token: tokens[0])
         } else {
-            HStack(alignment: .center, spacing: 8) {
+            HStack(alignment: .center, spacing: style == .standard ? 8 : 4) {
                 ForEach(tokens) { t in
-                    Text(t.text)
-                        .font(.body.monospaced())
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(blockColor(for: t))
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color.black.opacity(0.06), lineWidth: 0.5)
-                        )
+                    blockTile(for: t)
                 }
             }
+        }
+    }
+
+    @ViewBuilder
+    private func blockTile(for t: TokenPiece) -> some View {
+        switch style {
+        case .standard:
+            Text(t.text)
+                .font(.body.monospaced())
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(blockColor(for: t))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color.black.opacity(0.06), lineWidth: 0.5)
+                )
+        case .compact:
+            Text(t.text)
+                .font(.caption.monospaced())
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(blockColor(for: t))
+                .clipShape(RoundedRectangle(cornerRadius: 6))
         }
     }
 
@@ -62,16 +80,15 @@ struct TokenBlocksView: View {
     }
 
     private func blockColor(for piece: TokenPiece) -> Color {
-        // Deterministic hash → palette index. 8 colors is enough for a row.
         let palette: [Color] = [
-            Color(red: 1.00, green: 0.84, blue: 0.04),  // yellow
-            Color(red: 0.20, green: 0.78, blue: 0.35),  // green
-            Color(red: 1.00, green: 0.27, blue: 0.23),  // red
-            Color(red: 0.04, green: 0.52, blue: 1.00),  // blue
-            Color(red: 0.34, green: 0.78, blue: 0.98),  // sky
-            Color(red: 0.75, green: 0.35, blue: 0.95),  // purple
-            Color(red: 1.00, green: 0.45, blue: 0.70),  // pink
-            Color(red: 0.40, green: 0.85, blue: 0.55),  // mint
+            Color(red: 1.00, green: 0.84, blue: 0.04),
+            Color(red: 0.20, green: 0.78, blue: 0.35),
+            Color(red: 1.00, green: 0.27, blue: 0.23),
+            Color(red: 0.04, green: 0.52, blue: 1.00),
+            Color(red: 0.34, green: 0.78, blue: 0.98),
+            Color(red: 0.75, green: 0.35, blue: 0.95),
+            Color(red: 1.00, green: 0.45, blue: 0.70),
+            Color(red: 0.40, green: 0.85, blue: 0.55),
         ]
         let idx = abs(piece.id.hashValue) % palette.count
         return palette[idx]
