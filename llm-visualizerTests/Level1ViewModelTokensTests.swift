@@ -34,7 +34,11 @@ struct Level1ViewModelTokensTests {
     }
 
     @Test func emptyPromptProducesEmptyTokens() async {
-        let (v, _) = vm()
+        let (v, mock) = vm()
+        mock.stubbedTokens["hi"] = [TokenPiece(id: 1, text: "hi")]
+        v.prompt = "hi"
+        await v.waitForPendingTokenize()
+        #expect(v.tokens.count == 1)
         v.prompt = ""
         await v.waitForPendingTokenize()
         #expect(v.tokens.isEmpty)
