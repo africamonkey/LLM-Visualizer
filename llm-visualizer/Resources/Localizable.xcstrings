@@ -578,23 +578,6 @@
         }
       }
     },
-    "level1.counter.blocks" : {
-      "comment" : "Label for the block count counter cell in Level 1's playing view.",
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "blocks"
-          }
-        },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "块"
-          }
-        }
-      }
-    },
     "level1.statePill" : {
       "comment" : "Green pill shown in Level 1's playing view when the current submission's Top-1 exceeds the pass threshold.",
       "localizations" : {
