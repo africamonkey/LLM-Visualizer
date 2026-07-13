@@ -15,6 +15,13 @@ struct Level1View: View {
 
     private let fragments = InspirationButtonsView.defaultFragments
 
+    private var canSubmit: Bool {
+        !viewModel.prompt
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .isEmpty
+            && !viewModel.isLoading
+    }
+
     init(
         viewModel: Level1ViewModel,
         session: Level1Session,
@@ -39,6 +46,11 @@ struct Level1View: View {
                     .transition(.opacity)
             }
             inputSection
+            if !viewModel.tokens.isEmpty {
+                TokenBlocksView(tokens: viewModel.tokens, style: .compact)
+                    .padding(.vertical, 4)
+                    .transition(.opacity)
+            }
             if viewModel.topCandidates.isEmpty {
                 EmptyStateView(
                     message: String(
@@ -49,6 +61,18 @@ struct Level1View: View {
                 .padding(.horizontal, 16)
                 .padding(.vertical, 24)
             } else {
+                HStack(spacing: 12) {
+                    CounterCell(
+                        label: String(localized: "level1.counter.top1", defaultValue: "top-1"),
+                        value: Int((viewModel.topCandidates.first?.probability ?? 0) * 100)
+                    )
+                    CounterCell(
+                        label: String(localized: "level1.counter.blocks", defaultValue: "blocks"),
+                        value: viewModel.tokens.count
+                    )
+                }
+                .padding(.horizontal, 16)
+                .padding(.bottom, 4)
                 ProbabilityBarsView(
                     candidates: viewModel.topCandidates,
                     isPassed: viewModel.currentTop1IsPass
@@ -60,12 +84,26 @@ struct Level1View: View {
                 NarratorLineView(sentiment: viewModel.currentSentiment)
                     .padding(.bottom, 4)
             }
+            if viewModel.currentTop1IsPass {
+                Text(String(
+                    localized: "level1.statePill",
+                    defaultValue: "✨ passed"
+                ))
+                .font(.caption.weight(.bold))
+                .padding(.horizontal, 10)
+                .padding(.vertical, 6)
+                .background(Capsule().fill(Color.green.opacity(0.18)))
+                .foregroundStyle(Color.green)
+                .padding(.bottom, 4)
+                .transition(.opacity)
+            }
             Spacer(minLength: 8)
             if session.isComplete, let onGoToNextLevel {
                 nextLevelButton(action: onGoToNextLevel)
             }
         }
         .animation(.easeInOut(duration: 0.2), value: viewModel.errorBanner)
+        .animation(.easeInOut(duration: 0.2), value: viewModel.tokens)
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .onChange(of: viewModel.state) { _, newValue in
             if newValue == .passed {
@@ -130,14 +168,11 @@ struct Level1View: View {
                             .font(.body.weight(.bold))
                             .foregroundStyle(.white)
                             .frame(width: 32, height: 32)
-                            .background(Circle().fill(Color.accentColor))
+                            .background(Circle().fill(canSubmit ? Color.accentColor : Color.gray.opacity(0.4)))
                     }
                 }
                 .buttonStyle(.plain)
-                .disabled(
-                    viewModel.prompt.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                    || viewModel.isLoading
-                )
+                .disabled(!canSubmit)
                 .accessibilityLabel(String(
                     localized: "level1.submit",
                     defaultValue: "Submit"
