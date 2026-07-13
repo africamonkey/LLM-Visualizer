@@ -8,10 +8,25 @@ struct PassCelebrationView: View {
 
     let echoedPrompt: String?
     let topCandidate: TokenCandidate?
+    let isNewRecord: Bool
     let onContinue: () -> Void
     /// Optional closure invoked when the user taps "Next level →".
     /// Pass `nil` to hide the button (e.g., on the last level).
     let onGoToNextLevel: (() -> Void)?
+
+    init(
+        echoedPrompt: String?,
+        topCandidate: TokenCandidate?,
+        isNewRecord: Bool = false,
+        onContinue: @escaping () -> Void,
+        onGoToNextLevel: (() -> Void)?
+    ) {
+        self.echoedPrompt = echoedPrompt
+        self.topCandidate = topCandidate
+        self.isNewRecord = isNewRecord
+        self.onContinue = onContinue
+        self.onGoToNextLevel = onGoToNextLevel
+    }
 
     private var passColor: Color { Color(red: 0.13, green: 0.77, blue: 0.37) }
 
@@ -23,6 +38,18 @@ struct PassCelebrationView: View {
             VStack(spacing: 14) {
                 Text("🏆")
                     .font(.system(size: 64))
+                if isNewRecord {
+                    Text(String(
+                        localized: "level1.passed.newRecord",
+                        defaultValue: "NEW BEST"
+                    ))
+                    .font(.caption.weight(.bold))
+                    .tracking(2)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+                    .background(Capsule().fill(Color.accentColor))
+                    .foregroundStyle(.white)
+                }
                 Text("FIRST CLEAR")
                     .font(.caption.weight(.bold))
                     .tracking(2)
@@ -154,6 +181,7 @@ struct PassCelebrationView: View {
     PassCelebrationView(
         echoedPrompt: "中华人民共和",
         topCandidate: TokenCandidate(id: 1, text: "国", probability: 0.95),
+        isNewRecord: true,
         onContinue: {},
         onGoToNextLevel: {}
     )

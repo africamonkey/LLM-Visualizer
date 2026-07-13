@@ -5,28 +5,46 @@
 import SwiftUI
 
 struct TokenBlocksView: View {
+    enum Style { case standard, compact }
+
     let tokens: [TokenPiece]
+    var style: Style = .standard
 
     var body: some View {
         if tokens.isEmpty {
             EmptyView()
-        } else if tokens.count == 1 {
+        } else if tokens.count == 1 && style == .standard {
             singleBlockExplosion(token: tokens[0])
         } else {
-            HStack(alignment: .center, spacing: 8) {
+            HStack(alignment: .center, spacing: style == .standard ? 8 : 4) {
                 ForEach(tokens) { t in
-                    Text(t.text)
-                        .font(.body.monospaced())
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(blockColor(for: t))
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color.black.opacity(0.06), lineWidth: 0.5)
-                        )
+                    blockTile(for: t)
                 }
             }
+        }
+    }
+
+    @ViewBuilder
+    private func blockTile(for t: TokenPiece) -> some View {
+        switch style {
+        case .standard:
+            Text(t.text)
+                .font(.body.monospaced())
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background(blockColor(for: t))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(Color.black.opacity(0.06), lineWidth: 0.5)
+                )
+        case .compact:
+            Text(t.text)
+                .font(.caption.monospaced())
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(blockColor(for: t))
+                .clipShape(RoundedRectangle(cornerRadius: 6))
         }
     }
 

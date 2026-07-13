@@ -107,11 +107,11 @@ struct PlayingView: View {
 
     private var countersSection: some View {
         HStack(spacing: 12) {
-            counterCell(
+            CounterCell(
                 label: String(localized: "level2.counters.chars", defaultValue: "characters"),
                 value: viewModel.rawText.count
             )
-            counterCell(
+            CounterCell(
                 label: String(localized: "level2.counters.blocks", defaultValue: "blocks"),
                 value: viewModel.tokens.count
             )
@@ -125,23 +125,6 @@ struct PlayingView: View {
                     .transition(.opacity)
             }
         }
-    }
-
-    private func counterCell(label: String, value: Int) -> some View {
-        VStack(spacing: 4) {
-            Text("\(value)")
-                .font(.system(size: 38, weight: .bold, design: .rounded).monospacedDigit())
-                .foregroundStyle(.primary)
-            Text(label)
-                .font(.caption)
-                .foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 12)
-        .background(
-            RoundedRectangle(cornerRadius: 12)
-                .fill(Color(.secondarySystemBackground))
-        )
     }
 
     private var blocksSection: some View {
