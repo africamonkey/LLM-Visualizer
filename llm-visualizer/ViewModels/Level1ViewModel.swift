@@ -26,6 +26,10 @@ final class Level1ViewModel {
     }
     var topCandidates: [TokenCandidate] = []
     var bestSoFar: Double = 0.0
+    /// True when the most recent `submit()` set a new `bestSoFar` record.
+    /// Cleared on `dismissCelebration()`. Drives the "NEW BEST" badge on
+    /// `PassCelebrationView`.
+    private(set) var isNewRecord: Bool = false
     var submitCount: Int = 0
     var state: State = .playing
     var isLoading: Bool = false
@@ -53,8 +57,11 @@ final class Level1ViewModel {
             submitCount += 1
             let maxProb = candidates.map(\.probability).max() ?? 0
             if maxProb > bestSoFar {
+                isNewRecord = true
                 bestSoFar = maxProb
                 progressStore.setBestProbability(1, maxProb)
+            } else {
+                isNewRecord = false
             }
             if let top1 = candidates.first,
                top1.probability > Self.passThreshold {
@@ -71,6 +78,7 @@ final class Level1ViewModel {
     /// unaffected.
     func dismissCelebration() {
         if state == .passed { state = .playing }
+        isNewRecord = false
     }
 
     /// Wait for the in-flight tokenize task to complete. Tests use this to
