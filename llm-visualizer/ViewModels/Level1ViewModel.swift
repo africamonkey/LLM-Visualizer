@@ -18,12 +18,19 @@ final class Level1ViewModel {
     private let progressStore: ProgressStore
     private var autoClearTask: Task<Void, Never>?
 
-    var prompt: String = ""
+    var prompt: String = "" {
+        didSet {
+            guard oldValue != prompt else { return }
+            onPromptChanged()
+        }
+    }
     var topCandidates: [TokenCandidate] = []
     var bestSoFar: Double = 0.0
     var submitCount: Int = 0
     var state: State = .playing
     var isLoading: Bool = false
+    var tokens: [TokenPiece] = []
+    private(set) var tokenizeTask: Task<Void, Never>?
     var errorBanner: String?
 
     init(service: LLMServiceProtocol, progressStore: ProgressStore = .shared) {
@@ -64,6 +71,31 @@ final class Level1ViewModel {
     /// unaffected.
     func dismissCelebration() {
         if state == .passed { state = .playing }
+    }
+
+    /// Wait for the in-flight tokenize task to complete. Tests use this to
+    /// await real-time tokenization deterministically. No-op when no task.
+    func waitForPendingTokenize() async {
+        await tokenizeTask?.value
+    }
+
+    /// Real-time tokenize pipeline: every keystroke cancels any prior task
+    /// and launches a fresh one. Mirrors `Level2ViewModel.onRawTextChanged`.
+    /// Errors surface via `errorBanner` (3s auto-clear, same as submit errors).
+    private func onPromptChanged() {
+        tokenizeTask?.cancel()
+        let text = prompt
+        tokenizeTask = Task { @MainActor [weak self] in
+            guard let self else { return }
+            do {
+                let pieces = try await self.service.tokenize(text)
+                guard !Task.isCancelled else { return }
+                self.tokens = pieces
+            } catch {
+                guard !Task.isCancelled else { return }
+                self.showError(LevelError.humanize(error))
+            }
+        }
     }
 
     /// Whether the *current* top-1 token exceeds the pass threshold.
