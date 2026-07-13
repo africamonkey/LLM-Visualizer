@@ -561,6 +561,74 @@
         }
       }
     },
+    "level1.counter.top1" : {
+      "comment" : "Label for the Top-1 probability counter cell in Level 1's playing view.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "top-1"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "top-1"
+          }
+        }
+      }
+    },
+    "level1.counter.blocks" : {
+      "comment" : "Label for the block count counter cell in Level 1's playing view.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "blocks"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "块"
+          }
+        }
+      }
+    },
+    "level1.statePill" : {
+      "comment" : "Green pill shown in Level 1's playing view when the current submission's Top-1 exceeds the pass threshold.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "✨ passed"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "✨ 通过"
+          }
+        }
+      }
+    },
+    "level1.passed.newRecord" : {
+      "comment" : "Badge shown on Level 1's PassCelebrationView when the current submission set a new bestProbability record.",
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "NEW BEST"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "新纪录"
+          }
+        }
+      }
+    },
     "level2.challengeIntro.body" : {
       "comment" : "",
       "localizations" : {
