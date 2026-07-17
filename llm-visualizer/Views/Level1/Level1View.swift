@@ -46,11 +46,6 @@ struct Level1View: View {
                     .transition(.opacity)
             }
             inputSection
-            if !viewModel.tokens.isEmpty {
-                TokenBlocksView(tokens: viewModel.tokens, style: .compact)
-                    .padding(.vertical, 4)
-                    .transition(.opacity)
-            }
             if viewModel.topCandidates.isEmpty {
                 EmptyStateView(
                     message: String(
@@ -65,10 +60,6 @@ struct Level1View: View {
                     CounterCell(
                         label: String(localized: "level1.counter.top1", defaultValue: "top-1"),
                         value: Int((viewModel.topCandidates.first?.probability ?? 0) * 100)
-                    )
-                    CounterCell(
-                        label: String(localized: "level1.counter.blocks", defaultValue: "blocks"),
-                        value: viewModel.tokens.count
                     )
                 }
                 .padding(.horizontal, 16)
@@ -103,7 +94,6 @@ struct Level1View: View {
             }
         }
         .animation(.easeInOut(duration: 0.2), value: viewModel.errorBanner)
-        .animation(.easeInOut(duration: 0.2), value: viewModel.tokens)
         .background(Color(.systemGroupedBackground).ignoresSafeArea())
         .onChange(of: viewModel.state) { _, newValue in
             if newValue == .passed {
